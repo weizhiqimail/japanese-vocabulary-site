@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Category = "BJT" | "N1" | "BJT-外来语";
-type View = "home" | "learn" | "quiz" | "errors" | "mastered" | "words";
+type View = "home" | "learn" | "quiz" | "errors" | "mastered" | "words" | "articles";
 type Mode = "reading" | "word" | "meaning";
 type Word = {
   id: number;
@@ -21,6 +23,13 @@ type Question = {
   prompt: string;
   answer: string;
   options: string[];
+};
+type Article = {
+  id: number;
+  title: string;
+  content: string;
+  sortOrder: number;
+  categories: string[];
 };
 
 const categories: Category[] = ["BJT", "N1", "BJT-外来语"];
@@ -85,6 +94,7 @@ export default function Home() {
   const [selected, setSelected] = useState<string | null>(null);
   const [wrongIds, setWrongIds] = useState<Set<number>>(new Set());
   const [quizComplete, setQuizComplete] = useState(false);
+  const [questionLeaving, setQuestionLeaving] = useState(false);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
@@ -94,6 +104,9 @@ export default function Home() {
   const [editing, setEditing] = useState(emptyForm);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(false);
+  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
 
   const loadCategory = useCallback(async () => {
     setLoading(true);
@@ -128,6 +141,18 @@ export default function Home() {
   useEffect(() => { void loadCategory(); }, [loadCategory]);
   useEffect(() => { if (view === "words") void loadList(); }, [view, loadList]);
   useEffect(() => {
+    if (view !== "articles" || articles.length) return;
+    setArticlesLoading(true);
+    fetch("/api/articles?category=BJT")
+      .then((response) => response.json())
+      .then((data) => {
+        const items = data.items ?? [];
+        setArticles(items);
+        setSelectedArticleId(items[0]?.id ?? null);
+      })
+      .finally(() => setArticlesLoading(false));
+  }, [view, articles.length]);
+  useEffect(() => {
     const studiedIds = new Set([...mastered, ...errors].map((item) => item.id));
     const pool = words.filter((item) => !studiedIds.has(item.id));
     setCurrentGroup(shuffle(pool).slice(0, groupSize));
@@ -140,6 +165,7 @@ export default function Home() {
   const pendingCount = words.filter((item) => !studiedIds.has(item.id)).length;
   const currentQuestion = questions[questionIndex];
   const pageCount = Math.max(1, Math.ceil(total / 20));
+  const selectedArticle = articles.find((article) => article.id === selectedArticleId);
 
   function changeView(next: View) {
     setView(next);
@@ -187,6 +213,7 @@ export default function Home() {
     setSelected(null);
     setWrongIds(new Set());
     setQuizComplete(false);
+    setQuestionLeaving(false);
     setView("quiz");
   }
 
@@ -200,8 +227,11 @@ export default function Home() {
 
   async function nextQuestion() {
     if (questionIndex < questions.length - 1) {
+      setQuestionLeaving(true);
+      await new Promise((resolve) => window.setTimeout(resolve, 180));
       setQuestionIndex((index) => index + 1);
       setSelected(null);
+      setQuestionLeaving(false);
       return;
     }
     const wrong = new Set(wrongIds);
@@ -260,7 +290,7 @@ export default function Home() {
         <nav aria-label="主导航">
           {([
             ["home", "首页"], ["learn", "学习"], ["errors", "错题本"],
-            ["mastered", "背诵本"], ["words", "词库"],
+            ["mastered", "背诵本"], ["words", "词库"], ["articles", "文章"],
           ] as [View, string][]).map(([target, label]) => (
             <button key={target} className={view === target ? "active" : ""} onClick={() => changeView(target)}>{label}</button>
           ))}
@@ -327,7 +357,7 @@ export default function Home() {
               <>
                 <div className="quizTop"><button className="textButton" onClick={() => changeView("learn")}>← 退出测试</button><span>{questionIndex + 1} / {questions.length}</span></div>
                 <div className="progressBar"><i style={{ width: `${((questionIndex + 1) / questions.length) * 100}%` }} /></div>
-                <div className="quizCard" key={questionIndex}>
+                <div className={`quizCard ${questionLeaving ? "leaving" : ""}`} key={questionIndex}>
                   <span className="modeBadge">{currentQuestion.mode === "reading" ? "选择假名" : currentQuestion.mode === "word" ? "选择日语" : "选择翻译"}</span>
                   <div className={`question ${currentQuestion.mode === "word" ? "meaningPrompt" : ""}`}>{currentQuestion.prompt}</div>
                   <div className="options">
@@ -406,6 +436,46 @@ export default function Home() {
               <span>第 {page} / {pageCount} 页 · 共 {total} 条</span>
               <button className="ghost" disabled={page >= pageCount} onClick={() => setPage((value) => value + 1)}>下一页</button>
             </div>
+          </section>
+        )}
+
+        {view === "articles" && (
+          <section className="content articlePage">
+            <div className="sectionHead">
+              <div>
+                <span className="eyebrow">KNOWLEDGE · BJT</span>
+                <h2>文章与知识总结</h2>
+                <p>按模块整理的固定知识、商务表达与业务流程。</p>
+              </div>
+            </div>
+            {articlesLoading ? (
+              <div className="articleLoading"><span className="spinner" /><b>文章加载中</b></div>
+            ) : (
+              <div className="articleLayout">
+                <aside className="articleNav">
+                  <span>文章分类</span>
+                  <b>BJT</b>
+                  {articles.map((article) => (
+                    <button
+                      key={article.id}
+                      className={article.id === selectedArticleId ? "active" : ""}
+                      onClick={() => setSelectedArticleId(article.id)}
+                    >
+                      {article.title}
+                    </button>
+                  ))}
+                </aside>
+                {selectedArticle && (
+                  <article className="articleReader" key={selectedArticle.id}>
+                    <div className="articleTags">
+                      {selectedArticle.categories.map((tag) => <span key={tag}>{tag}</span>)}
+                    </div>
+                    <h1>{selectedArticle.title}</h1>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{selectedArticle.content}</ReactMarkdown>
+                  </article>
+                )}
+              </div>
+            )}
           </section>
         )}
       </div>
