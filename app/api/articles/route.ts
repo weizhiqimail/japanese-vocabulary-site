@@ -8,11 +8,12 @@ export async function GET(request: Request) {
   try {
     const [rows] = await db.query(
       `SELECT a.id, a.title, a.content, a.sort_order AS sortOrder,
-              GROUP_CONCAT(ac_all.category ORDER BY ac_all.category SEPARATOR '|||') AS categoryList
+              GROUP_CONCAT(c_all.name ORDER BY c_all.sort_order SEPARATOR '|||') AS categoryList
        FROM articles a
-       JOIN article_categories ac_filter
-         ON ac_filter.article_id = a.id AND ac_filter.category = ?
-       JOIN article_categories ac_all ON ac_all.article_id = a.id
+       JOIN article_category_links acl_filter ON acl_filter.article_id = a.id
+       JOIN categories c_filter ON c_filter.id = acl_filter.category_id AND c_filter.name = ?
+       JOIN article_category_links acl_all ON acl_all.article_id = a.id
+       JOIN categories c_all ON c_all.id = acl_all.category_id
        GROUP BY a.id, a.title, a.content, a.sort_order
        ORDER BY a.sort_order, a.id`,
       [category],

@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const category = url.searchParams.get("category") || "BJT";
   const status = url.searchParams.get("status");
   const db = await getDb();
-  const clauses = ["p.user_key = ?", "v.category = ?"];
+  const clauses = ["p.user_key = ?", "c.name = ?"];
   const params: unknown[] = [getUserKey(request), category];
   if (status === "mastered" || status === "error") {
     clauses.push("p.status = ?");
@@ -17,7 +17,10 @@ export async function GET(request: Request) {
             v.part_of_speech AS partOfSpeech, v.familiarity, p.status
      FROM learning_progress p
      JOIN vocabulary v ON v.id = p.vocabulary_id
+     JOIN vocabulary_category_links vcl ON vcl.vocabulary_id = v.id
+     JOIN categories c ON c.id = vcl.category_id
      WHERE ${clauses.join(" AND ")}
+     GROUP BY v.id, v.category, v.word, v.reading, v.meaning, v.part_of_speech, v.familiarity, p.status, p.updated_at
      ORDER BY p.updated_at DESC`,
     params,
   );

@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-type Category = "BJT" | "N1" | "BJT-外来语";
-type View = "home" | "learn" | "quiz" | "errors" | "mastered" | "words" | "articles";
+type Category = string;
+type View = "home" | "learn" | "quiz" | "errors" | "mastered" | "words" | "articles" | "settings";
 type Mode = "reading" | "word" | "meaning";
 type Word = {
   id: number;
@@ -15,6 +15,7 @@ type Word = {
   meaning: string;
   partOfSpeech: string;
   familiarity: string;
+  categories: string[];
   status?: "mastered" | "error";
 };
 type Question = {
@@ -31,8 +32,15 @@ type Article = {
   sortOrder: number;
   categories: string[];
 };
+type CategoryConfig = {
+  id: number;
+  name: string;
+  scope: "vocabulary" | "article" | "both";
+  purpose: "study" | "topic";
+  sortOrder: number;
+  enabled: number | boolean;
+};
 
-const categories: Category[] = ["BJT", "N1", "BJT-外来语"];
 const emptyForm = {
   id: 0,
   word: "",
@@ -40,6 +48,15 @@ const emptyForm = {
   meaning: "",
   partOfSpeech: "",
   familiarity: "",
+  categories: ["BJT"],
+};
+const emptyCategoryForm: CategoryConfig = {
+  id: 0,
+  name: "",
+  scope: "vocabulary",
+  purpose: "study",
+  sortOrder: 0,
+  enabled: true,
 };
 
 function shuffle<T>(items: T[]) {
@@ -107,6 +124,21 @@ export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryConfig[]>([]);
+  const [categoryEditing, setCategoryEditing] = useState<CategoryConfig>(emptyCategoryForm);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const studyCategories = categoryOptions.filter(
+    (item) => Boolean(item.enabled) && item.purpose === "study" && (item.scope === "vocabulary" || item.scope === "both"),
+  );
+  const vocabularyCategories = categoryOptions.filter(
+    (item) => Boolean(item.enabled) && (item.scope === "vocabulary" || item.scope === "both"),
+  );
+
+  const loadCategories = useCallback(async () => {
+    const response = await fetch("/api/categories");
+    const data = await response.json();
+    setCategoryOptions(data.items ?? []);
+  }, []);
 
   const loadCategory = useCallback(async () => {
     setLoading(true);
@@ -139,6 +171,11 @@ export default function Home() {
   }, [category, page, search]);
 
   useEffect(() => { void loadCategory(); }, [loadCategory]);
+  useEffect(() => { void loadCategories(); }, [loadCategories]);
+  useEffect(() => {
+    if (!studyCategories.length || studyCategories.some((item) => item.name === category)) return;
+    setCategory(studyCategories[0].name);
+  }, [studyCategories, category]);
   useEffect(() => { if (view === "words") void loadList(); }, [view, loadList]);
   useEffect(() => {
     if (view !== "articles" || articles.length) return;
@@ -189,13 +226,13 @@ export default function Home() {
     return (
       <div className="categoryPicker" aria-label="选择词汇分类">
         <span>词汇分类</span>
-        {categories.map((item) => (
+        {studyCategories.map((item) => (
           <button
-            key={item}
-            className={category === item ? "active" : ""}
-            onClick={() => selectCategory(item)}
+            key={item.id}
+            className={category === item.name ? "active" : ""}
+            onClick={() => selectCategory(item.name)}
           >
-            {item}
+            {item.name}
           </button>
         ))}
       </div>
@@ -254,7 +291,7 @@ export default function Home() {
 
   async function saveWord(event: React.FormEvent) {
     event.preventDefault();
-    const payload = { ...editing, category };
+    const payload = editing;
     const response = await fetch(
       editing.id ? `/api/vocabulary/${editing.id}` : "/api/vocabulary",
       {
@@ -274,6 +311,27 @@ export default function Home() {
     await Promise.all([loadList(), loadCategory()]);
   }
 
+  async function saveCategory(event: React.FormEvent) {
+    event.preventDefault();
+    const response = await fetch(
+      categoryEditing.id ? `/api/categories/${categoryEditing.id}` : "/api/categories",
+      {
+        method: categoryEditing.id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoryEditing),
+      },
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      setMessage(data.error ?? "类别保存失败");
+      return;
+    }
+    setCategoryDialogOpen(false);
+    setCategoryEditing(emptyCategoryForm);
+    setMessage("类别已保存");
+    await loadCategories();
+  }
+
   async function deleteWord(item: Word) {
     if (!window.confirm(`确定删除「${item.word}」吗？`)) return;
     await fetch(`/api/vocabulary/${item.id}`, { method: "DELETE" });
@@ -290,7 +348,7 @@ export default function Home() {
         <nav aria-label="主导航">
           {([
             ["home", "首页"], ["learn", "学习"], ["errors", "错题本"],
-            ["mastered", "背诵本"], ["words", "词库"], ["articles", "文章"],
+            ["mastered", "背诵本"], ["words", "词库"], ["articles", "文章"], ["settings", "配置"],
           ] as [View, string][]).map(([target, label]) => (
             <button key={target} className={view === target ? "active" : ""} onClick={() => changeView(target)}>{label}</button>
           ))}
@@ -404,11 +462,11 @@ export default function Home() {
             <CategoryPicker />
             <div className="sectionHead">
               <div><span className="eyebrow">DATABASE · {category}</span><h2>词库管理</h2><p>在线查看、搜索、新增、编辑和删除词汇。</p></div>
-              <button className="primary" onClick={() => { setEditing(emptyForm); setDialogOpen(true); }}>＋ 新增单词</button>
+              <button className="primary" onClick={() => { setEditing({ ...emptyForm, categories: [category] }); setDialogOpen(true); }}>＋ 新增单词</button>
             </div>
             <form className="searchBar" onSubmit={(event) => { event.preventDefault(); setPage(1); setSearch(searchInput.trim()); }}>
               <select value={category} onChange={(event) => selectCategory(event.target.value as Category)} aria-label="查询分类">
-                {categories.map((item) => <option key={item}>{item}</option>)}
+                {vocabularyCategories.map((item) => <option key={item.id}>{item.name}</option>)}
               </select>
               <input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="模糊查询日语、假名或翻译" aria-label="搜索词汇" />
               <button className="primary">查询</button>
@@ -416,11 +474,12 @@ export default function Home() {
             <div className={`tableWrap ${listLoading ? "isLoading" : ""}`} aria-busy={listLoading}>
               {listLoading && <div className="loadingOverlay"><span className="spinner" /><b>加载中</b></div>}
               <table>
-                <thead><tr><th>日语</th><th>假名</th><th>翻译</th><th>词性</th><th>操作</th></tr></thead>
+                <thead><tr><th>日语</th><th>假名</th><th>翻译</th><th>标签</th><th>操作</th></tr></thead>
                 <tbody>
                   {listItems.map((item) => (
                     <tr key={item.id}>
-                      <td><b>{item.word}</b></td><td>{item.reading}</td><td>{item.meaning}</td><td>{item.partOfSpeech || "—"}</td>
+                      <td><b>{item.word}</b></td><td>{item.reading}</td><td>{item.meaning}</td>
+                      <td><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
                       <td className="rowActions">
                         <button onClick={() => { setEditing({ ...item }); setDialogOpen(true); }}>编辑</button>
                         <button className="danger" onClick={() => void deleteWord(item)}>删除</button>
@@ -478,6 +537,41 @@ export default function Home() {
             )}
           </section>
         )}
+
+        {view === "settings" && (
+          <section className="content settingsPage">
+            <div className="sectionHead">
+              <div><span className="eyebrow">SETTINGS</span><h2>配置</h2><p>管理系统中可复用的标签与用途。</p></div>
+            </div>
+            <div className="settingsLayout">
+              <aside className="settingsNav"><button className="active">类别</button></aside>
+              <div className="settingsPanel">
+                <div className="panelHead">
+                  <div><h3>类别</h3><p>类别可用于词汇、文章或两者；学习类标签会出现在背词分类中。</p></div>
+                  <button className="primary" onClick={() => { setCategoryEditing(emptyCategoryForm); setCategoryDialogOpen(true); }}>＋ 新增类别</button>
+                </div>
+                <div className="tableWrap">
+                  <table>
+                    <thead><tr><th>名称</th><th>适用对象</th><th>用途</th><th>状态</th><th>排序</th><th>操作</th></tr></thead>
+                    <tbody>
+                      {categoryOptions.map((item) => (
+                        <tr key={item.id}>
+                          <td><b>{item.name}</b></td>
+                          <td>{item.scope === "both" ? "词汇与文章" : item.scope === "vocabulary" ? "词汇" : "文章"}</td>
+                          <td>{item.purpose === "study" ? "学习分类" : "内容主题"}</td>
+                          <td>{item.enabled ? "启用" : "停用"}</td>
+                          <td>{item.sortOrder}</td>
+                          <td className="rowActions"><button onClick={() => { setCategoryEditing(item); setCategoryDialogOpen(true); }}>编辑</button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="configNote">类别用于历史数据关联，因此不提供删除操作；不再使用时可将其停用。</p>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
 
       {dialogOpen && (
@@ -487,11 +581,54 @@ export default function Home() {
             <label>日语<input required value={editing.word} onChange={(event) => setEditing({ ...editing, word: event.target.value })} /></label>
             <label>假名<input required value={editing.reading} onChange={(event) => setEditing({ ...editing, reading: event.target.value })} /></label>
             <label>翻译<textarea required value={editing.meaning} onChange={(event) => setEditing({ ...editing, meaning: event.target.value })} /></label>
+            <fieldset className="tagSelector">
+              <legend>所属类别（可多选）</legend>
+              {vocabularyCategories.map((item) => (
+                <label key={item.id}>
+                  <input
+                    type="checkbox"
+                    checked={editing.categories.includes(item.name)}
+                    onChange={() => setEditing({
+                      ...editing,
+                      categories: editing.categories.includes(item.name)
+                        ? editing.categories.filter((name) => name !== item.name)
+                        : [...editing.categories, item.name],
+                    })}
+                  />
+                  {item.name}
+                </label>
+              ))}
+            </fieldset>
             <div className="formRow">
               <label>词性<input value={editing.partOfSpeech} onChange={(event) => setEditing({ ...editing, partOfSpeech: event.target.value })} /></label>
               <label>熟悉度<input value={editing.familiarity} onChange={(event) => setEditing({ ...editing, familiarity: event.target.value })} /></label>
             </div>
-            <button className="primary">保存到 {category}</button>
+            <button className="primary">保存单词</button>
+          </form>
+        </div>
+      )}
+      {categoryDialogOpen && (
+        <div className="modalBackdrop" role="presentation" onMouseDown={() => setCategoryDialogOpen(false)}>
+          <form className="modal" onSubmit={saveCategory} onMouseDown={(event) => event.stopPropagation()}>
+            <div className="modalHead"><h2>{categoryEditing.id ? "编辑类别" : "新增类别"}</h2><button type="button" onClick={() => setCategoryDialogOpen(false)}>×</button></div>
+            <label>类别名称<input required value={categoryEditing.name} onChange={(event) => setCategoryEditing({ ...categoryEditing, name: event.target.value })} /></label>
+            <div className="formRow">
+              <label>适用对象
+                <select value={categoryEditing.scope} onChange={(event) => setCategoryEditing({ ...categoryEditing, scope: event.target.value as CategoryConfig["scope"] })}>
+                  <option value="vocabulary">词汇</option><option value="article">文章</option><option value="both">词汇与文章</option>
+                </select>
+              </label>
+              <label>用途
+                <select value={categoryEditing.purpose} onChange={(event) => setCategoryEditing({ ...categoryEditing, purpose: event.target.value as CategoryConfig["purpose"] })}>
+                  <option value="study">学习分类</option><option value="topic">内容主题</option>
+                </select>
+              </label>
+            </div>
+            <div className="formRow">
+              <label>排序<input type="number" min="0" value={categoryEditing.sortOrder} onChange={(event) => setCategoryEditing({ ...categoryEditing, sortOrder: Number(event.target.value) })} /></label>
+              <label className="checkLine"><input type="checkbox" checked={Boolean(categoryEditing.enabled)} onChange={(event) => setCategoryEditing({ ...categoryEditing, enabled: event.target.checked })} />启用</label>
+            </div>
+            <button className="primary">保存类别</button>
           </form>
         </div>
       )}
