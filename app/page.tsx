@@ -90,6 +90,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [listItems, setListItems] = useState<Word[]>([]);
+  const [listLoading, setListLoading] = useState(false);
   const [editing, setEditing] = useState(emptyForm);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -111,23 +112,32 @@ export default function Home() {
   }, [category]);
 
   const loadList = useCallback(async () => {
-    const response = await fetch(
-      `/api/vocabulary?category=${encodeURIComponent(category)}&page=${page}&pageSize=20&search=${encodeURIComponent(search)}`,
-    );
-    const data = await response.json();
-    setListItems(data.items ?? []);
-    setTotal(data.total ?? 0);
+    setListLoading(true);
+    try {
+      const response = await fetch(
+        `/api/vocabulary?category=${encodeURIComponent(category)}&page=${page}&pageSize=20&search=${encodeURIComponent(search.trim())}`,
+      );
+      const data = await response.json();
+      setListItems(data.items ?? []);
+      setTotal(data.total ?? 0);
+    } finally {
+      setListLoading(false);
+    }
   }, [category, page, search]);
 
   useEffect(() => { void loadCategory(); }, [loadCategory]);
   useEffect(() => { if (view === "words") void loadList(); }, [view, loadList]);
   useEffect(() => {
-    const masteredIds = new Set(mastered.map((item) => item.id));
-    const pool = words.filter((item) => !masteredIds.has(item.id));
+    const studiedIds = new Set([...mastered, ...errors].map((item) => item.id));
+    const pool = words.filter((item) => !studiedIds.has(item.id));
     setCurrentGroup(shuffle(pool).slice(0, groupSize));
-  }, [words, mastered, groupSize]);
+  }, [words, mastered, errors, groupSize]);
 
-  const pendingCount = words.length - mastered.length;
+  const studiedIds = useMemo(
+    () => new Set([...mastered, ...errors].map((item) => item.id)),
+    [mastered, errors],
+  );
+  const pendingCount = words.filter((item) => !studiedIds.has(item.id)).length;
   const currentQuestion = questions[questionIndex];
   const pageCount = Math.max(1, Math.ceil(total / 20));
 
@@ -136,18 +146,33 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function changeCategory(next: Category) {
+  function selectCategory(next: Category) {
     setCategory(next);
     setPage(1);
     setSearch("");
     setSearchInput("");
-    setView("home");
   }
 
   function refreshGroup() {
-    const masteredIds = new Set(mastered.map((item) => item.id));
     setCurrentGroup(
-      shuffle(words.filter((item) => !masteredIds.has(item.id))).slice(0, groupSize),
+      shuffle(words.filter((item) => !studiedIds.has(item.id))).slice(0, groupSize),
+    );
+  }
+
+  function CategoryPicker() {
+    return (
+      <div className="categoryPicker" aria-label="选择词汇分类">
+        <span>词汇分类</span>
+        {categories.map((item) => (
+          <button
+            key={item}
+            className={category === item ? "active" : ""}
+            onClick={() => selectCategory(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
     );
   }
 
@@ -240,16 +265,14 @@ export default function Home() {
             <button key={target} className={view === target ? "active" : ""} onClick={() => changeView(target)}>{label}</button>
           ))}
         </nav>
-        <select className="categorySelect" value={category} onChange={(event) => changeCategory(event.target.value as Category)} aria-label="词汇分类">
-          {categories.map((item) => <option key={item}>{item}</option>)}
-        </select>
       </header>
 
       <div key={`${view}-${category}`} className="pageFade">
         {view === "home" && (
           <section className="hero">
+            <CategoryPicker />
             <div className="eyebrow">{category} · 在线词库 · {words.length} 词</div>
-            <h1>今天，也记住<br /><em>一点点。</em></h1>
+            <h1>日本語言葉勉強</h1>
             <p>词汇与学习记录已连接在线数据库。每组随机检测假名、日语与中文释义，随时继续上次的进度。</p>
             <button className="primary" onClick={() => changeView("learn")}>开始今天的学习 <span>→</span></button>
             <div className="stats">
@@ -263,10 +286,13 @@ export default function Home() {
 
         {view === "learn" && (
           <section className="content">
+            <CategoryPicker />
             <div className="sectionHead">
               <div><span className="eyebrow">RANDOM LEARN · {category}</span><h2>随机学习一组</h2></div>
               <label>每组
-                <input type="number" min="4" max="100" value={groupSize} onChange={(event) => setGroupSize(Math.max(4, Math.min(100, Number(event.target.value) || 10)))} />
+                <select value={groupSize} onChange={(event) => setGroupSize(Number(event.target.value))}>
+                  {[10, 20, 30, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+                </select>
                 词
               </label>
             </div>
@@ -329,6 +355,7 @@ export default function Home() {
 
         {(view === "errors" || view === "mastered") && (
           <section className="content">
+            <CategoryPicker />
             <div className="sectionHead">
               <div><span className="eyebrow">{view === "errors" ? "REVIEW" : "MASTERED"} · {category}</span><h2>{view === "errors" ? "错题本" : "背诵本"}</h2></div>
               {view === "errors" && errors.length > 0 && <button className="primary" onClick={() => startQuiz(errors)}>复习全部 <span>→</span></button>}
@@ -344,15 +371,20 @@ export default function Home() {
 
         {view === "words" && (
           <section className="content wordsPage">
+            <CategoryPicker />
             <div className="sectionHead">
               <div><span className="eyebrow">DATABASE · {category}</span><h2>词库管理</h2><p>在线查看、搜索、新增、编辑和删除词汇。</p></div>
               <button className="primary" onClick={() => { setEditing(emptyForm); setDialogOpen(true); }}>＋ 新增单词</button>
             </div>
-            <form className="searchBar" onSubmit={(event) => { event.preventDefault(); setPage(1); setSearch(searchInput); }}>
+            <form className="searchBar" onSubmit={(event) => { event.preventDefault(); setPage(1); setSearch(searchInput.trim()); }}>
+              <select value={category} onChange={(event) => selectCategory(event.target.value as Category)} aria-label="查询分类">
+                {categories.map((item) => <option key={item}>{item}</option>)}
+              </select>
               <input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="模糊查询日语、假名或翻译" aria-label="搜索词汇" />
               <button className="primary">查询</button>
             </form>
-            <div className="tableWrap">
+            <div className={`tableWrap ${listLoading ? "isLoading" : ""}`} aria-busy={listLoading}>
+              {listLoading && <div className="loadingOverlay"><span className="spinner" /><b>加载中</b></div>}
               <table>
                 <thead><tr><th>日语</th><th>假名</th><th>翻译</th><th>词性</th><th>操作</th></tr></thead>
                 <tbody>
