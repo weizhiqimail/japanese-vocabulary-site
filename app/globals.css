@@ -178,6 +178,7 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .content, .quizWrap { max-width: 1120px; margin: 0 auto; padding: 64px 28px 90px; }
 .sectionHead { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 34px; }
 .sectionHead h2 { font-size: clamp(36px, 5vw, 58px); line-height: 1.1; font-weight: 800; margin: 10px 0 0; }
+.compactLearnHead h2 { font-size: clamp(28px, 3.2vw, 42px); }
 .sectionHead p { color: var(--muted); margin: 12px 0 0; }
 .sectionHead label { display: flex; align-items: center; gap: 10px; color: var(--muted); }
 .sectionHead select { width: 82px; padding: 9px; border: 1px solid var(--line); background: var(--card); border-radius: 6px; }
@@ -230,6 +231,16 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .wordCard .reading { color: var(--green); font-size: 13px; margin-top: 5px; }
 .wordCard p { color: var(--muted); margin: 18px 0 0; line-height: 1.55; }
 .wordCard .concealed { color: #b8bbb3; letter-spacing: .18em; user-select: none; }
+.compactWordGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.compactWordGrid .wordCard {
+  min-height: 112px;
+  padding: 17px 42px 16px 48px;
+}
+.compactWordGrid .wordCard .number { left: 15px; top: 20px; }
+.compactWordGrid .wordCard > .favoriteButton { right: 10px; top: 10px; }
+.compactWordGrid .wordCard h3 { font-size: 21px; line-height: 1.3; }
+.compactWordGrid .wordCard .reading { margin-top: 3px; }
+.compactWordGrid .wordCard p { margin-top: 10px; font-size: 13px; line-height: 1.45; }
 .actions { display: flex; justify-content: center; gap: 12px; margin-top: 34px; }
 .ghost { border: 1px solid var(--green); color: var(--green); background: transparent; padding: 13px 18px; border-radius: 8px; font-weight: 700; }
 .empty { text-align: center; color: var(--muted); padding: 70px 20px; border: 1px dashed #c9ccc1; margin-top: 20px; }
@@ -350,7 +361,23 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 }
 .reviewFilters .compact { padding: 9px 12px; }
 .groupNote { margin: -7px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-.reviewList article { grid-template-columns: 1fr 1.6fr auto; }
+.reviewList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  border-top: 0;
+}
+.reviewList article {
+  position: relative;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.25fr) auto;
+  gap: 12px;
+  padding: 14px 8px 14px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #faf9f4;
+}
+.reviewList h3 { font-size: 19px; }
+.reviewList p { font-size: 13px; line-height: 1.45; }
 .inlineFavorite { align-self: center; }
 .reset { display: block; margin: 50px auto 0; border: 0; background: none; color: #9a6b63; font-size: 12px; text-decoration: underline; }
 
@@ -484,17 +511,29 @@ tbody tr:hover { background: #faf9f3; }
 }
 .tagSelector input, .checkLine input { width: auto; }
 .checkLine { align-content: center; grid-template-columns: auto 1fr !important; align-items: center; }
-.toast {
+.notificationStack {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
+  top: 94px;
+  right: 18px;
   z-index: 60;
-  border: 0;
+  width: min(330px, calc(100vw - 36px));
+  display: grid;
+  gap: 8px;
+  pointer-events: none;
+}
+.notificationItem {
   border-radius: 8px;
-  padding: 12px 18px;
+  padding: 11px 15px;
   color: white;
   background: var(--green);
   box-shadow: 0 12px 32px rgba(0,0,0,.18);
+  font-size: 13px;
+  font-weight: 700;
+  animation: notificationIn .18s ease both;
+}
+@keyframes notificationIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .articleLoading {
@@ -607,6 +646,7 @@ tbody tr:hover { background: #faf9f3; }
   .visibilityBar { flex-wrap: wrap; gap: 11px 16px; }
   .visibilityBar .textButton { margin-left: 0; }
   .wordGrid, .options { grid-template-columns: 1fr; }
+  .compactWordGrid { grid-template-columns: 1fr; }
   .wordCard { padding-left: 62px; }
   .actions { flex-wrap: wrap; }
   .list article { grid-template-columns: 1fr; gap: 9px; }
@@ -625,6 +665,7 @@ tbody tr:hover { background: #faf9f3; }
     grid-template-columns: 1fr;
     padding-right: 44px;
   }
+  .reviewList { grid-template-columns: 1fr; }
   .reviewList .inlineFavorite { position: absolute; right: 4px; top: 15px; }
   .formRow { grid-template-columns: 1fr; }
   .searchBar { flex-wrap: wrap; }
@@ -680,6 +721,7 @@ tbody tr:hover { background: #faf9f3; }
   .settingsNav button { text-align: center; }
   .panelHead { flex-direction: column; }
   .settingsPanel { padding: 17px; }
+  .notificationStack { top: 82px; right: 12px; width: min(310px, calc(100vw - 24px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

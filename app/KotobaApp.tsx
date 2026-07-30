@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Notifications, { type NotificationMessage } from "./components/Notifications";
 
 type View = "home" | "learn" | "quiz" | "review" | "words" | "articles" | "management";
 type Mode = "reading" | "word" | "meaning";
@@ -160,7 +161,8 @@ export default function KotobaApp() {
   const [listVisibility, setListVisibility] = useState({ word: true, reading: true, meaning: true });
   const [editing, setEditing] = useState(emptyForm);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
+  const notificationSequence = useRef(0);
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
@@ -184,6 +186,16 @@ export default function KotobaApp() {
     (item) => Boolean(item.enabled) && item.purpose === "development" && (item.scope === "article" || item.scope === "both"),
   ) ?? null;
   const defaultFavoriteGroup = favoriteGroups.find((group) => Boolean(group.isDefault)) ?? null;
+
+  const dismissNotification = useCallback((id: number) => {
+    setNotifications((items) => items.filter((item) => item.id !== id));
+  }, []);
+
+  function setMessage(text: string) {
+    if (!text) return;
+    notificationSequence.current += 1;
+    setNotifications((items) => [...items, { id: notificationSequence.current, text }]);
+  }
 
   const loadCategories = useCallback(async () => {
     const response = await fetch("/api/categories");
@@ -532,7 +544,7 @@ export default function KotobaApp() {
         {view === "learn" && (
           <section className="content">
             <div className="sectionHead">
-              <div><span className="eyebrow">RANDOM LEARN · {selectedCategory?.name ?? "—"}</span><h2>随机学习一组</h2></div>
+              <div className="compactLearnHead"><span className="eyebrow">RANDOM LEARN · {selectedCategory?.name ?? "—"}</span><h2>学习单词</h2></div>
               <div className="pageFilters">
                 <label>词汇分类
                   <select value={categoryId ?? ""} onChange={(event) => selectCategory(Number(event.target.value))}>
@@ -554,7 +566,7 @@ export default function KotobaApp() {
               ))}
               <button className="textButton" onClick={refreshGroup}>换一组 ↻</button>
             </div>
-            <div className="wordGrid">
+            <div className="wordGrid compactWordGrid">
               {currentGroup.map((item, index) => (
                 <article className="wordCard" key={item.id}>
                   <span className="number">{String(index + 1).padStart(2, "0")}</span>
@@ -960,7 +972,7 @@ export default function KotobaApp() {
           </form>
         </div>
       )}
-      {message && <button className="toast" onClick={() => setMessage("")}>{message}</button>}
+      <Notifications items={notifications} onDismiss={dismissNotification} />
     </main>
   );
 }
