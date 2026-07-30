@@ -222,6 +222,11 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 }
 .wordCard .number { position: absolute; left: 22px; top: 29px; color: #a2a69d; font: 12px monospace; }
 .favoriteButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   border: 0;
   background: transparent;
   color: #989d92;
@@ -249,6 +254,7 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .compactWordGrid .wordCard .reading { margin-top: 3px; }
 .compactWordGrid .wordCard p { margin-top: 10px; font-size: 13px; line-height: 1.45; }
 .memoryField, .tableMemoryField {
+  display: block;
   width: 100%;
   min-width: 0;
   padding: 0;
@@ -257,7 +263,7 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   color: inherit;
   text-align: left;
 }
-.memoryField:disabled, .tableMemoryField:disabled { cursor: default; opacity: 1; }
+.memoryCard .memoryField, .wordsPage .tableMemoryField[role="button"] { cursor: pointer; }
 .wordMemoryField { font-size: 21px; line-height: 1.3; font-weight: 800; }
 .readingMemoryField { min-height: 18px; margin-top: 3px; }
 .meaningMemoryField {
@@ -459,6 +465,12 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 table { width: 100%; border-collapse: collapse; min-width: 780px; }
+.vocabularyTable { table-layout: fixed; }
+.vocabularyTable .wordColumn { width: 27%; }
+.vocabularyTable .readingColumn { width: 17%; }
+.vocabularyTable .meaningColumn { width: 39%; }
+.vocabularyTable .tagColumn { width: 9%; }
+.vocabularyTable .actionColumn { width: 8%; }
 th, td { text-align: left; padding: 15px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { color: var(--muted); background: #ecece4; font-size: 12px; letter-spacing: .05em; }
 td { font-size: 14px; line-height: 1.55; }
@@ -472,8 +484,10 @@ tbody tr:hover { background: #faf9f3; }
 .listVisibilityBar { margin-bottom: 12px; }
 .tableConcealed { color: #b8bbb3 !important; letter-spacing: .16em; user-select: none; }
 .wordCell { position: relative; }
+.wordCellMain { display: flex; align-items: flex-start; gap: 7px; min-width: 0; }
+.wordCellMain .tableMemoryField { flex: 0 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .tableFavorite {
-  margin-left: 8px;
+  margin-left: 0;
   vertical-align: middle;
   color: #989d92 !important;
   letter-spacing: normal;
@@ -490,6 +504,18 @@ tbody tr:hover { background: #faf9f3; }
   color: var(--green);
   font-weight: 800;
 }
+.pageJump { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.pageJump input {
+  width: 68px;
+  padding: 8px 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--card);
+  color: var(--green);
+  text-align: center;
+  font-weight: 800;
+}
+.pageJump .ghost { padding: 8px 11px; }
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -741,6 +767,7 @@ tbody tr:hover { background: #faf9f3; }
   .wordsPage .tableWrap { overflow: visible; border: 0; background: transparent; }
   .wordsPage .tableWrap.isLoading table { opacity: .25; }
   .wordsPage table { min-width: 0; }
+  .wordsPage colgroup { display: none; }
   .wordsPage thead { display: none; }
   .wordsPage tbody { display: grid; gap: 10px; }
   .wordsPage tbody tr {
@@ -778,6 +805,7 @@ tbody tr:hover { background: #faf9f3; }
   .wordsPage .pagination { flex-wrap: wrap; gap: 10px 12px; }
   .wordsPage .pagination > span { flex: 1 0 100%; text-align: center; order: -2; }
   .wordsPage .pageSizePicker { order: -1; }
+  .wordsPage .pageJump { order: 1; }
   .wordsPage .pagination .ghost { padding: 10px 14px; }
   .articleLayout { grid-template-columns: 1fr; }
   .articleNav { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }

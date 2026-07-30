@@ -29,6 +29,8 @@
 13. 词汇导入不得只识别单个单词：固定搭配、短语和完整句子都必须进入候选。使用 `scripts/audit-and-import-vocabulary.mjs` 先审计、后事务导入、再反向核验。
 14. 来源导入顺序为 BJT 后 N1；只有审计结果 `missingCount=0` 且 `needsCategoryCount=0` 才能报告完成。
 15. 不得把 BJT 外来语括号统一当作假名；`アポ（イント）` 等表示可选后缀，必须保留完整词面。N1 必须保留第七列补充说明。
+16. 在线 MySQL 是 1 GB 内存的测试实例；批量重建每批最多写入 30 条，禁止一次提交数百或数千行参数。
+17. 词汇类别关联必须保存 `sort_order`、`source_file`、`source_line`；查询按类别内来源顺序返回。固定搭配或句子没有可靠读音时 `reading` 使用 `NULL`，测试跳过假名题。
 
 ## 开发工作流
 
@@ -55,4 +57,4 @@
 - 收藏操作默认进入用户设置的默认收藏组，并在通知中显示收藏组名称。
 - 页面隐藏项与默记模式的行为应在学习页和词库页保持一致。
 - 项目原始数据来源目录为 `files/vocabulary/`；网站运行时数据仍以在线 MySQL 为准。
-- 词汇导入命令为 `npm run vocabulary:audit:bjt`、`vocabulary:import:bjt`、`vocabulary:audit:n1`、`vocabulary:import:n1`；审计输出位于 `work/vocabulary-import-audit/`。
+- 词汇导入命令为 `npm run vocabulary:audit:bjt`、`vocabulary:import:bjt`、`vocabulary:audit:n1`、`vocabulary:import:n1`；完整重建先运行 `npm run vocabulary:preview:rebuild`，确认后运行 `npm run vocabulary:rebuild`，最后执行 `node --env-file=.env scripts/verify-vocabulary-rebuild.mjs`。审计输出位于 `work/vocabulary-import-audit/`。

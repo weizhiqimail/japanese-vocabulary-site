@@ -29,7 +29,7 @@ export async function GET(request: Request) {
        JOIN categories c_all ON c_all.id = vcl_all.category_id
        WHERE 1 = 1 ${searchSql}
        GROUP BY v.id, v.word, v.reading, v.meaning, v.part_of_speech, v.familiarity
-       ORDER BY v.id LIMIT ? OFFSET ?`,
+       ORDER BY MIN(vcl_filter.sort_order), v.id LIMIT ? OFFSET ?`,
       [...params, pageSize, offset],
     );
     const [countRows] = await db.query(
@@ -64,8 +64,8 @@ export async function POST(request: Request) {
   const word = String(body.word || "").trim();
   const reading = String(body.reading || "").trim();
   const meaning = String(body.meaning || "").trim();
-  if (!categoryIds.length || !word || !reading || !meaning) {
-    return NextResponse.json({ error: "至少选择一个类别，并填写单词、假名和翻译" }, { status: 400 });
+  if (!categoryIds.length || !word || !meaning) {
+    return NextResponse.json({ error: "至少选择一个类别，并填写单词和翻译" }, { status: 400 });
   }
   const db = await getDb();
   await db.beginTransaction();
@@ -83,13 +83,18 @@ export async function POST(request: Request) {
       `INSERT INTO vocabulary
        (word, reading, meaning, part_of_speech, familiarity)
        VALUES (?, ?, ?, ?, ?)`,
-      [word, reading, meaning, String(body.partOfSpeech || "").trim(), String(body.familiarity || "").trim()],
+      [word, reading || null, meaning, String(body.partOfSpeech || "").trim(), String(body.familiarity || "").trim()],
     );
     const vocabularyId = Number((result as { insertId: number }).insertId);
     for (const category of categoryRows as Array<{ id: number }>) {
+      const [orderRows] = await db.query(
+        "SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM vocabulary_category_links WHERE category_id = ?",
+        [category.id],
+      );
+      const nextOrder = Number((orderRows as Array<{ nextOrder: number }>)[0].nextOrder);
       await db.execute(
-        "INSERT INTO vocabulary_category_links (vocabulary_id, category_id) VALUES (?, ?)",
-        [vocabularyId, category.id],
+        "INSERT INTO vocabulary_category_links (vocabulary_id, category_id, sort_order) VALUES (?, ?, ?)",
+        [vocabularyId, category.id, nextOrder],
       );
     }
     await db.commit();

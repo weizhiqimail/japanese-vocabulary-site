@@ -57,10 +57,10 @@ erDiagram
 ```sql
 CREATE TABLE "vocabulary" (
   "id" bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '词汇唯一ID',
-  "word" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '日语词汇',
-  "reading" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '词汇假名读音',
-  "meaning" text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '中文翻译或释义',
-  "part_of_speech" varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '词性',
+  "word" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '日语词汇、固定搭配或完整句子',
+  "reading" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '假名读音；固定搭配或完整句子可为空',
+  "meaning" text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '中文释义',
+  "part_of_speech" varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '词性或条目类型',
   "familiarity" varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '熟悉程度或原始数据标记',
   "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间',
@@ -92,8 +92,11 @@ CREATE TABLE "categories" (
 
 ```sql
 CREATE TABLE "vocabulary_category_links" (
-  "vocabulary_id" bigint unsigned NOT NULL COMMENT '词汇ID',
-  "category_id" bigint unsigned NOT NULL COMMENT '类别ID',
+  "vocabulary_id" bigint unsigned NOT NULL COMMENT '关联 vocabulary.id',
+  "category_id" bigint unsigned NOT NULL COMMENT '关联 categories.id',
+  "sort_order" int unsigned NOT NULL COMMENT '词汇在该类别内的来源顺序',
+  "source_file" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '词汇来源文件名',
+  "source_line" int unsigned DEFAULT NULL COMMENT '词汇在来源文件中的行号',
   "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '关联创建时间',
   PRIMARY KEY ("vocabulary_id","category_id"),
   KEY "vocabulary_category_links_category_idx" ("category_id"),
@@ -102,7 +105,7 @@ CREATE TABLE "vocabulary_category_links" (
 );
 ```
 
-复合主键防止一个词汇重复关联同一类别。
+复合主键防止一个词汇重复关联同一类别；`sort_order` 独立保存每个类别的来源顺序，因此同一词汇可以在 BJT 与 N1 中处于不同位置。
 
 ### 4.4 learning_progress
 

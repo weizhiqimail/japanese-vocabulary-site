@@ -15,7 +15,10 @@
     "vocabulary:audit:bjt": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs audit-bjt",
     "vocabulary:import:bjt": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-bjt",
     "vocabulary:audit:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs audit-n1",
-    "vocabulary:import:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-n1"
+    "vocabulary:import:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-n1",
+    "vocabulary:preview:rebuild": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs preview-rebuild",
+    "vocabulary:rebuild": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs rebuild",
+    "docs:sync:project": "node --env-file=.env scripts/sync-project-document.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

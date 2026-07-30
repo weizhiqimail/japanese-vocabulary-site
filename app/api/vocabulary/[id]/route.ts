@@ -8,8 +8,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   const word = String(body.word || "").trim();
   const reading = String(body.reading || "").trim();
   const meaning = String(body.meaning || "").trim();
-  if (!categoryIds.length || !word || !reading || !meaning) {
-    return NextResponse.json({ error: "至少选择一个类别，并填写单词、假名和翻译" }, { status: 400 });
+  if (!categoryIds.length || !word || !meaning) {
+    return NextResponse.json({ error: "至少选择一个类别，并填写单词和翻译" }, { status: 400 });
   }
   const db = await getDb();
   await db.beginTransaction();
@@ -24,13 +24,32 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     await db.execute(
       `UPDATE vocabulary SET word = ?, reading = ?, meaning = ?,
        part_of_speech = ?, familiarity = ? WHERE id = ?`,
-      [word, reading, meaning, String(body.partOfSpeech || "").trim(), String(body.familiarity || "").trim(), id],
+      [word, reading || null, meaning, String(body.partOfSpeech || "").trim(), String(body.familiarity || "").trim(), id],
+    );
+    const [existingLinks] = await db.query(
+      "SELECT category_id AS categoryId, sort_order AS sortOrder, source_file AS sourceFile, source_line AS sourceLine FROM vocabulary_category_links WHERE vocabulary_id = ?",
+      [id],
+    );
+    const existingByCategory = new Map(
+      (existingLinks as Array<{ categoryId: number; sortOrder: number; sourceFile: string | null; sourceLine: number | null }>)
+        .map((link) => [Number(link.categoryId), link]),
     );
     await db.execute("DELETE FROM vocabulary_category_links WHERE vocabulary_id = ?", [id]);
     for (const category of categoryRows as Array<{ id: number }>) {
+      const existing = existingByCategory.get(Number(category.id));
+      let sortOrder = existing?.sortOrder;
+      if (sortOrder === undefined) {
+        const [orderRows] = await db.query(
+          "SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM vocabulary_category_links WHERE category_id = ?",
+          [category.id],
+        );
+        sortOrder = Number((orderRows as Array<{ nextOrder: number }>)[0].nextOrder);
+      }
       await db.execute(
-        "INSERT INTO vocabulary_category_links (vocabulary_id, category_id) VALUES (?, ?)",
-        [id, category.id],
+        `INSERT INTO vocabulary_category_links
+          (vocabulary_id, category_id, sort_order, source_file, source_line)
+         VALUES (?, ?, ?, ?, ?)`,
+        [id, category.id, sortOrder, existing?.sourceFile ?? null, existing?.sourceLine ?? null],
       );
     }
     await db.commit();

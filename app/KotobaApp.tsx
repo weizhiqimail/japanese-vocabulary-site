@@ -21,7 +21,7 @@ type FavoriteGroup = {
 type Word = {
   id: number;
   word: string;
-  reading: string;
+  reading: string | null;
   meaning: string;
   partOfSpeech: string;
   familiarity: string;
@@ -116,25 +116,28 @@ function createQuestions(items: Word[], pool: Word[]) {
   const modes: Mode[] = ["reading", "word", "meaning"];
   return shuffle(
     modes.flatMap((mode) =>
-      shuffle(items).map((item) => {
+      shuffle(items).filter((item) => mode !== "reading" || Boolean(item.reading)).map((item) => {
         const field = mode === "reading" ? "reading" : mode === "word" ? "word" : "meaning";
-        const seen = new Set([item[field]]);
+        const answer = item[field];
+        if (!answer) return null;
+        const seen = new Set([answer]);
         const distractors = shuffle(pool.filter((candidate) => candidate.id !== item.id))
           .filter((candidate) => {
-            if (seen.has(candidate[field])) return false;
-            seen.add(candidate[field]);
+            const value = candidate[field];
+            if (!value || seen.has(value)) return false;
+            seen.add(value);
             return true;
           })
           .slice(0, 3)
-          .map((candidate) => candidate[field]);
+          .map((candidate) => candidate[field] as string);
         return {
           item,
           mode,
           prompt: mode === "word" ? item.meaning : item.word,
-          answer: item[field],
-          options: shuffle([item[field], ...distractors]),
+          answer,
+          options: shuffle([answer, ...distractors]),
         };
-      }),
+      }).filter((question): question is Question => question !== null),
     ),
   );
 }
@@ -174,6 +177,7 @@ export default function KotobaApp() {
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [pageJump, setPageJump] = useState("1");
   const [total, setTotal] = useState(0);
   const [listItems, setListItems] = useState<Word[]>([]);
   const [listLoading, setListLoading] = useState(false);
@@ -356,7 +360,9 @@ export default function KotobaApp() {
   }
 
   function changeListPage(nextPage: number) {
-    setPage(nextPage);
+    const target = Math.min(pageCount, Math.max(1, nextPage));
+    setPage(target);
+    setPageJump(String(target));
     window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -635,27 +641,30 @@ export default function KotobaApp() {
                   >
                     {favoriteIds.has(item.id) ? "★" : "☆"}
                   </button>
-                  <button
+                  <span
                     className={`memoryField wordMemoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
-                    disabled={!memoryMode}
-                    onClick={() => toggleMemoryField(item.id, "word", setMemoryToggles)}
+                    role={memoryMode ? "button" : undefined}
+                    tabIndex={memoryMode ? 0 : undefined}
+                    onClick={() => memoryMode && toggleMemoryField(item.id, "word", setMemoryToggles)}
                   >
                     {fieldVisible("word") ? item.word : memoryMode ? "点击显示日语" : ""}
-                  </button>
-                  <button
+                  </span>
+                  {item.reading && <span
                     className={`memoryField reading readingMemoryField ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
-                    disabled={!memoryMode}
-                    onClick={() => toggleMemoryField(item.id, "reading", setMemoryToggles)}
+                    role={memoryMode ? "button" : undefined}
+                    tabIndex={memoryMode ? 0 : undefined}
+                    onClick={() => memoryMode && toggleMemoryField(item.id, "reading", setMemoryToggles)}
                   >
                     {fieldVisible("reading") ? item.reading : memoryMode ? "点击显示假名" : ""}
-                  </button>
-                  <button
+                  </span>}
+                  <span
                     className={`memoryField meaningMemoryField ${!fieldVisible("meaning") ? "memoryHidden" : ""}`}
-                    disabled={!memoryMode}
-                    onClick={() => toggleMemoryField(item.id, "meaning", setMemoryToggles)}
+                    role={memoryMode ? "button" : undefined}
+                    tabIndex={memoryMode ? 0 : undefined}
+                    onClick={() => memoryMode && toggleMemoryField(item.id, "meaning", setMemoryToggles)}
                   >
                     {fieldVisible("meaning") ? item.meaning : memoryMode ? "点击显示翻译" : ""}
-                  </button>
+                  </span>
                 </article>
               )})}
             </div>
@@ -832,7 +841,8 @@ export default function KotobaApp() {
             </div>
             <div className={`tableWrap ${listLoading ? "isLoading" : ""}`} aria-busy={listLoading}>
               {listLoading && <div className="loadingOverlay"><span className="spinner" /><b>加载中</b></div>}
-              <table>
+              <table className="vocabularyTable">
+                <colgroup><col className="wordColumn" /><col className="readingColumn" /><col className="meaningColumn" /><col className="tagColumn" /><col className="actionColumn" /></colgroup>
                 <thead><tr><th>日语</th><th>假名</th><th>翻译</th><th>标签</th><th>操作</th></tr></thead>
                 <tbody>
                   {listItems.map((item) => {
@@ -842,38 +852,43 @@ export default function KotobaApp() {
                     return (
                     <tr key={item.id}>
                       <td className={`wordCell ${!fieldVisible("word") ? "tableConcealed" : ""}`}>
-                        <button
-                          className={`tableMemoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
-                          disabled={!listMemoryMode}
-                          onClick={() => toggleMemoryField(item.id, "word", setListMemoryToggles)}
-                        >
-                          <b>{fieldVisible("word") ? item.word : listMemoryMode ? "点击显示日语" : ""}</b>
-                        </button>
-                        <button
-                          className={`favoriteButton tableFavorite ${favoriteIds.has(item.id) ? "active" : ""}`}
-                          onClick={() => void toggleFavorite(item)}
-                          aria-label={favoriteIds.has(item.id) ? `取消收藏 ${item.word}` : `收藏 ${item.word}`}
-                        >
-                          {favoriteIds.has(item.id) ? "★" : "☆"}
-                        </button>
+                        <div className="wordCellMain">
+                          <span
+                            className={`tableMemoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
+                            role={listMemoryMode ? "button" : undefined}
+                            tabIndex={listMemoryMode ? 0 : undefined}
+                            onClick={() => listMemoryMode && toggleMemoryField(item.id, "word", setListMemoryToggles)}
+                          >
+                            <b>{fieldVisible("word") ? item.word : listMemoryMode ? "点击显示日语" : ""}</b>
+                          </span>
+                          <button
+                            className={`favoriteButton tableFavorite ${favoriteIds.has(item.id) ? "active" : ""}`}
+                            onClick={() => void toggleFavorite(item)}
+                            aria-label={favoriteIds.has(item.id) ? `取消收藏 ${item.word}` : `收藏 ${item.word}`}
+                          >
+                            {favoriteIds.has(item.id) ? "★" : "☆"}
+                          </button>
+                        </div>
                       </td>
                       <td className={`readingCell ${!fieldVisible("reading") ? "tableConcealed" : ""}`}>
-                        <button
+                        {item.reading && <span
                           className={`tableMemoryField ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
-                          disabled={!listMemoryMode}
-                          onClick={() => toggleMemoryField(item.id, "reading", setListMemoryToggles)}
+                          role={listMemoryMode ? "button" : undefined}
+                          tabIndex={listMemoryMode ? 0 : undefined}
+                          onClick={() => listMemoryMode && toggleMemoryField(item.id, "reading", setListMemoryToggles)}
                         >
                           {fieldVisible("reading") ? item.reading : listMemoryMode ? "点击显示假名" : ""}
-                        </button>
+                        </span>}
                       </td>
                       <td className={`meaningCell ${!fieldVisible("meaning") ? "tableConcealed" : ""}`}>
-                        <button
+                        <span
                           className={`tableMemoryField ${!fieldVisible("meaning") ? "memoryHidden" : ""}`}
-                          disabled={!listMemoryMode}
-                          onClick={() => toggleMemoryField(item.id, "meaning", setListMemoryToggles)}
+                          role={listMemoryMode ? "button" : undefined}
+                          tabIndex={listMemoryMode ? 0 : undefined}
+                          onClick={() => listMemoryMode && toggleMemoryField(item.id, "meaning", setListMemoryToggles)}
                         >
                           {fieldVisible("meaning") ? item.meaning : listMemoryMode ? "点击显示翻译" : ""}
-                        </button>
+                        </span>
                       </td>
                       <td className="tagCell"><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
                       <td className="rowActions actionCell">
@@ -902,6 +917,17 @@ export default function KotobaApp() {
                   {[20, 30, 40, 50].map((size) => <option key={size} value={size}>{size} 条</option>)}
                 </select>
               </label>
+              <form
+                className="pageJump"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  changeListPage(Number(pageJump) || 1);
+                }}
+              >
+                <label htmlFor="page-jump-input">跳至</label>
+                <input id="page-jump-input" type="number" min="1" max={pageCount} value={pageJump} onChange={(event) => setPageJump(event.target.value)} />
+                <button className="ghost" type="submit">跳转</button>
+              </form>
               <button className="ghost" disabled={page >= pageCount} onClick={() => changeListPage(page + 1)}>下一页</button>
             </div>
           </section>
