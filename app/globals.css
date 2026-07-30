@@ -524,9 +524,10 @@ tbody tr:hover { background: #faf9f3; }
 .notificationItem {
   border-radius: 8px;
   padding: 11px 15px;
-  color: white;
-  background: var(--green);
-  box-shadow: 0 12px 32px rgba(0,0,0,.18);
+  color: #174c3b;
+  background: #dff3e5;
+  border: 1px solid #b9ddc5;
+  box-shadow: 0 10px 26px rgba(22,75,60,.12);
   font-size: 13px;
   font-weight: 700;
   animation: notificationIn .18s ease both;

@@ -141,7 +141,7 @@ export default function KotobaApp() {
   const [favoriteGroupDialogOpen, setFavoriteGroupDialogOpen] = useState(false);
   const [favoriteGroupEditing, setFavoriteGroupEditing] = useState({ id: 0, name: "", note: "", isDefault: false });
   const [loading, setLoading] = useState(true);
-  const [groupSize, setGroupSize] = useState(10);
+  const [groupSize, setGroupSize] = useState(30);
   const [currentGroup, setCurrentGroup] = useState<Word[]>([]);
   const [visibility, setVisibility] = useState({ word: true, reading: true, meaning: true });
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -471,6 +471,9 @@ export default function KotobaApp() {
   async function toggleFavorite(item: Word, groupId = 0) {
     const isReviewGroup = groupId > 0;
     const favorite = !(isReviewGroup ? reviewFavoriteIds : favoriteIds).has(item.id);
+    const groupName = isReviewGroup
+      ? favoriteGroups.find((group) => group.id === groupId)?.name ?? "当前收藏组"
+      : defaultFavoriteGroup?.name ?? "默认收藏组";
     if (isReviewGroup) {
       setReviewFavorites((current) => favorite ? [item, ...current.filter((word) => word.id !== item.id)] : current.filter((word) => word.id !== item.id));
     } else {
@@ -487,7 +490,7 @@ export default function KotobaApp() {
       return;
     }
     await loadFavoriteGroups();
-    setMessage(favorite ? "已收藏到默认组" : "已取消收藏");
+    setMessage(favorite ? `已收藏到「${groupName}」` : `已从「${groupName}」取消收藏`);
   }
 
   async function saveFavoriteGroup(event: React.FormEvent) {
