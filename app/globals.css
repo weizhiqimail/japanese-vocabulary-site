@@ -640,6 +640,8 @@ tbody tr:hover { background: #faf9f3; }
   gap: 6px;
   min-width: 0;
 }
+.wordCellText { display: contents; }
+.mobileReading, .mobileTags { display: none; }
 .wordCellMain .tableMemoryField {
   width: auto;
   flex: 0 1 auto;
@@ -966,10 +968,7 @@ tbody tr:hover { background: #faf9f3; }
   .wordsPage tbody { display: grid; gap: 10px; }
   .wordsPage tbody tr {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    column-gap: 12px;
-    row-gap: 7px;
+    display: block;
     padding: 15px 16px;
     border: 1px solid var(--line);
     border-radius: 9px;
@@ -992,24 +991,63 @@ tbody tr:hover { background: #faf9f3; }
     min-width: 0;
   }
   .wordsPage .wordCell { font-size: 18px; line-height: 1.4; }
-  .wordsPage .wordCellMain { padding-right: 38px; }
-  .wordsPage .tableFavorite {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
+  .wordsPage .wordCellMain {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
   }
-  .wordsPage .readingCell {
-    align-self: center;
+  .wordsPage .wordCellText {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 3px 10px;
+  }
+  .wordsPage .wordCellText .tableMemoryField {
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+  .wordsPage .mobileReading {
+    display: inline;
     color: var(--green);
     font-size: 13px;
-    overflow-wrap: anywhere;
+    line-height: 1.45;
   }
+  .wordsPage .tableFavorite {
+    position: static;
+    flex: 0 0 auto;
+    align-self: flex-start;
+    margin: -4px -5px 0 0;
+  }
+  .wordsPage .readingCell { display: none; }
   .wordsPage .meaningCell {
-    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 7px 10px;
+    margin-top: 9px;
     color: var(--muted);
     line-height: 1.6;
     overflow-wrap: anywhere;
+  }
+  .wordsPage .meaningCell > .tableMemoryField { flex: 1 1 220px; }
+  .wordsPage .mobileTags {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .wordsPage .mobileTags span {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #e7ecdf;
+    color: var(--green);
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: nowrap;
   }
   .wordsPage .tagCell, .wordsPage .actionCell { display: none; }
   .wordsPage .loadingOverlay { position: fixed; inset: 0; }

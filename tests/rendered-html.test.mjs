@@ -55,4 +55,8 @@ test("keeps shared interactions local, responsive, and duplicate-safe", async ()
   assert.match(app, /const apiFetch = useCallback/);
   assert.match(app, /submitLocks\.current\.word/);
   assert.match(app, /className="globalRequestLoading"/);
+  assert.match(app, /className="wordCellText"/);
+  assert.match(app, /className="mobileTags"/);
+  assert.match(css, /\.wordsPage \.wordCellMain \{[\s\S]*justify-content:\s*space-between/);
+  assert.match(css, /\.wordsPage \.readingCell \{ display:\s*none; \}/);
 });

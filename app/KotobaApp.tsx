@@ -887,16 +887,28 @@ export default function KotobaApp() {
                     );
                     return (
                     <tr key={item.id} data-vocabulary-lookup="true">
-                      <td className={`wordCell ${!fieldVisible("word") ? "tableConcealed" : ""}`}>
+                      <td className="wordCell">
                         <div className="wordCellMain">
-                          <span
-                            className={`tableMemoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
-                            role={listMemoryMode ? "button" : undefined}
-                            tabIndex={listMemoryMode ? 0 : undefined}
-                            onClick={() => listMemoryMode && toggleMemoryField(item.id, "word", setListMemoryToggles)}
-                          >
-                            <b>{fieldVisible("word") ? item.word : listMemoryMode ? "点击显示日语" : ""}</b>
-                          </span>
+                          <div className="wordCellText">
+                            <span
+                              className={`tableMemoryField ${!fieldVisible("word") ? "memoryHidden tableConcealed" : ""}`}
+                              role={listMemoryMode ? "button" : undefined}
+                              tabIndex={listMemoryMode ? 0 : undefined}
+                              onClick={() => listMemoryMode && toggleMemoryField(item.id, "word", setListMemoryToggles)}
+                            >
+                              <b>{fieldVisible("word") ? item.word : listMemoryMode ? "点击显示日语" : ""}</b>
+                            </span>
+                            {item.reading && (
+                              <span
+                                className={`mobileReading ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
+                                role={listMemoryMode ? "button" : undefined}
+                                tabIndex={listMemoryMode ? 0 : undefined}
+                                onClick={() => listMemoryMode && toggleMemoryField(item.id, "reading", setListMemoryToggles)}
+                              >
+                                {fieldVisible("reading") ? item.reading : listMemoryMode ? "点击显示假名" : ""}
+                              </span>
+                            )}
+                          </div>
                           <button
                             className={`favoriteButton tableFavorite ${favoriteIds.has(item.id) ? "active" : ""}`}
                             onClick={() => void toggleFavorite(item)}
@@ -906,9 +918,9 @@ export default function KotobaApp() {
                           </button>
                         </div>
                       </td>
-                      <td className={`readingCell ${!fieldVisible("reading") ? "tableConcealed" : ""}`}>
+                      <td className="readingCell">
                         {item.reading && <span
-                          className={`tableMemoryField ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
+                          className={`tableMemoryField ${!fieldVisible("reading") ? "memoryHidden tableConcealed" : ""}`}
                           role={listMemoryMode ? "button" : undefined}
                           tabIndex={listMemoryMode ? 0 : undefined}
                           onClick={() => listMemoryMode && toggleMemoryField(item.id, "reading", setListMemoryToggles)}
@@ -916,15 +928,18 @@ export default function KotobaApp() {
                           {fieldVisible("reading") ? item.reading : listMemoryMode ? "点击显示假名" : ""}
                         </span>}
                       </td>
-                      <td className={`meaningCell ${!fieldVisible("meaning") ? "tableConcealed" : ""}`}>
+                      <td className="meaningCell">
                         <span
-                          className={`tableMemoryField ${!fieldVisible("meaning") ? "memoryHidden" : ""}`}
+                          className={`tableMemoryField ${!fieldVisible("meaning") ? "memoryHidden tableConcealed" : ""}`}
                           role={listMemoryMode ? "button" : undefined}
                           tabIndex={listMemoryMode ? 0 : undefined}
                           onClick={() => listMemoryMode && toggleMemoryField(item.id, "meaning", setListMemoryToggles)}
                         >
                           {fieldVisible("meaning") ? item.meaning : listMemoryMode ? "点击显示翻译" : ""}
                         </span>
+                        <div className="mobileTags">
+                          {item.categories.map((tag) => <span key={tag}>{tag}</span>)}
+                        </div>
                       </td>
                       <td className="tagCell"><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
                       <td className="rowActions actionCell">
