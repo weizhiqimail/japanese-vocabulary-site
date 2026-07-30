@@ -31,7 +31,8 @@ test("server-renders the vocabulary application and local GitHub corner", async 
   const html = await response.text();
   assert.match(html, /<title>日本語言葉勉強｜日语词汇学习<\/title>/);
   assert.match(html, /<h1>日本語言葉勉強<\/h1>/);
-  assert.match(html, /当前版本：<!-- -->22<!-- -->，构建时间：/);
+  assert.match(html, /当前版本：<!-- -->23/);
+  assert.match(html, /构建时间：/);
   assert.match(html, /class="buildInfo"/);
   assert.match(html, /class="githubCorner"/);
   assert.match(html, /href="https:\/\/github\.com\/weizhiqimail\/japanese-vocabulary-site"/);
@@ -59,6 +60,11 @@ test("keeps shared interactions local, responsive, and duplicate-safe", async ()
   assert.match(app, /className="globalRequestLoading"/);
   assert.match(app, /className="wordCellText"/);
   assert.match(app, /className="mobileTags"/);
+  assert.match(app, /useSearchParams/);
+  assert.match(app, /pageNum/);
+  assert.match(app, /pageSize/);
+  assert.match(app, /className="mobileNav"/);
+  assert.match(app, /className="mobileMenuPanel"/);
   assert.match(css, /\.wordsPage \.wordCellMain \{[\s\S]*justify-content:\s*space-between/);
   assert.match(css, /\.wordsPage \.readingCell \{ display:\s*none; \}/);
 });

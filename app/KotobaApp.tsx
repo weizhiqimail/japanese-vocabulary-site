@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { BUILD_INFO } from "./build-info";
@@ -132,6 +132,8 @@ function createQuestions(items: Word[], pool: Word[]) {
 export default function KotobaApp() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryKey = searchParams.toString();
   const [view, setView] = useState<View>(() => viewFromPath(pathname));
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [words, setWords] = useState<Word[]>([]);
@@ -144,6 +146,8 @@ export default function KotobaApp() {
   const [reviewMastered, setReviewMastered] = useState<Word[]>([]);
   const [reviewFavorites, setReviewFavorites] = useState<Word[]>([]);
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewPage, setReviewPage] = useState(1);
+  const [reviewPageSize, setReviewPageSize] = useState(30);
   const [favoriteGroups, setFavoriteGroups] = useState<FavoriteGroup[]>([]);
   const [selectedFavoriteGroupId, setSelectedFavoriteGroupId] = useState(0);
   const [favoriteGroupDialogOpen, setFavoriteGroupDialogOpen] = useState(false);
@@ -186,6 +190,7 @@ export default function KotobaApp() {
   const [savingWord, setSavingWord] = useState(false);
   const [savingCategory, setSavingCategory] = useState(false);
   const [savingFavoriteGroup, setSavingFavoriteGroup] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const submitLocks = useRef({ word: false, category: false, favoriteGroup: false });
   const studyCategories = categoryOptions.filter(
     (item) => Boolean(item.enabled) && item.purpose === "study" && (item.scope === "vocabulary" || item.scope === "both"),
@@ -208,6 +213,16 @@ export default function KotobaApp() {
     notificationSequence.current += 1;
     setNotifications((items) => [...items, { id: notificationSequence.current, text }]);
   }
+
+  const updateQuery = useCallback((values: Record<string, number | string | null>) => {
+    const next = new URLSearchParams(searchParams.toString());
+    Object.entries(values).forEach(([key, value]) => {
+      if (value === null || value === "" || value === 0) next.delete(key);
+      else next.set(key, String(value));
+    });
+    const query = next.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams]);
 
   const apiFetch = useCallback(async (...args: Parameters<typeof fetch>) => {
     setActiveRequests((count) => count + 1);
@@ -271,6 +286,27 @@ export default function KotobaApp() {
   useEffect(() => { void loadCategory(); }, [loadCategory]);
   useEffect(() => { void loadCategories(); }, [loadCategories]);
   useEffect(() => { void loadFavoriteGroups(); }, [loadFavoriteGroups]);
+  useEffect(() => {
+    const categoryParam = Number(searchParams.get("categoryId"));
+    const pageParam = Math.max(1, Number(searchParams.get("pageNum")) || 1);
+    const sizeParam = Number(searchParams.get("pageSize"));
+    const groupParam = Number(searchParams.get("groupId"));
+    const allowedSize = [10, 20, 30, 40, 50, 100].includes(sizeParam) ? sizeParam : 30;
+    if (view === "learn") {
+      if (categoryParam > 0) setCategoryId(categoryParam);
+      setGroupSize(allowedSize);
+    } else if (view === "review") {
+      setReviewCategoryId(categoryParam > 0 ? categoryParam : 0);
+      if (groupParam > 0) setSelectedFavoriteGroupId(groupParam);
+      setReviewPage(pageParam);
+      setReviewPageSize(allowedSize);
+    } else if (view === "words") {
+      if (categoryParam > 0) setCategoryId(categoryParam);
+      setPage(pageParam);
+      setPageJump(String(pageParam));
+      setPageSize(allowedSize);
+    }
+  }, [queryKey, view]);
   useEffect(() => {
     if (!defaultFavoriteGroup) return;
     apiFetch(`/api/favorites?categoryId=0&groupId=${defaultFavoriteGroup.id}`)
@@ -348,11 +384,32 @@ export default function KotobaApp() {
   const pendingCount = words.filter((item) => !studiedIds.has(item.id)).length;
   const currentQuestion = questions[questionIndex];
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const reviewAllItems = reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites;
+  const reviewPageCount = Math.max(1, Math.ceil(reviewAllItems.length / reviewPageSize));
+  const reviewVisibleItems = reviewAllItems.slice((reviewPage - 1) * reviewPageSize, reviewPage * reviewPageSize);
   const selectedArticle = articles.find((article) => article.id === selectedArticleId);
+
+  useEffect(() => {
+    if (reviewPage <= reviewPageCount) return;
+    setReviewPage(reviewPageCount);
+    updateQuery({ pageNum: reviewPageCount });
+  }, [reviewPage, reviewPageCount, updateQuery]);
 
   function changeView(next: View) {
     setView(next);
-    router.push(viewPaths[next]);
+    setMobileNavOpen(false);
+    const params = new URLSearchParams();
+    if (next === "learn" || next === "words") {
+      if (categoryId) params.set("categoryId", String(categoryId));
+      params.set("pageNum", "1");
+      params.set("pageSize", String(next === "learn" ? groupSize : pageSize));
+    } else if (next === "review") {
+      if (reviewCategoryId) params.set("categoryId", String(reviewCategoryId));
+      params.set("pageNum", String(reviewPage));
+      params.set("pageSize", String(reviewPageSize));
+    }
+    const query = params.toString();
+    router.push(`${viewPaths[next]}${query ? `?${query}` : ""}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -360,6 +417,7 @@ export default function KotobaApp() {
     const target = Math.min(pageCount, Math.max(1, nextPage));
     setPage(target);
     setPageJump(String(target));
+    updateQuery({ pageNum: target });
     window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -370,6 +428,13 @@ export default function KotobaApp() {
     setPage(1);
     setSearch("");
     setSearchInput("");
+    updateQuery({ categoryId: nextId, pageNum: 1 });
+  }
+
+  function changeReviewPage(nextPage: number) {
+    const target = Math.min(reviewPageCount, Math.max(1, nextPage));
+    setReviewPage(target);
+    updateQuery({ pageNum: target });
   }
 
   function refreshGroup() {
@@ -585,11 +650,12 @@ export default function KotobaApp() {
           <span className="brandText">
             <span className="brandName">ことば帳</span>
             <small className="buildInfo">
-              当前版本：{BUILD_INFO.version}，构建时间：{BUILD_INFO.builtAt}
+              <span>当前版本：{BUILD_INFO.version}</span>
+              <span>构建时间：{BUILD_INFO.builtAt}</span>
             </small>
           </span>
         </button>
-        <nav aria-label="主导航">
+        <nav className="desktopNav" aria-label="主导航">
           {([
             ["home", "首页"], ["learn", "学习"], ["review", "复习"],
             ["words", "词库"], ["articles", "文章"], ["management", "管理"],
@@ -597,7 +663,42 @@ export default function KotobaApp() {
             <button key={target} className={view === target ? "active" : ""} onClick={() => changeView(target)}>{label}</button>
           ))}
         </nav>
+        <nav className="mobileNav" aria-label="手机主导航">
+          <button className={view === "home" ? "active" : ""} onClick={() => changeView("home")}>首页</button>
+          <button className={view === "learn" ? "active" : ""} onClick={() => changeView("learn")}>学习</button>
+          <button
+            className={`mobileMenuTrigger ${mobileNavOpen ? "active" : ""}`}
+            onClick={() => setMobileNavOpen((open) => !open)}
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-navigation-menu"
+          >
+            <span className="menuIcon" aria-hidden="true"><i /><i /><i /></span>
+            导航
+          </button>
+        </nav>
       </header>
+      {mobileNavOpen && (
+        <div className="mobileMenuBackdrop" onClick={() => setMobileNavOpen(false)}>
+          <div id="mobile-navigation-menu" className="mobileMenuPanel" onClick={(event) => event.stopPropagation()}>
+            {([
+              ["review", "复习"], ["words", "词库"], ["articles", "文章"], ["management", "管理"],
+            ] as [View, string][]).map(([target, label]) => (
+              <button key={target} className={view === target ? "active" : ""} onClick={() => changeView(target)}>
+                <span>{label}</span><span aria-hidden="true">→</span>
+              </button>
+            ))}
+            <a
+              className="mobileGithubLink"
+              href="https://github.com/weizhiqimail/japanese-vocabulary-site"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span><img src="/icons/github/github.png" alt="" /> japanese-vocabulary-site</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      )}
 
       <div key={`${view}-${categoryId ?? "loading"}`} className="pageFade">
         {view === "home" && (
@@ -627,7 +728,11 @@ export default function KotobaApp() {
                   </select>
                 </label>
                 <label>每组
-                  <select value={groupSize} onChange={(event) => setGroupSize(Number(event.target.value))}>
+                  <select value={groupSize} onChange={(event) => {
+                    const size = Number(event.target.value);
+                    setGroupSize(size);
+                    updateQuery({ pageNum: 1, pageSize: size });
+                  }}>
                     {[10, 20, 30, 40, 50, 100].map((size) => <option key={size} value={size}>{size}</option>)}
                   </select>
                   词
@@ -754,7 +859,14 @@ export default function KotobaApp() {
                   <button
                     key={target}
                     className={reviewTab === target ? "active" : ""}
-                    onClick={() => router.push(`/review/${target}`)}
+                    onClick={() => {
+                      setReviewPage(1);
+                      const params = new URLSearchParams();
+                      if (reviewCategoryId) params.set("categoryId", String(reviewCategoryId));
+                      params.set("pageNum", "1");
+                      params.set("pageSize", String(reviewPageSize));
+                      router.push(`/review/${target}?${params}`);
+                    }}
                   >
                     <span>{label}</span><b>{count}</b>
                   </button>
@@ -779,14 +891,34 @@ export default function KotobaApp() {
                 <div className="reviewFilters">
                   <div className="reviewFilterFields">
                     <label>词汇分类
-                      <select value={reviewCategoryId} onChange={(event) => setReviewCategoryId(Number(event.target.value))}>
+                      <select value={reviewCategoryId} onChange={(event) => {
+                        const nextId = Number(event.target.value);
+                        setReviewCategoryId(nextId);
+                        setReviewPage(1);
+                        updateQuery({ categoryId: nextId, pageNum: 1 });
+                      }}>
                         <option value={0}>全部</option>
                         {studyCategories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                       </select>
                     </label>
+                    <label>每页
+                      <select value={reviewPageSize} onChange={(event) => {
+                        const size = Number(event.target.value);
+                        setReviewPageSize(size);
+                        setReviewPage(1);
+                        updateQuery({ pageNum: 1, pageSize: size });
+                      }}>
+                        {[10, 20, 30, 40, 50, 100].map((size) => <option key={size} value={size}>{size}</option>)}
+                      </select>
+                    </label>
                     {reviewTab === "favorites" && (
                       <label>收藏组
-                        <select value={selectedFavoriteGroupId} onChange={(event) => setSelectedFavoriteGroupId(Number(event.target.value))}>
+                        <select value={selectedFavoriteGroupId} onChange={(event) => {
+                          const groupId = Number(event.target.value);
+                          setSelectedFavoriteGroupId(groupId);
+                          setReviewPage(1);
+                          updateQuery({ groupId, pageNum: 1 });
+                        }}>
                           {favoriteGroups.map((group) => <option key={group.id} value={group.id}>{group.name}{group.isDefault ? "（默认）" : ""}</option>)}
                         </select>
                       </label>
@@ -819,7 +951,7 @@ export default function KotobaApp() {
                     <p className="groupNote">{favoriteGroups.find((group) => group.id === selectedFavoriteGroupId)?.note}</p>
                   )}
                   <div className="list reviewList">
-                    {(reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).map((item) => (
+                    {reviewVisibleItems.map((item) => (
                       <article key={item.id} data-vocabulary-lookup="true">
                         <div><h3>{item.word}</h3><span>{item.reading}</span></div>
                         <p>{item.meaning}</p>
@@ -836,6 +968,13 @@ export default function KotobaApp() {
                   {!reviewLoading && (reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).length === 0 && (
                     <div className="empty">
                       {reviewTab === "errors" ? "还没有错题，继续保持。" : reviewTab === "mastered" ? "通过三种题型的词会出现在这里。" : "还没有收藏词汇。"}
+                    </div>
+                  )}
+                  {!reviewLoading && reviewAllItems.length > 0 && (
+                    <div className="pagination reviewPagination">
+                      <button className="ghost" disabled={reviewPage <= 1} onClick={() => changeReviewPage(reviewPage - 1)}>上一页</button>
+                      <span>第 {reviewPage} / {reviewPageCount} 页 · 共 {reviewAllItems.length} 条</span>
+                      <button className="ghost" disabled={reviewPage >= reviewPageCount} onClick={() => changeReviewPage(reviewPage + 1)}>下一页</button>
                     </div>
                   )}
                   </div>
@@ -967,8 +1106,10 @@ export default function KotobaApp() {
                 <select
                   value={pageSize}
                   onChange={(event) => {
-                    setPageSize(Number(event.target.value));
+                    const size = Number(event.target.value);
+                    setPageSize(size);
                     changeListPage(1);
+                    updateQuery({ pageNum: 1, pageSize: size });
                   }}
                   aria-label="每页显示数量"
                 >
