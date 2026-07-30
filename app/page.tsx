@@ -114,6 +114,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [total, setTotal] = useState(0);
   const [listItems, setListItems] = useState<Word[]>([]);
   const [listLoading, setListLoading] = useState(false);
@@ -165,7 +166,7 @@ export default function Home() {
     setListLoading(true);
     try {
       const response = await fetch(
-        `/api/vocabulary?categoryId=${categoryId}&page=${page}&pageSize=20&search=${encodeURIComponent(search.trim())}`,
+        `/api/vocabulary?categoryId=${categoryId}&page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search.trim())}`,
       );
       const data = await response.json();
       setListItems(data.items ?? []);
@@ -173,7 +174,7 @@ export default function Home() {
     } finally {
       setListLoading(false);
     }
-  }, [categoryId, page, search]);
+  }, [categoryId, page, pageSize, search]);
 
   useEffect(() => { void loadCategory(); }, [loadCategory]);
   useEffect(() => { void loadCategories(); }, [loadCategories]);
@@ -206,7 +207,7 @@ export default function Home() {
   );
   const pendingCount = words.filter((item) => !studiedIds.has(item.id)).length;
   const currentQuestion = questions[questionIndex];
-  const pageCount = Math.max(1, Math.ceil(total / 20));
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const selectedArticle = articles.find((article) => article.id === selectedArticleId);
 
   function changeView(next: View) {
@@ -483,9 +484,11 @@ export default function Home() {
                 <tbody>
                   {listItems.map((item) => (
                     <tr key={item.id}>
-                      <td><b>{item.word}</b></td><td>{item.reading}</td><td>{item.meaning}</td>
-                      <td><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
-                      <td className="rowActions">
+                      <td className="wordCell"><b>{item.word}</b></td>
+                      <td className="readingCell">{item.reading}</td>
+                      <td className="meaningCell">{item.meaning}</td>
+                      <td className="tagCell"><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
+                      <td className="rowActions actionCell">
                         <button onClick={() => { setEditing({ ...item }); setDialogOpen(true); }}>编辑</button>
                         <button className="danger" onClick={() => void deleteWord(item)}>删除</button>
                       </td>
@@ -498,6 +501,19 @@ export default function Home() {
             <div className="pagination">
               <button className="ghost" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>上一页</button>
               <span>第 {page} / {pageCount} 页 · 共 {total} 条</span>
+              <label className="pageSizePicker">
+                每页
+                <select
+                  value={pageSize}
+                  onChange={(event) => {
+                    setPageSize(Number(event.target.value));
+                    setPage(1);
+                  }}
+                  aria-label="每页显示数量"
+                >
+                  {[20, 30, 40, 50].map((size) => <option key={size} value={size}>{size} 条</option>)}
+                </select>
+              </label>
               <button className="ghost" disabled={page >= pageCount} onClick={() => setPage((value) => value + 1)}>下一页</button>
             </div>
           </section>

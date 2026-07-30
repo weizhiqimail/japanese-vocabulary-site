@@ -335,6 +335,15 @@ tbody tr:hover { background: #faf9f3; }
 .miniTags { display: flex; flex-wrap: wrap; gap: 5px; }
 .miniTags span { padding: 3px 7px; border-radius: 99px; background: #e7ecdf; color: var(--green); font-size: 11px; white-space: nowrap; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 28px; color: var(--muted); font-size: 13px; }
+.pageSizePicker { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.pageSizePicker select {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--card);
+  color: var(--green);
+  font-weight: 800;
+}
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -513,6 +522,47 @@ tbody tr:hover { background: #faf9f3; }
   .searchBar { flex-wrap: wrap; }
   .searchBar select { flex: 1 1 130px; }
   .searchBar input { flex-basis: 100%; order: 3; }
+  .wordsPage .tableWrap { overflow: visible; border: 0; background: transparent; }
+  .wordsPage .tableWrap.isLoading table { opacity: .25; }
+  .wordsPage table { min-width: 0; }
+  .wordsPage thead { display: none; }
+  .wordsPage tbody { display: grid; gap: 10px; }
+  .wordsPage tbody tr {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 7px;
+    padding: 15px 16px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--card);
+  }
+  .wordsPage tbody tr:hover { background: var(--card); }
+  .wordsPage td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .wordsPage .wordCell { font-size: 18px; line-height: 1.4; }
+  .wordsPage .readingCell {
+    align-self: center;
+    color: var(--green);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+  .wordsPage .meaningCell {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  .wordsPage .tagCell, .wordsPage .actionCell { display: none; }
+  .wordsPage .loadingOverlay { position: fixed; inset: 0; }
+  .wordsPage .pagination { flex-wrap: wrap; gap: 10px 12px; }
+  .wordsPage .pagination > span { flex: 1 0 100%; text-align: center; order: -2; }
+  .wordsPage .pageSizePicker { order: -1; }
+  .wordsPage .pagination .ghost { padding: 10px 14px; }
   .articleLayout { grid-template-columns: 1fr; }
   .articleNav { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .articleNav > span, .articleNav > b { grid-column: 1 / -1; }
