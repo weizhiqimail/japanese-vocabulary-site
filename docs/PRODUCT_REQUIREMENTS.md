@@ -56,9 +56,12 @@
 
 ### 3.1 词汇来源
 
-- BJT：BJT 汇总词汇及后续补充词汇。
-- N1：N1 词汇工作簿导入数据。
-- BJT-外来语：BJT 外来语文件导入数据。
+- BJT：[BJT 汇总](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/BJTSummary.md)及[BJT 补充词汇](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/BJT-%E8%AF%8D%E6%B1%87.txt)。
+- N1：[N1 词汇 CSV](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/N1-%E8%AF%8D%E6%B1%87.csv)，由原始 XLSX 直接转换。
+- BJT-外来语：[BJT 外来语](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/BJT-%E5%A4%96%E6%9D%A5%E8%AF%AD.txt)。
+- 文章：[文章来源文件](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/%E6%96%87%E7%AB%A0.txt)。
+
+这些文件是可追溯的原始来源；网站运行时使用已导入在线 MySQL 的数据。
 
 ### 3.2 类别与标签
 
@@ -317,4 +320,3 @@
 - 前后端模块、API、构建或部署变化时更新《前后端技术架构》。
 - 数据表、字段、索引、约束或关系变化时更新《数据库结构》和数据库字段 `COMMENT`。
 - 文档只描述当前有效状态，不堆叠相互冲突的历史需求。
-

@@ -56,6 +56,19 @@ mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
 - `app/lib/db.ts`：数据库连接与公共数据访问
 - `.openai/hosting.json`：OpenAI Sites 项目标识，不要删除或重新生成
 - `docs/`：架构、数据库、开发和部署说明
+- `files/vocabulary/`：项目使用的原始词汇与文章来源文件
+
+## 词汇来源文件
+
+来源文件统一保存在 [`files/vocabulary`](files/vocabulary/)：
+
+- [BJT 词汇](files/vocabulary/BJT-词汇.txt)
+- [BJT 外来语](files/vocabulary/BJT-外来语.txt)
+- [BJT 汇总](files/vocabulary/BJTSummary.md)
+- [N1 词汇 CSV](files/vocabulary/N1-词汇.csv)：由原始 `N1-词汇.xlsx` 直接转换，保留 3,208 行、7 列内容
+- [文章来源](files/vocabulary/文章.txt)
+
+在线 MySQL 是网站运行时数据源；上述文件用于追溯原始数据、重新导入和核对。
 
 ## 文档
 

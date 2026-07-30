@@ -1,0 +1,27 @@
+アウトソーシング：outsourcing，外包，外购	アポ（イント）：appointment，预约，约会	アルバイト：arbeit（ドイツ語），兼职，打工	クライアント：client，客户，委托人
+グローバル：global，全球的，国际化的	シフト：shift，轮班，转换	スタッフ：staff，员工，工作人员	セールス：sales，销售，推销
+セキュリティー：security，安全，安保	チーフ：chief，主管，负责人	チーム：team，团队，小组	テナント：tenant，租户，承租商
+デモ（ンストレーション）：demonstration，演示，示范	トップ：top，最高层，首位	トップダウン：top-down，自上而下	ニッチ：niche，利基，缝隙市场
+パート：part-timer，兼职	プレゼン（テーション）：presentation，演示，发表	フレックス（タイム）：flextime，弹性工作制	プロジェクト：project，项目，计划
+ベンチャー：venture，风险企业，创业公司	ボトムアップ：bottom up，自下而上	マネージメント：management，管理，经营	マネージャー：manager，经理，管理者
+マンパワー：man power，人力	メーカー：maker，制造商，厂家	リーダー：leader，领导，负责人	リストラ：restructuring，重组，裁员
+インフレ（ーション）：inflation，通货膨胀	コスト：cost，成本，费用	シェア：share，市场占有率，份额	デフレ（ーション）：deflation，通货紧缩
+マーケット：market，市场	アナログ：analog，模拟，类比	（インター）ネット：internet，互联网	ディスプレー：display，显示器，显示屏
+テクノロジー：technology，技术，科技	デジタル：digital，数字的，数码	ハイテク：high-tech，高科技	ハイブリッド：hybrid，混合型，混合动力
+ブロードバンド：broad band，宽带	メガビット：megabit，兆比特	モバイル：mobile，移动，手机	ログイン：log in，登录
+アフターサービス：after-sales service，售后服务	アウトレット：outlet，折扣店，厂家直销店	オーダー：order，订单，订购	カスタマー：customer，顾客，客户
+カスタマイズ：customize，定制，个性化	カタログ：catalog，目录，商品册	キャンペーン：campaign，宣传活动，促销	クレーム：claim，投诉，索赔
+グロス：gross，总额，毛重	コストパフォーマンス：cost performance，性价比	コンテンツ：contents，内容	サンプル：sample，样品
+ストック：stock，库存，储备	ターゲット：target，目标，对象	チェーン（ストア）：chain store，连锁店	チャネル：channel，渠道，途径
+ニーズ：needs，需求	ネット：net，网络，净值	バージョン：version，版本	パーツ：parts，零件，部件
+バイヤー：buyer，采购员，买家	パッケージ：package，包装，套装	パンフ（レット）：pamphlet，宣传册	ヒット：hit，畅销，成功
+フランチャイズ（チェーン）：franchise chain，特许经营连锁	ブランド：brand，品牌	マーケティング：marketing，市场营销	メンテ（ナンス）：maintenance，维护，保养
+ユーザー：user，用户	ライン：line，生产线，系列	リコール：recall，召回	ロット：lot，批次，批量
+アンケート：enquête（フランス語），问卷调查	イベント：event，活动，事件	キャンセル：cancel，取消	コンセプト：concept，概念，理念
+コンセンサス：consensus，共识，一致意见	コンプライアンス：compliance，合规，守法经营	サブ：sub-，副，次级	サポート：support，支持，支援
+システム：system，系统	データ：data，数据，资料	デメリット：demerit，缺点，不利之处	ドラフト：draft，草案，初稿
+トラブル：trouble，故障，纠纷	ノウハウ：know-how，诀窍，专有技术	ノルマ：norma（ロシア語），指标，定额	パー（セント）：percent，百分比
+バブル：bubble，泡沫	ペンディング：pending，搁置，待定	ポテンシャル：potential，潜力，可能性	ボリューム：volume，数量，容量
+マニュアル：manual，手册，指南	メイン：main，主要，主	メリット：merit，优点，好处	ライセンス：license，许可证，授权
+リース：lease，租赁	リサイクル：recycle，回收利用	リスク：risk，风险	レンタル：rental，出租，租借
+ロゴ：logo，标志，商标		
