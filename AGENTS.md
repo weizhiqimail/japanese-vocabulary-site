@@ -26,6 +26,9 @@
 10. 不覆盖或回退用户未授权的现有改动；不使用 `git reset --hard` 或强制推送。
 11. 每次任务完成前检查并更新 `AGENTS.md`：新增的长期规则、目录、数据来源或工作流必须写入；交付时明确说明本次是否更新及更新内容。
 12. 原始词汇与文章来源统一保存在 `files/vocabulary/`。新增或替换来源文件时，同步更新 README 和项目需求文档中的链接。
+13. 词汇导入不得只识别单个单词：固定搭配、短语和完整句子都必须进入候选。使用 `scripts/audit-and-import-vocabulary.mjs` 先审计、后事务导入、再反向核验。
+14. 来源导入顺序为 BJT 后 N1；只有审计结果 `missingCount=0` 且 `needsCategoryCount=0` 才能报告完成。
+15. 不得把 BJT 外来语括号统一当作假名；`アポ（イント）` 等表示可选后缀，必须保留完整词面。N1 必须保留第七列补充说明。
 
 ## 开发工作流
 
@@ -52,3 +55,4 @@
 - 收藏操作默认进入用户设置的默认收藏组，并在通知中显示收藏组名称。
 - 页面隐藏项与默记模式的行为应在学习页和词库页保持一致。
 - 项目原始数据来源目录为 `files/vocabulary/`；网站运行时数据仍以在线 MySQL 为准。
+- 词汇导入命令为 `npm run vocabulary:audit:bjt`、`vocabulary:import:bjt`、`vocabulary:audit:n1`、`vocabulary:import:n1`；审计输出位于 `work/vocabulary-import-audit/`。

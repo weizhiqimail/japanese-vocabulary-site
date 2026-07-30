@@ -11,7 +11,11 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "vocabulary:audit:bjt": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs audit-bjt",
+    "vocabulary:import:bjt": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-bjt",
+    "vocabulary:audit:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs audit-n1",
+    "vocabulary:import:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-n1"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

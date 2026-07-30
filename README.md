@@ -70,6 +70,28 @@ mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
 
 在线 MySQL 是网站运行时数据源；上述文件用于追溯原始数据、重新导入和核对。
 
+### 来源核对与导入
+
+导入工具会把单词、固定搭配、短语和完整句子全部作为学习条目。执行写入前先审计，写入后再次反向核验：
+
+```powershell
+npm run vocabulary:audit:bjt
+npm run vocabulary:import:bjt
+npm run vocabulary:audit:n1
+npm run vocabulary:import:n1
+```
+
+审计报告写入被 Git 忽略的 `work/vocabulary-import-audit/`。导入顺序固定为 BJT 后 N1，所有数据库操作读取本地 `.env` 中的 `DATABASE_URL`。
+
+2026-07-30 全量核对结果：
+
+| 来源 | 有效来源行/候选 | 唯一学习条目 | 本次新增 | 最终遗漏 |
+|---|---:|---:|---:|---:|
+| BJT 汇总、BJT 补充、BJT 外来语 | 804 个含日语汇总行 + 277 个词典项 | 1,134 | 523 | 0 |
+| N1 | 3,007 个有效数据行 | 2,118 | 5 | 0 |
+
+N1 原表另有 200 个只预填“陌生程度=9”的空白模板行，不包含日语、假名或翻译，不作为词汇。
+
 ## 文档
 
 项目文档精简为三个互不重复的核心文件：
