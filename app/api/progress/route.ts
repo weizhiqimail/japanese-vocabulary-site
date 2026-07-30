@@ -6,11 +6,15 @@ export async function GET(request: Request) {
   const categoryId = Number(url.searchParams.get("categoryId"));
   const status = url.searchParams.get("status");
   const db = await getDb();
-  if (!Number.isInteger(categoryId) || categoryId <= 0) {
+  if (!Number.isInteger(categoryId) || categoryId < 0) {
     return NextResponse.json({ error: "无效类别 ID" }, { status: 400 });
   }
-  const clauses = ["p.user_key = ?", "c.id = ?"];
-  const params: unknown[] = [getUserKey(request), categoryId];
+  const clauses = ["p.user_key = ?"];
+  const params: unknown[] = [getUserKey(request)];
+  if (categoryId > 0) {
+    clauses.push("c.id = ?");
+    params.push(categoryId);
+  }
   if (status === "mastered" || status === "error") {
     clauses.push("p.status = ?");
     params.push(status);
