@@ -4,11 +4,10 @@ import KotobaApp from "../KotobaApp";
 const routes = new Set([
   "learn",
   "quiz",
-  "errors",
-  "mastered",
+  "review",
   "words",
   "articles",
-  "settings",
+  "management",
 ]);
 
 export default async function ModulePage({

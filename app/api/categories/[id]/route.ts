@@ -12,7 +12,7 @@ export async function PUT(
   const purpose = body.purpose;
   const sortOrder = Math.max(0, Number(body.sortOrder) || 0);
   const enabled = body.enabled ? 1 : 0;
-  if (!name || !["vocabulary", "article", "both"].includes(scope) || !["study", "topic"].includes(purpose)) {
+  if (!name || !["vocabulary", "article", "both"].includes(scope) || !["study", "topic", "development"].includes(purpose)) {
     return NextResponse.json({ error: "请完整填写类别信息" }, { status: 400 });
   }
   const db = await getDb();

@@ -211,6 +211,19 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   to { opacity: 1; transform: translateY(0); }
 }
 .wordCard .number { position: absolute; left: 22px; top: 29px; color: #a2a69d; font: 12px monospace; }
+.favoriteButton {
+  border: 0;
+  background: transparent;
+  color: #989d92;
+  font-size: 23px;
+  line-height: 1;
+  padding: 5px;
+  border-radius: 50%;
+  transition: transform .15s ease, color .15s ease, background-color .15s ease;
+}
+.favoriteButton:hover { color: #a87916; background: #f4ecd5; transform: scale(1.08); }
+.favoriteButton.active { color: #c18a16; }
+.wordCard > .favoriteButton { position: absolute; right: 17px; top: 17px; }
 .wordCard h3 { font-size: 27px; font-weight: 800; margin: 0; }
 .wordCard .reading { color: var(--green); font-size: 13px; margin-top: 5px; }
 .wordCard p { color: var(--muted); margin: 18px 0 0; line-height: 1.55; }
@@ -278,6 +291,44 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .list article { display: grid; grid-template-columns: 1fr 1.6fr; gap: 30px; padding: 20px 12px; border-bottom: 1px solid var(--line); align-items: center; }
 .list h3 { font-size: 23px; font-weight: 800; margin: 0 0 4px; }
 .list span, .list p { color: var(--muted); margin: 0; }
+.reviewLayout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.reviewNav {
+  position: sticky;
+  top: 106px;
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+}
+.reviewNav button {
+  border: 0;
+  border-radius: 7px;
+  padding: 12px 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  background: transparent;
+  text-align: left;
+}
+.reviewNav button b { min-width: 25px; text-align: center; }
+.reviewNav button:hover, .reviewNav button.active { color: var(--green); background: #e7ecdf; }
+.reviewPanel {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+}
+.reviewList article { grid-template-columns: 1fr 1.6fr auto; }
+.inlineFavorite { align-self: center; }
 .reset { display: block; margin: 50px auto 0; border: 0; background: none; color: #9a6b63; font-size: 12px; text-decoration: underline; }
 
 .searchBar { display: flex; gap: 10px; margin-bottom: 22px; }
@@ -336,6 +387,14 @@ tbody tr:hover { background: #faf9f3; }
 .miniTags span { padding: 3px 7px; border-radius: 99px; background: #e7ecdf; color: var(--green); font-size: 11px; white-space: nowrap; }
 .listVisibilityBar { margin-bottom: 12px; }
 .tableConcealed { color: #b8bbb3 !important; letter-spacing: .16em; user-select: none; }
+.wordCell { position: relative; }
+.tableFavorite {
+  margin-left: 8px;
+  vertical-align: middle;
+  color: #989d92 !important;
+  letter-spacing: normal;
+}
+.tableFavorite.active { color: #c18a16 !important; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 28px; color: var(--muted); font-size: 13px; }
 .pageSizePicker { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
 .pageSizePicker select {
@@ -477,6 +536,8 @@ tbody tr:hover { background: #faf9f3; }
   align-items: start;
 }
 .settingsNav {
+  display: grid;
+  gap: 6px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -487,11 +548,12 @@ tbody tr:hover { background: #faf9f3; }
   border: 0;
   border-radius: 6px;
   padding: 11px 13px;
-  background: #e7ecdf;
-  color: var(--green);
+  background: transparent;
+  color: var(--muted);
   text-align: left;
   font-weight: 800;
 }
+.settingsNav button:hover, .settingsNav button.active { background: #e7ecdf; color: var(--green); }
 .settingsPanel {
   min-width: 0;
   padding: 24px;
@@ -503,6 +565,8 @@ tbody tr:hover { background: #faf9f3; }
 .panelHead h3 { margin: 0; font-size: 28px; }
 .panelHead p, .configNote { margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
 .configNote { font-size: 12px; }
+.developmentReader { border: 0; padding: 8px 4px; box-shadow: none; }
+.developmentReader > h1 { font-size: clamp(32px, 4vw, 48px); }
 
 @media (max-width: 720px) {
   .topbar { height: auto; padding: 14px 18px; align-items: flex-start; }
@@ -520,6 +584,19 @@ tbody tr:hover { background: #faf9f3; }
   .wordCard { padding-left: 62px; }
   .actions { flex-wrap: wrap; }
   .list article { grid-template-columns: 1fr; gap: 9px; }
+  .reviewLayout { grid-template-columns: 1fr; }
+  .reviewNav {
+    position: static;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .reviewNav button { display: grid; justify-items: center; padding: 10px 6px; text-align: center; }
+  .reviewPanel { padding: 17px; }
+  .reviewList article {
+    position: relative;
+    grid-template-columns: 1fr;
+    padding-right: 44px;
+  }
+  .reviewList .inlineFavorite { position: absolute; right: 4px; top: 15px; }
   .formRow { grid-template-columns: 1fr; }
   .searchBar { flex-wrap: wrap; }
   .searchBar select { flex: 1 1 130px; }
@@ -570,6 +647,8 @@ tbody tr:hover { background: #faf9f3; }
   .articleNav > span, .articleNav > b { grid-column: 1 / -1; }
   .articleReader { padding: 24px 19px; overflow-x: auto; }
   .settingsLayout { grid-template-columns: 1fr; }
+  .settingsNav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .settingsNav button { text-align: center; }
   .panelHead { flex-direction: column; }
   .settingsPanel { padding: 17px; }
 }
