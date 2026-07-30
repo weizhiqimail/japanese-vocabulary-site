@@ -22,14 +22,14 @@ export async function GET(request: Request) {
     }
     const [rows] = await db.query(
       `SELECT v.id, v.word, v.reading, v.meaning,
-              v.part_of_speech AS partOfSpeech, v.familiarity,
+              v.part_of_speech AS partOfSpeech,
               f.group_id AS groupId, f.created_at AS favoritedAt
        FROM vocabulary_favorites f
        JOIN vocabulary v ON v.id = f.vocabulary_id
        JOIN vocabulary_category_links vcl ON vcl.vocabulary_id = v.id
        WHERE ${clauses.join(" AND ")}
        GROUP BY v.id, v.word, v.reading, v.meaning, v.part_of_speech,
-                v.familiarity, f.group_id, f.created_at
+                f.group_id, f.created_at
        ORDER BY f.created_at DESC`,
       params,
     );

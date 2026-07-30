@@ -17,7 +17,7 @@
 
 | 表 | 用途 |
 |---|---|
-| `vocabulary` | 词汇、假名、翻译、词性和熟悉度 |
+| `vocabulary` | 词汇、可选假名、翻译和词性 |
 | `categories` | 词汇与文章共用的类别/标签配置 |
 | `vocabulary_category_links` | 词汇与类别的多对多关系 |
 | `learning_progress` | 用户对词汇的当前状态和累计答题次数 |
@@ -61,7 +61,6 @@ CREATE TABLE "vocabulary" (
   "reading" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '假名读音；固定搭配或完整句子可为空',
   "meaning" text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '中文释义',
   "part_of_speech" varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '词性或条目类型',
-  "familiarity" varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '熟悉程度或原始数据标记',
   "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间',
   PRIMARY KEY ("id"),

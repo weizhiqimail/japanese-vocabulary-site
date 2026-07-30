@@ -23,7 +23,6 @@ type Word = {
   reading: string | null;
   meaning: string;
   partOfSpeech: string;
-  familiarity: string;
   categories: string[];
   categoryIds: number[];
   status?: "mastered" | "error";
@@ -74,7 +73,6 @@ const emptyForm = {
   reading: "",
   meaning: "",
   partOfSpeech: "",
-  familiarity: "",
   categoryIds: [] as number[],
 };
 const emptyCategoryForm: CategoryConfig = {
@@ -1018,7 +1016,7 @@ export default function KotobaApp() {
           <form className="modal" onSubmit={saveWord} onMouseDown={(event) => event.stopPropagation()}>
             <div className="modalHead"><h2>{editing.id ? "编辑单词" : "新增单词"}</h2><button type="button" onClick={() => setDialogOpen(false)}>×</button></div>
             <label>日语<input required value={editing.word} onChange={(event) => setEditing({ ...editing, word: event.target.value })} /></label>
-            <label>假名<input required value={editing.reading} onChange={(event) => setEditing({ ...editing, reading: event.target.value })} /></label>
+            <label>假名（可选）<input value={editing.reading ?? ""} onChange={(event) => setEditing({ ...editing, reading: event.target.value })} /></label>
             <label>翻译<textarea required value={editing.meaning} onChange={(event) => setEditing({ ...editing, meaning: event.target.value })} /></label>
             <fieldset className="tagSelector">
               <legend>所属类别（可多选）</legend>
@@ -1038,10 +1036,7 @@ export default function KotobaApp() {
                 </label>
               ))}
             </fieldset>
-            <div className="formRow">
-              <label>词性<input value={editing.partOfSpeech} onChange={(event) => setEditing({ ...editing, partOfSpeech: event.target.value })} /></label>
-              <label>熟悉度<input value={editing.familiarity} onChange={(event) => setEditing({ ...editing, familiarity: event.target.value })} /></label>
-            </div>
+            <label>词性<input value={editing.partOfSpeech} onChange={(event) => setEditing({ ...editing, partOfSpeech: event.target.value })} /></label>
             <button className="primary">保存单词</button>
           </form>
         </div>

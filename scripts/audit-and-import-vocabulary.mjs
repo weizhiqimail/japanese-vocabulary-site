@@ -326,7 +326,7 @@ async function loadN1Candidates() {
     if (!row.some((cell) => normalize(cell))) return;
     nonEmptyRows += 1;
     const sourceLine = index + 2;
-    const [sequence, wordValue, readingValue, partOfSpeech, familiarity, meaningValue, ...extra] = row;
+    const [sequence, wordValue, readingValue, partOfSpeech, templateMarker, meaningValue, ...extra] = row;
     const originalWord = normalize(wordValue);
     const word = WORD_CORRECTIONS.get(originalWord) ?? originalWord;
     const reading = word === "ぶかぶか" && normalize(readingValue) === "ぶだぶだ"
@@ -335,14 +335,14 @@ async function loadN1Candidates() {
     const primaryMeaning = normalize(meaningValue);
     const extraMeaning = extra.map(normalize).filter(Boolean).join("；");
     if (!word) {
-      const meaningfulWithoutDefaultFamiliarity = [
+      const meaningfulWithoutTemplateMarker = [
         sequence,
         readingValue,
         partOfSpeech,
         meaningValue,
         ...extra,
       ].some((cell) => normalize(cell));
-      if (!meaningfulWithoutDefaultFamiliarity && normalize(familiarity) === "9") {
+      if (!meaningfulWithoutTemplateMarker && normalize(templateMarker) === "9") {
         skippedTemplateRows += 1;
       } else {
         uncovered.push({ line: sourceLine, raw: row });
@@ -354,7 +354,6 @@ async function loadN1Candidates() {
       reading,
       meaning: [primaryMeaning, extraMeaning].filter(Boolean).join("；补充：") || `来源行：${sourceLine}`,
       partOfSpeech: normalize(partOfSpeech),
-      familiarity: normalize(familiarity),
       sequence: normalize(sequence),
       source: "N1-词汇.csv",
       line: sourceLine,
@@ -449,8 +448,7 @@ async function rebuildVocabulary(bjtLoaded, n1Loaded) {
         MODIFY reading VARCHAR(255) NULL COMMENT '假名读音；固定搭配或完整句子可为空',
         MODIFY word VARCHAR(255) NOT NULL COMMENT '日语词汇、固定搭配或完整句子',
         MODIFY meaning TEXT NOT NULL COMMENT '中文释义',
-        MODIFY part_of_speech VARCHAR(50) NOT NULL DEFAULT '' COMMENT '词性或条目类型',
-        MODIFY familiarity VARCHAR(40) NOT NULL DEFAULT '' COMMENT '原始资料中的熟悉度或来源标记'
+        MODIFY part_of_speech VARCHAR(50) NOT NULL DEFAULT '' COMMENT '词性或条目类型'
     `);
     const [linkColumns] = await db.query(
       `SELECT COLUMN_NAME FROM information_schema.COLUMNS
@@ -490,7 +488,6 @@ async function rebuildVocabulary(bjtLoaded, n1Loaded) {
           meaning: candidate.meaning,
           partOfSpeech: candidate.partOfSpeech
             || (/[。！？!?]/u.test(candidate.word) ? "句子" : candidate.reading ? "词汇" : "固定搭配"),
-          familiarity: candidate.familiarity || `来源:${candidate.source}`,
         });
       }
       const sortOrder = (categoryOrder.get(candidate.category) ?? 0) + 1;
@@ -517,9 +514,9 @@ async function rebuildVocabulary(bjtLoaded, n1Loaded) {
       const batch = inserted.slice(index, index + writeBatchSize);
       await db.query(
         `INSERT INTO vocabulary
-          (id,word,reading,meaning,part_of_speech,familiarity) VALUES ?`,
+          (id,word,reading,meaning,part_of_speech) VALUES ?`,
         [batch.map((item) => [
-          item.id, item.word, item.reading, item.meaning, item.partOfSpeech, item.familiarity,
+          item.id, item.word, item.reading, item.meaning, item.partOfSpeech,
         ])],
       );
     }
@@ -655,14 +652,13 @@ async function importBjt(loaded, comparison) {
           : "词汇";
       const [result] = await db.execute(
         `INSERT INTO vocabulary
-          (word,reading,meaning,part_of_speech,familiarity)
-         VALUES (?,?,?,?,?)`,
+          (word,reading,meaning,part_of_speech)
+         VALUES (?,?,?,?)`,
         [
           candidate.word,
           candidate.reading,
           candidate.meaning,
           entryType,
-          `来源:${candidate.source}`.slice(0, 40),
         ],
       );
       const vocabularyId = Number(result.insertId);
@@ -722,14 +718,13 @@ async function importN1(loaded, comparison) {
     for (const candidate of comparison.missing) {
       const [result] = await db.execute(
         `INSERT INTO vocabulary
-          (word,reading,meaning,part_of_speech,familiarity)
-         VALUES (?,?,?,?,?)`,
+          (word,reading,meaning,part_of_speech)
+         VALUES (?,?,?,?)`,
         [
           candidate.word,
           candidate.reading,
           candidate.meaning,
           candidate.partOfSpeech || "",
-          candidate.familiarity || "",
         ],
       );
       const vocabularyId = Number(result.insertId);

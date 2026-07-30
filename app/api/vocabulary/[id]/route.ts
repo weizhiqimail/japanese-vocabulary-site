@@ -23,8 +23,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     if ((categoryRows as unknown[]).length !== categoryIds.length) throw new Error("包含无效的词汇类别");
     await db.execute(
       `UPDATE vocabulary SET word = ?, reading = ?, meaning = ?,
-       part_of_speech = ?, familiarity = ? WHERE id = ?`,
-      [word, reading || null, meaning, String(body.partOfSpeech || "").trim(), String(body.familiarity || "").trim(), id],
+       part_of_speech = ? WHERE id = ?`,
+      [word, reading || null, meaning, String(body.partOfSpeech || "").trim(), id],
     );
     const [existingLinks] = await db.query(
       "SELECT category_id AS categoryId, sort_order AS sortOrder, source_file AS sourceFile, source_line AS sourceLine FROM vocabulary_category_links WHERE vocabulary_id = ?",

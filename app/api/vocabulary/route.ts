@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const search = (url.searchParams.get("search") || "").trim();
   const all = url.searchParams.get("all") === "true";
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-  const pageSize = all ? 5000 : Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize")) || 20));
+  const pageSize = all ? 5000 : Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize")) || 30));
   const offset = all ? 0 : (page - 1) * pageSize;
   const like = `%${search}%`;
   const searchSql = search ? "AND (v.word LIKE ? OR v.reading LIKE ? OR v.meaning LIKE ?)" : "";
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   try {
     const [rows] = await db.query(
       `SELECT v.id, v.word, v.reading, v.meaning,
-              v.part_of_speech AS partOfSpeech, v.familiarity,
+              v.part_of_speech AS partOfSpeech,
               GROUP_CONCAT(DISTINCT c_all.name ORDER BY c_all.sort_order SEPARATOR '|||') AS categoryList,
               GROUP_CONCAT(DISTINCT c_all.id ORDER BY c_all.sort_order SEPARATOR ',') AS categoryIdList
        FROM vocabulary v
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
        JOIN vocabulary_category_links vcl_all ON vcl_all.vocabulary_id = v.id
        JOIN categories c_all ON c_all.id = vcl_all.category_id
        WHERE 1 = 1 ${searchSql}
-       GROUP BY v.id, v.word, v.reading, v.meaning, v.part_of_speech, v.familiarity
+       GROUP BY v.id, v.word, v.reading, v.meaning, v.part_of_speech
        ORDER BY MIN(vcl_filter.sort_order), v.id LIMIT ? OFFSET ?`,
       [...params, pageSize, offset],
     );
@@ -81,9 +81,9 @@ export async function POST(request: Request) {
     }
     const [result] = await db.execute(
       `INSERT INTO vocabulary
-       (word, reading, meaning, part_of_speech, familiarity)
-       VALUES (?, ?, ?, ?, ?)`,
-      [word, reading || null, meaning, String(body.partOfSpeech || "").trim(), String(body.familiarity || "").trim()],
+       (word, reading, meaning, part_of_speech)
+       VALUES (?, ?, ?, ?)`,
+      [word, reading || null, meaning, String(body.partOfSpeech || "").trim()],
     );
     const vocabularyId = Number((result as { insertId: number }).insertId);
     for (const category of categoryRows as Array<{ id: number }>) {
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
   } catch (error) {
     await db.rollback();
     const message = error instanceof Error && error.message.includes("Duplicate")
-      ? "相同单词和假名已经存在"
+      ? "相同词汇记录已经存在"
       : error instanceof Error ? error.message : "新增失败";
     return NextResponse.json({ error: message }, { status: 409 });
   } finally {
