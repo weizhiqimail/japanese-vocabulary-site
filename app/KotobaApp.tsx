@@ -137,6 +137,7 @@ export default function KotobaApp() {
   const [total, setTotal] = useState(0);
   const [listItems, setListItems] = useState<Word[]>([]);
   const [listLoading, setListLoading] = useState(false);
+  const [listVisibility, setListVisibility] = useState({ word: true, reading: true, meaning: true });
   const [editing, setEditing] = useState(emptyForm);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -514,6 +515,19 @@ export default function KotobaApp() {
               <input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="模糊查询日语、假名或翻译" aria-label="搜索词汇" />
               <button className="primary">查询</button>
             </form>
+            <div className="visibilityBar listVisibilityBar">
+              <span>卡片显示</span>
+              {([["word", "日语"], ["reading", "假名"], ["meaning", "翻译"]] as const).map(([field, label]) => (
+                <label key={field}>
+                  <input
+                    type="checkbox"
+                    checked={listVisibility[field]}
+                    onChange={() => setListVisibility((value) => ({ ...value, [field]: !value[field] }))}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
             <div className={`tableWrap ${listLoading ? "isLoading" : ""}`} aria-busy={listLoading}>
               {listLoading && <div className="loadingOverlay"><span className="spinner" /><b>加载中</b></div>}
               <table>
@@ -521,9 +535,15 @@ export default function KotobaApp() {
                 <tbody>
                   {listItems.map((item) => (
                     <tr key={item.id}>
-                      <td className="wordCell"><b>{item.word}</b></td>
-                      <td className="readingCell">{item.reading}</td>
-                      <td className="meaningCell">{item.meaning}</td>
+                      <td className={`wordCell ${!listVisibility.word ? "tableConcealed" : ""}`}>
+                        <b>{listVisibility.word ? item.word : "••••"}</b>
+                      </td>
+                      <td className={`readingCell ${!listVisibility.reading ? "tableConcealed" : ""}`}>
+                        {listVisibility.reading ? item.reading : "••••"}
+                      </td>
+                      <td className={`meaningCell ${!listVisibility.meaning ? "tableConcealed" : ""}`}>
+                        {listVisibility.meaning ? item.meaning : "••••••"}
+                      </td>
                       <td className="tagCell"><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
                       <td className="rowActions actionCell">
                         <button onClick={() => { setEditing({ ...item }); setDialogOpen(true); }}>编辑</button>

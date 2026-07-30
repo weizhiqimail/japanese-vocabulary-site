@@ -334,6 +334,8 @@ tbody tr:hover { background: #faf9f3; }
 .rowActions button.danger { color: var(--red); }
 .miniTags { display: flex; flex-wrap: wrap; gap: 5px; }
 .miniTags span { padding: 3px 7px; border-radius: 99px; background: #e7ecdf; color: var(--green); font-size: 11px; white-space: nowrap; }
+.listVisibilityBar { margin-bottom: 12px; }
+.tableConcealed { color: #b8bbb3 !important; letter-spacing: .16em; user-select: none; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 28px; color: var(--muted); font-size: 13px; }
 .pageSizePicker { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
 .pageSizePicker select {
