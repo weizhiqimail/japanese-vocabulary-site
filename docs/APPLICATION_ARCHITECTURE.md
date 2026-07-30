@@ -116,7 +116,7 @@ app/
 
 ### 4.7 全局选词查询
 
-`SelectionLookup` 在根布局中全局挂载，通过浏览器 Selection API 监听非输入区域的文本选择，并用 Range 边界计算浮层位置。严格匹配单个 Unicode Han 字符时提供漢字ペディア与 Weblio，否则只提供 Weblio。查询词使用 `encodeURIComponent()` 编码，目标页以 `noopener,noreferrer` 在新窗口打开。第三方服务图标下载后统一保存在 `public/icons/lookup/`，运行时不依赖外部图片地址。
+`SelectionLookup` 在根布局中挂载，但只响应带 `data-vocabulary-lookup="true"` 的学习卡片、复习卡片和词库行。组件同时监听选区变化、鼠标/触控结束和键盘选取，通过浏览器 Selection API 与 Range 边界计算浮层位置。严格匹配单个 Unicode Han 字符时提供漢字ペディア与 Weblio，否则只提供 Weblio。查询词使用 `encodeURIComponent()` 编码，目标页以 `noopener,noreferrer` 在新窗口打开。第三方服务图标下载后统一保存在 `public/icons/lookup/`，运行时不依赖外部图片地址。
 
 ## 5. API 设计
 

@@ -19,6 +19,11 @@ function isEditableSelection(selection: Selection) {
   return Boolean(element?.closest("input, textarea, [contenteditable='true']"));
 }
 
+function lookupZone(node: Node | null) {
+  const element = node instanceof Element ? node : node?.parentElement;
+  return element?.closest<HTMLElement>("[data-vocabulary-lookup='true']") ?? null;
+}
+
 export default function SelectionLookup() {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const animationFrame = useRef<number | null>(null);
@@ -29,7 +34,16 @@ export default function SelectionLookup() {
   const readSelection = useCallback(() => {
     const current = window.getSelection();
     const text = current?.toString().trim() ?? "";
-    if (!current || current.rangeCount === 0 || !text || isEditableSelection(current)) {
+    const anchorZone = current ? lookupZone(current.anchorNode) : null;
+    const focusZone = current ? lookupZone(current.focusNode) : null;
+    if (
+      !current
+      || current.rangeCount === 0
+      || !text
+      || isEditableSelection(current)
+      || !anchorZone
+      || anchorZone !== focusZone
+    ) {
       setSelection(null);
       return;
     }
@@ -55,10 +69,16 @@ export default function SelectionLookup() {
     };
     const dismiss = () => setSelection(null);
     document.addEventListener("selectionchange", scheduleRead);
+    document.addEventListener("pointerup", scheduleRead);
+    document.addEventListener("keyup", scheduleRead);
+    document.addEventListener("touchend", scheduleRead, { passive: true });
     window.addEventListener("resize", dismiss);
     window.addEventListener("scroll", dismiss, true);
     return () => {
       document.removeEventListener("selectionchange", scheduleRead);
+      document.removeEventListener("pointerup", scheduleRead);
+      document.removeEventListener("keyup", scheduleRead);
+      document.removeEventListener("touchend", scheduleRead);
       window.removeEventListener("resize", dismiss);
       window.removeEventListener("scroll", dismiss, true);
       if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);

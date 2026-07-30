@@ -635,7 +635,11 @@ export default function KotobaApp() {
                   memoryMode ? isMemoryFieldVisible(item.id, field, memoryToggles) : visibility[field]
                 );
                 return (
-                <article className={`wordCard ${memoryMode ? "memoryCard" : ""}`} key={item.id}>
+                <article
+                  className={`wordCard ${memoryMode ? "memoryCard" : ""}`}
+                  key={item.id}
+                  data-vocabulary-lookup="true"
+                >
                   <span className="number">{String(index + 1).padStart(2, "0")}</span>
                   <button
                     className={`favoriteButton ${favoriteIds.has(item.id) ? "active" : ""}`}
@@ -782,7 +786,7 @@ export default function KotobaApp() {
                 )}
                 <div className="list reviewList">
                   {(reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).map((item) => (
-                    <article key={item.id}>
+                    <article key={item.id} data-vocabulary-lookup="true">
                       <div><h3>{item.word}</h3><span>{item.reading}</span></div>
                       <p>{item.meaning}</p>
                       <button
@@ -854,7 +858,7 @@ export default function KotobaApp() {
                       listMemoryMode ? isMemoryFieldVisible(item.id, field, listMemoryToggles) : listVisibility[field]
                     );
                     return (
-                    <tr key={item.id}>
+                    <tr key={item.id} data-vocabulary-lookup="true">
                       <td className={`wordCell ${!fieldVisible("word") ? "tableConcealed" : ""}`}>
                         <div className="wordCellMain">
                           <span
