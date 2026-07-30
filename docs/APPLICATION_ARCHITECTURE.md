@@ -219,6 +219,8 @@ beginTransaction → 执行业务 SQL → commit
 
 ## 9. 开发与协作
 
+顶部版本信息由 Vite `define` 在构建时注入：版本号在发布前递增，构建时间使用 `Asia/Tokyo` 时区生成。客户端只读取编译后的常量，不额外发起 HTTP 请求。
+
 ### 9.1 本地运行
 
 ```powershell

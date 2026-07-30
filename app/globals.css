@@ -85,6 +85,23 @@ button:disabled { cursor: not-allowed; opacity: .4; }
   font-weight: 800;
   font-size: 19px;
 }
+.brandText {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3px 9px;
+  min-width: 0;
+  text-align: left;
+}
+.brandName { white-space: nowrap; }
+.buildInfo {
+  color: #8d938b;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
 .brandMark {
   display: grid;
   place-items: center;
@@ -917,7 +934,9 @@ tbody tr:hover { background: #faf9f3; }
     background: var(--card);
   }
   .modalHead h2 { font-size: 26px; }
-  .brand span:last-child { display: none; }
+  .brand { align-items: flex-start; gap: 9px; }
+  .brandText { display: grid; gap: 2px; padding-top: 2px; }
+  .buildInfo { max-width: 190px; font-size: 9px; white-space: normal; }
   nav { flex-wrap: wrap; justify-content: flex-end; }
   nav button { padding: 8px 10px; font-size: 13px; }
   .hero { padding-top: 11vh; }

@@ -31,6 +31,8 @@ test("server-renders the vocabulary application and local GitHub corner", async 
   const html = await response.text();
   assert.match(html, /<title>日本語言葉勉強｜日语词汇学习<\/title>/);
   assert.match(html, /<h1>日本語言葉勉強<\/h1>/);
+  assert.match(html, /当前版本：<!-- -->22<!-- -->，构建时间：/);
+  assert.match(html, /class="buildInfo"/);
   assert.match(html, /class="githubCorner"/);
   assert.match(html, /href="https:\/\/github\.com\/weizhiqimail\/japanese-vocabulary-site"/);
   assert.match(html, /src="\/icons\/github\/github\.png"/);

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { BUILD_INFO } from "./build-info";
 import Notifications, { type NotificationMessage } from "./components/Notifications";
 
 type View = "home" | "learn" | "quiz" | "review" | "words" | "articles" | "management";
@@ -580,7 +581,13 @@ export default function KotobaApp() {
     <main>
       <header className="topbar">
         <button className="brand" onClick={() => changeView("home")}>
-          <span className="brandMark">こ</span><span>ことば帳</span>
+          <span className="brandMark">こ</span>
+          <span className="brandText">
+            <span className="brandName">ことば帳</span>
+            <small className="buildInfo">
+              当前版本：{BUILD_INFO.version}，构建时间：{BUILD_INFO.builtAt}
+            </small>
+          </span>
         </button>
         <nav aria-label="主导航">
           {([
