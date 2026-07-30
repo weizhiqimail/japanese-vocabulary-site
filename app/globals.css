@@ -464,6 +464,83 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   animation: spin .7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+.selectionLookup {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid rgba(27, 60, 48, .16);
+  border-radius: 11px;
+  background: rgba(255, 254, 250, .98);
+  box-shadow: 0 10px 30px rgba(24, 42, 34, .18), 0 2px 8px rgba(24, 42, 34, .09);
+  opacity: 0;
+  transform: translateY(5px) scale(.97);
+  pointer-events: none;
+  transition: opacity .14s ease, transform .14s ease;
+  backdrop-filter: blur(10px);
+}
+.selectionLookup.ready {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.selectionLookup button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 5px 9px 5px 6px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #29483d;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: color .13s ease, background-color .13s ease, transform .13s ease;
+}
+.selectionLookup button:hover { color: var(--green); background: #edf2e9; }
+.selectionLookup button:active, .selectionLookup button.opening {
+  background: #dfeadf;
+  transform: scale(.94);
+}
+.selectionLookup button:focus-visible {
+  outline: 2px solid #82a796;
+  outline-offset: 1px;
+}
+.selectionLookup img {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(20, 41, 33, .16);
+}
+.selectionLookupArrow {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 9px;
+  height: 9px;
+  border-right: 1px solid rgba(27, 60, 48, .16);
+  border-bottom: 1px solid rgba(27, 60, 48, .16);
+  background: rgba(255, 254, 250, .98);
+  transform: translateX(-50%) rotate(45deg);
+}
+.selectionLookup.below .selectionLookupArrow {
+  top: -5px;
+  bottom: auto;
+  border: 0;
+  border-top: 1px solid rgba(27, 60, 48, .16);
+  border-left: 1px solid rgba(27, 60, 48, .16);
+}
+@media (max-width: 520px) {
+  .selectionLookup { max-width: calc(100vw - 16px); }
+  .selectionLookup button { padding-right: 7px; }
+  .selectionLookup button span { display: none; }
+}
 table { width: 100%; border-collapse: collapse; min-width: 780px; }
 .vocabularyTable { table-layout: fixed; }
 .vocabularyTable .wordColumn { width: 27%; }

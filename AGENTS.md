@@ -51,6 +51,7 @@
 ## 关键实现约定
 
 - 主界面在 `app/KotobaApp.tsx`，公共通知组件在 `app/components/Notifications.tsx`。
+- 全局选词查询组件在 `app/components/SelectionLookup.tsx`；第三方查询服务图标统一下载到 `public/icons/lookup/`，禁止运行时直接引用远程图标。
 - API 位于 `app/api`；数据库公共代码位于 `app/lib/db.ts`。
 - 当前站点是单用户个人词汇站，学习和收藏统一使用 `SITE_OWNER_KEY`；未配置时固定为 `site-owner`，不得再按请求头邮箱拆分成多个用户空间。
 - 学习题目、选项和学习顺序必须随机；已学会的词汇不能再次进入普通学习组。

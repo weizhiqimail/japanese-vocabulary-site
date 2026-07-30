@@ -114,6 +114,10 @@ app/
 
 公共 Notification 组件使用递增 ID 管理消息队列。消息追加而非覆盖，约一秒后自动移除，多条消息自动补位。页面、切题、分页和通知使用轻量动画，并尊重系统减少动画设置。
 
+### 4.7 全局选词查询
+
+`SelectionLookup` 在根布局中全局挂载，通过浏览器 Selection API 监听非输入区域的文本选择，并用 Range 边界计算浮层位置。严格匹配单个 Unicode Han 字符时提供漢字ペディア与 Weblio，否则只提供 Weblio。查询词使用 `encodeURIComponent()` 编码，目标页以 `noopener,noreferrer` 在新窗口打开。第三方服务图标下载后统一保存在 `public/icons/lookup/`，运行时不依赖外部图片地址。
+
 ## 5. API 设计
 
 ### 5.1 API 列表

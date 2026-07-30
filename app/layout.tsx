@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SelectionLookup from "./components/SelectionLookup";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,7 +24,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body>
+        {children}
+        <SelectionLookup />
+      </body>
     </html>
   );
 }
