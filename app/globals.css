@@ -197,6 +197,13 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 }
 .visibilityBar > span { color: var(--ink); font-weight: 800; }
 .visibilityBar label { display: flex; gap: 6px; align-items: center; }
+.visibilityBar .memoryModeToggle {
+  margin-left: 4px;
+  padding-left: 16px;
+  border-left: 1px solid #cbd1c3;
+  color: var(--green);
+  font-weight: 800;
+}
 .visibilityBar .textButton { margin-left: auto; color: var(--green); font-weight: 800; }
 .groupMeta { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .wordGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
@@ -241,6 +248,33 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .compactWordGrid .wordCard h3 { font-size: 21px; line-height: 1.3; }
 .compactWordGrid .wordCard .reading { margin-top: 3px; }
 .compactWordGrid .wordCard p { margin-top: 10px; font-size: 13px; line-height: 1.45; }
+.memoryField, .tableMemoryField {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+.memoryField:disabled, .tableMemoryField:disabled { cursor: default; opacity: 1; }
+.wordMemoryField { font-size: 21px; line-height: 1.3; font-weight: 800; }
+.readingMemoryField { min-height: 18px; margin-top: 3px; }
+.meaningMemoryField {
+  min-height: 38px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.memoryCard .memoryField:not(:disabled) { border-radius: 5px; }
+.memoryCard .memoryField:not(:disabled):hover { background: #eef2e8; }
+.memoryHidden {
+  color: #9ba398 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+}
 .actions { display: flex; justify-content: center; gap: 12px; margin-top: 34px; }
 .ghost { border: 1px solid var(--green); color: var(--green); background: transparent; padding: 13px 18px; border-radius: 8px; font-weight: 700; }
 .empty { text-align: center; color: var(--muted); padding: 70px 20px; border: 1px dashed #c9ccc1; margin-top: 20px; }
@@ -445,6 +479,7 @@ tbody tr:hover { background: #faf9f3; }
   letter-spacing: normal;
 }
 .tableFavorite.active { color: #c18a16 !important; }
+.tableMemoryField.memoryHidden { min-height: 24px; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 28px; color: var(--muted); font-size: 13px; }
 .pageSizePicker { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
 .pageSizePicker select {
@@ -630,6 +665,36 @@ tbody tr:hover { background: #faf9f3; }
 .configNote { font-size: 12px; }
 .developmentReader { border: 0; padding: 8px 4px; box-shadow: none; }
 .developmentReader > h1 { font-size: clamp(32px, 4vw, 48px); }
+.developmentReader [id] { scroll-margin-top: 100px; }
+.developmentLayout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.documentToc {
+  position: sticky;
+  top: 98px;
+  max-height: calc(100vh - 118px);
+  overflow-y: auto;
+  display: grid;
+  gap: 6px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f6f6ef;
+}
+.documentToc b { margin-bottom: 5px; color: var(--green); }
+.documentToc a {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.documentToc a:hover { color: var(--green); }
+.documentToc .tocLevel1 { font-weight: 800; color: var(--ink); }
+.documentToc .tocLevel2 { padding-left: 10px; }
+.documentToc .tocLevel3 { padding-left: 22px; font-size: 11px; }
 
 @media (max-width: 720px) {
   .topbar { height: auto; padding: 14px 18px; align-items: flex-start; }
@@ -646,6 +711,7 @@ tbody tr:hover { background: #faf9f3; }
   .pageFilters label select, .pageFilters label:first-child select { width: 100%; }
   .visibilityBar { flex-wrap: wrap; gap: 11px 16px; }
   .visibilityBar .textButton { margin-left: 0; }
+  .visibilityBar .memoryModeToggle { margin-left: 0; padding-left: 0; border-left: 0; }
   .wordGrid, .options { grid-template-columns: 1fr; }
   .compactWordGrid { grid-template-columns: 1fr; }
   .wordCard { padding-left: 62px; }
@@ -722,6 +788,8 @@ tbody tr:hover { background: #faf9f3; }
   .settingsNav button { text-align: center; }
   .panelHead { flex-direction: column; }
   .settingsPanel { padding: 17px; }
+  .developmentLayout { grid-template-columns: 1fr; }
+  .documentToc { position: static; max-height: 280px; }
   .notificationStack { top: 82px; right: 12px; width: min(310px, calc(100vw - 24px)); }
 }
 

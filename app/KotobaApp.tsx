@@ -8,6 +8,7 @@ import Notifications, { type NotificationMessage } from "./components/Notificati
 
 type View = "home" | "learn" | "quiz" | "review" | "words" | "articles" | "management";
 type Mode = "reading" | "word" | "meaning";
+type DisplayField = "word" | "reading" | "meaning";
 type ReviewTab = "errors" | "mastered" | "favorites";
 type ManagementTab = "settings" | "development";
 type FavoriteGroup = {
@@ -95,6 +96,22 @@ function shuffle<T>(items: T[]) {
   return result;
 }
 
+function isMemoryFieldVisible(itemId: number, field: DisplayField, toggledFields: Set<string>) {
+  const toggled = toggledFields.has(`${itemId}:${field}`);
+  return field === "word" ? !toggled : toggled;
+}
+
+function headingId(value: string) {
+  return `doc-${value.toLowerCase().replace(/[`*_()[\]{}:：，。、“”'"]/g, "").replace(/\s+/g, "-")}`;
+}
+
+function documentOutline(content: string) {
+  return content.split(/\r?\n/).flatMap((line) => {
+    const match = /^(#{1,3})\s+(.+)$/.exec(line.trim());
+    return match ? [{ level: match[1].length, title: match[2], id: headingId(match[2]) }] : [];
+  });
+}
+
 function createQuestions(items: Word[], pool: Word[]) {
   const modes: Mode[] = ["reading", "word", "meaning"];
   return shuffle(
@@ -144,6 +161,8 @@ export default function KotobaApp() {
   const [groupSize, setGroupSize] = useState(30);
   const [currentGroup, setCurrentGroup] = useState<Word[]>([]);
   const [visibility, setVisibility] = useState({ word: true, reading: true, meaning: true });
+  const [memoryMode, setMemoryMode] = useState(false);
+  const [memoryToggles, setMemoryToggles] = useState<Set<string>>(new Set());
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizItems, setQuizItems] = useState<Word[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -159,6 +178,8 @@ export default function KotobaApp() {
   const [listItems, setListItems] = useState<Word[]>([]);
   const [listLoading, setListLoading] = useState(false);
   const [listVisibility, setListVisibility] = useState({ word: true, reading: true, meaning: true });
+  const [listMemoryMode, setListMemoryMode] = useState(false);
+  const [listMemoryToggles, setListMemoryToggles] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState(emptyForm);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
@@ -319,6 +340,10 @@ export default function KotobaApp() {
   );
   const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.id)), [favorites]);
   const reviewFavoriteIds = useMemo(() => new Set(reviewFavorites.map((item) => item.id)), [reviewFavorites]);
+  const developmentOutline = useMemo(
+    () => documentOutline(developmentArticles[0]?.content ?? ""),
+    [developmentArticles],
+  );
   const pendingCount = words.filter((item) => !studiedIds.has(item.id)).length;
   const currentQuestion = questions[questionIndex];
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
@@ -348,6 +373,20 @@ export default function KotobaApp() {
     setCurrentGroup(
       shuffle(words.filter((item) => !studiedIds.has(item.id))).slice(0, groupSize),
     );
+  }
+
+  function toggleMemoryField(
+    itemId: number,
+    field: DisplayField,
+    setter: React.Dispatch<React.SetStateAction<Set<string>>>,
+  ) {
+    setter((current) => {
+      const next = new Set(current);
+      const key = `${itemId}:${field}`;
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   }
 
   function CategoryPicker() {
@@ -565,13 +604,28 @@ export default function KotobaApp() {
             <div className="visibilityBar">
               <span>卡片显示</span>
               {([["word", "日语"], ["reading", "假名"], ["meaning", "翻译"]] as const).map(([field, label]) => (
-                <label key={field}><input type="checkbox" checked={visibility[field]} onChange={() => setVisibility((value) => ({ ...value, [field]: !value[field] }))} />{label}</label>
+                <label key={field}><input type="checkbox" disabled={memoryMode} checked={visibility[field]} onChange={() => setVisibility((value) => ({ ...value, [field]: !value[field] }))} />{label}</label>
               ))}
+              <label className="memoryModeToggle">
+                <input
+                  type="checkbox"
+                  checked={memoryMode}
+                  onChange={(event) => {
+                    setMemoryMode(event.target.checked);
+                    setMemoryToggles(new Set());
+                  }}
+                />
+                默记模式
+              </label>
               <button className="textButton" onClick={refreshGroup}>换一组 ↻</button>
             </div>
             <div className="wordGrid compactWordGrid">
-              {currentGroup.map((item, index) => (
-                <article className="wordCard" key={item.id}>
+              {currentGroup.map((item, index) => {
+                const fieldVisible = (field: DisplayField) => (
+                  memoryMode ? isMemoryFieldVisible(item.id, field, memoryToggles) : visibility[field]
+                );
+                return (
+                <article className={`wordCard ${memoryMode ? "memoryCard" : ""}`} key={item.id}>
                   <span className="number">{String(index + 1).padStart(2, "0")}</span>
                   <button
                     className={`favoriteButton ${favoriteIds.has(item.id) ? "active" : ""}`}
@@ -581,11 +635,29 @@ export default function KotobaApp() {
                   >
                     {favoriteIds.has(item.id) ? "★" : "☆"}
                   </button>
-                  <h3 className={!visibility.word ? "concealed" : ""}>{visibility.word ? item.word : "••••"}</h3>
-                  <div className={`reading ${!visibility.reading ? "concealed" : ""}`}>{visibility.reading ? item.reading : "••••"}</div>
-                  <p className={!visibility.meaning ? "concealed" : ""}>{visibility.meaning ? item.meaning : "••••••"}</p>
+                  <button
+                    className={`memoryField wordMemoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
+                    disabled={!memoryMode}
+                    onClick={() => toggleMemoryField(item.id, "word", setMemoryToggles)}
+                  >
+                    {fieldVisible("word") ? item.word : memoryMode ? "点击显示日语" : ""}
+                  </button>
+                  <button
+                    className={`memoryField reading readingMemoryField ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
+                    disabled={!memoryMode}
+                    onClick={() => toggleMemoryField(item.id, "reading", setMemoryToggles)}
+                  >
+                    {fieldVisible("reading") ? item.reading : memoryMode ? "点击显示假名" : ""}
+                  </button>
+                  <button
+                    className={`memoryField meaningMemoryField ${!fieldVisible("meaning") ? "memoryHidden" : ""}`}
+                    disabled={!memoryMode}
+                    onClick={() => toggleMemoryField(item.id, "meaning", setMemoryToggles)}
+                  >
+                    {fieldVisible("meaning") ? item.meaning : memoryMode ? "点击显示翻译" : ""}
+                  </button>
                 </article>
-              ))}
+              )})}
             </div>
             {!currentGroup.length && <div className="empty">当前分类全部掌握，去背诵本回顾一下吧。</div>}
             <div className="actions">
@@ -739,22 +811,44 @@ export default function KotobaApp() {
                 <label key={field}>
                   <input
                     type="checkbox"
+                    disabled={listMemoryMode}
                     checked={listVisibility[field]}
                     onChange={() => setListVisibility((value) => ({ ...value, [field]: !value[field] }))}
                   />
                   {label}
                 </label>
               ))}
+              <label className="memoryModeToggle">
+                <input
+                  type="checkbox"
+                  checked={listMemoryMode}
+                  onChange={(event) => {
+                    setListMemoryMode(event.target.checked);
+                    setListMemoryToggles(new Set());
+                  }}
+                />
+                默记模式
+              </label>
             </div>
             <div className={`tableWrap ${listLoading ? "isLoading" : ""}`} aria-busy={listLoading}>
               {listLoading && <div className="loadingOverlay"><span className="spinner" /><b>加载中</b></div>}
               <table>
                 <thead><tr><th>日语</th><th>假名</th><th>翻译</th><th>标签</th><th>操作</th></tr></thead>
                 <tbody>
-                  {listItems.map((item) => (
+                  {listItems.map((item) => {
+                    const fieldVisible = (field: DisplayField) => (
+                      listMemoryMode ? isMemoryFieldVisible(item.id, field, listMemoryToggles) : listVisibility[field]
+                    );
+                    return (
                     <tr key={item.id}>
-                      <td className={`wordCell ${!listVisibility.word ? "tableConcealed" : ""}`}>
-                        <b>{listVisibility.word ? item.word : "••••"}</b>
+                      <td className={`wordCell ${!fieldVisible("word") ? "tableConcealed" : ""}`}>
+                        <button
+                          className={`tableMemoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
+                          disabled={!listMemoryMode}
+                          onClick={() => toggleMemoryField(item.id, "word", setListMemoryToggles)}
+                        >
+                          <b>{fieldVisible("word") ? item.word : listMemoryMode ? "点击显示日语" : ""}</b>
+                        </button>
                         <button
                           className={`favoriteButton tableFavorite ${favoriteIds.has(item.id) ? "active" : ""}`}
                           onClick={() => void toggleFavorite(item)}
@@ -763,11 +857,23 @@ export default function KotobaApp() {
                           {favoriteIds.has(item.id) ? "★" : "☆"}
                         </button>
                       </td>
-                      <td className={`readingCell ${!listVisibility.reading ? "tableConcealed" : ""}`}>
-                        {listVisibility.reading ? item.reading : "••••"}
+                      <td className={`readingCell ${!fieldVisible("reading") ? "tableConcealed" : ""}`}>
+                        <button
+                          className={`tableMemoryField ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
+                          disabled={!listMemoryMode}
+                          onClick={() => toggleMemoryField(item.id, "reading", setListMemoryToggles)}
+                        >
+                          {fieldVisible("reading") ? item.reading : listMemoryMode ? "点击显示假名" : ""}
+                        </button>
                       </td>
-                      <td className={`meaningCell ${!listVisibility.meaning ? "tableConcealed" : ""}`}>
-                        {listVisibility.meaning ? item.meaning : "••••••"}
+                      <td className={`meaningCell ${!fieldVisible("meaning") ? "tableConcealed" : ""}`}>
+                        <button
+                          className={`tableMemoryField ${!fieldVisible("meaning") ? "memoryHidden" : ""}`}
+                          disabled={!listMemoryMode}
+                          onClick={() => toggleMemoryField(item.id, "meaning", setListMemoryToggles)}
+                        >
+                          {fieldVisible("meaning") ? item.meaning : listMemoryMode ? "点击显示翻译" : ""}
+                        </button>
                       </td>
                       <td className="tagCell"><div className="miniTags">{item.categories.map((tag) => <span key={tag}>{tag}</span>)}</div></td>
                       <td className="rowActions actionCell">
@@ -775,7 +881,7 @@ export default function KotobaApp() {
                         <button className="danger" onClick={() => void deleteWord(item)}>删除</button>
                       </td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </div>
@@ -880,13 +986,30 @@ export default function KotobaApp() {
                 ) : developmentLoading ? (
                   <div className="articleLoading"><span className="spinner" /><b>开发文档加载中</b></div>
                 ) : developmentArticles[0] ? (
-                  <article className="articleReader developmentReader">
-                    <div className="articleTags">
-                      {developmentArticles[0].categories.map((tag) => <span key={tag}>{tag}</span>)}
-                    </div>
-                    <h1>{developmentArticles[0].title}</h1>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{developmentArticles[0].content}</ReactMarkdown>
-                  </article>
+                  <div className="developmentLayout">
+                    <nav className="documentToc" aria-label="项目文档目录">
+                      <b>目录</b>
+                      {developmentOutline.map((item) => (
+                        <a key={item.id} className={`tocLevel${item.level}`} href={`#${item.id}`}>{item.title}</a>
+                      ))}
+                    </nav>
+                    <article className="articleReader developmentReader">
+                      <div className="articleTags">
+                        {developmentArticles[0].categories.map((tag) => <span key={tag}>{tag}</span>)}
+                      </div>
+                      <h1>{developmentArticles[0].title}</h1>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          h1: ({ children }) => <h1 id={headingId(String(children))}>{children}</h1>,
+                          h2: ({ children }) => <h2 id={headingId(String(children))}>{children}</h2>,
+                          h3: ({ children }) => <h3 id={headingId(String(children))}>{children}</h3>,
+                        }}
+                      >
+                        {developmentArticles[0].content}
+                      </ReactMarkdown>
+                    </article>
+                  </div>
                 ) : (
                   <div className="empty">暂无开发需求文档。</div>
                 )}
