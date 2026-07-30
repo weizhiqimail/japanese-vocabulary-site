@@ -59,11 +59,11 @@ mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
 
 ## 文档
 
-- [系统架构](docs/ARCHITECTURE.md)
-- [前后端与数据库详细设计](docs/TECHNICAL_DESIGN.md)
-- [数据库设计](docs/DATABASE.md)
-- [开发与协作](docs/DEVELOPMENT.md)
-- [部署说明](docs/DEPLOYMENT.md)
+项目文档精简为三个互不重复的核心文件：
+
+- [项目需求文档](docs/PRODUCT_REQUIREMENTS.md)：产品目标、业务规则、页面需求和验收标准
+- [前后端技术架构](docs/APPLICATION_ARCHITECTURE.md)：前端、路由、API、数据库访问方式、开发和部署
+- [数据库结构](docs/DATABASE_SCHEMA.md)：数据表、字段、索引、约束、SQL 和表关系
 
 ## 线上地址
 
