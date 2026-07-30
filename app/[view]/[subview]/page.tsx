@@ -3,7 +3,7 @@ import KotobaApp from "../../KotobaApp";
 
 const routes: Record<string, Set<string>> = {
   review: new Set(["errors", "mastered", "favorites"]),
-  management: new Set(["categories", "documents"]),
+  management: new Set(["categories"]),
 };
 
 export default async function SubmodulePage({

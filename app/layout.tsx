@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import GitHubCorner from "./components/GitHubCorner";
 import SelectionLookup from "./components/SelectionLookup";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         {children}
+        <GitHubCorner />
         <SelectionLookup />
       </body>
     </html>

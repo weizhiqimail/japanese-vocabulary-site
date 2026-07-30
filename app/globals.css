@@ -17,10 +17,50 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: Inter, "Noto Sans JP", "Noto Sans SC", "Yu Gothic", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
+  overflow-x: hidden;
 }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .4; }
+.githubCorner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 95;
+  width: 82px;
+  height: 82px;
+  background: var(--green);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  color: white;
+  filter: drop-shadow(-3px 4px 7px rgba(21, 46, 37, .17));
+}
+.githubCorner img {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) invert(1);
+  transition: transform .18s ease;
+}
+.githubCatTail {
+  position: absolute;
+  top: 37px;
+  right: 29px;
+  width: 18px;
+  height: 13px;
+  border-right: 3px solid white;
+  border-bottom: 3px solid white;
+  border-radius: 0 0 14px 0;
+  transform-origin: 100% 0;
+}
+.githubCorner:hover img { transform: translate(-1px, 1px) rotate(-5deg); }
+.githubCorner:hover .githubCatTail { animation: githubTailWag .46s ease-in-out infinite alternate; }
+.githubCorner:focus-visible { outline: 3px solid #91b3a4; outline-offset: -3px; }
+@keyframes githubTailWag {
+  from { transform: rotate(-18deg); }
+  to { transform: rotate(18deg); }
+}
 
 .topbar {
   height: 78px;
@@ -209,6 +249,9 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .wordGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
 .wordCard {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   background: var(--card);
   border: 1px solid var(--line);
   padding: 25px 26px 23px 76px;
@@ -239,9 +282,9 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 .favoriteButton:hover { color: #a87916; background: #f4ecd5; transform: scale(1.08); }
 .favoriteButton.active { color: #c18a16; }
 .wordCard > .favoriteButton { position: absolute; right: 17px; top: 17px; }
-.wordCard h3 { font-size: 27px; font-weight: 800; margin: 0; }
+.wordCard h3 { font-size: 27px; font-weight: 800; margin: 0; overflow-wrap: anywhere; word-break: break-word; }
 .wordCard .reading { color: var(--green); font-size: 13px; margin-top: 5px; }
-.wordCard p { color: var(--muted); margin: 18px 0 0; line-height: 1.55; }
+.wordCard p { color: var(--muted); margin: 18px 0 0; line-height: 1.55; overflow-wrap: anywhere; word-break: break-word; }
 .wordCard .concealed { color: #b8bbb3; letter-spacing: .18em; user-select: none; }
 .compactWordGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .compactWordGrid .wordCard {
@@ -381,16 +424,19 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   background: var(--card);
 }
 .reviewFilters {
-  display: flex;
-  align-items: end;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: 10px 14px;
   margin: 0 0 18px;
   padding: 13px 14px;
   border-radius: 8px;
   background: #eef0e8;
 }
-.reviewFilters label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; }
+.reviewFilterFields, .reviewFilterActions { display: flex; align-items: center; gap: 10px 14px; }
+.reviewFilterFields { min-width: 0; flex-wrap: wrap; }
+.reviewFilterActions { justify-content: flex-end; white-space: nowrap; }
+.reviewFilters label { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .reviewFilters select {
   min-width: 145px;
   padding: 9px 10px;
@@ -400,6 +446,8 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   color: var(--ink);
 }
 .reviewFilters .compact { padding: 9px 12px; }
+.reviewResults { position: relative; min-height: 112px; }
+.reviewResults.isLoading .reviewList, .reviewResults.isLoading .groupNote { opacity: .32; }
 .groupNote { margin: -7px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .reviewList {
   display: grid;
@@ -409,6 +457,9 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 }
 .reviewList article {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   grid-template-columns: minmax(0, .8fr) minmax(0, 1.25fr) auto;
   gap: 12px;
   padding: 14px 8px 14px 12px;
@@ -416,8 +467,8 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   border-radius: 8px;
   background: #faf9f4;
 }
-.reviewList h3 { font-size: 19px; }
-.reviewList p { font-size: 13px; line-height: 1.45; }
+.reviewList h3 { font-size: 19px; overflow-wrap: anywhere; word-break: break-word; }
+.reviewList p { font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; word-break: break-word; }
 .inlineFavorite { align-self: center; }
 .reset { display: block; margin: 50px auto 0; border: 0; background: none; color: #9a6b63; font-size: 12px; text-decoration: underline; }
 
@@ -442,6 +493,7 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
 }
 .searchBar input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,75,60,.08); }
 .tableWrap { position: relative; overflow-x: auto; border: 1px solid var(--line); background: var(--card); min-height: 160px; }
+.wordsPage .tableWrap { overflow-x: hidden; }
 .tableWrap.isLoading table { opacity: .35; }
 .loadingOverlay {
   position: absolute;
@@ -542,7 +594,8 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   .selectionLookup button span { display: none; }
 }
 table { width: 100%; border-collapse: collapse; min-width: 780px; }
-.vocabularyTable { table-layout: fixed; }
+.vocabularyTable { table-layout: fixed; min-width: 0; }
+.vocabularyTable th, .vocabularyTable td { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
 .vocabularyTable .wordColumn { width: 27%; }
 .vocabularyTable .readingColumn { width: 17%; }
 .vocabularyTable .meaningColumn { width: 39%; }
@@ -811,7 +864,10 @@ tbody tr:hover { background: #faf9f3; }
 .documentToc .tocLevel3 { padding-left: 22px; font-size: 11px; }
 
 @media (max-width: 720px) {
-  .topbar { height: auto; padding: 14px 18px; align-items: flex-start; }
+  .githubCorner { width: 62px; height: 62px; }
+  .githubCorner img { top: 8px; right: 8px; width: 24px; height: 24px; }
+  .githubCatTail { top: 29px; right: 22px; width: 14px; height: 10px; border-width: 0 2px 2px 0; }
+  .topbar { height: auto; padding: 14px 64px 14px 18px; align-items: flex-start; }
   .brand span:last-child { display: none; }
   nav { flex-wrap: wrap; justify-content: flex-end; }
   nav button { padding: 8px 10px; font-size: 13px; }
@@ -838,8 +894,11 @@ tbody tr:hover { background: #faf9f3; }
   }
   .reviewNav button { display: grid; justify-items: center; padding: 10px 6px; text-align: center; }
   .reviewPanel { padding: 17px; }
-  .reviewFilters { align-items: stretch; }
-  .reviewFilters label { flex: 1 1 130px; }
+  .reviewFilters { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 10px; gap: 8px; }
+  .reviewFilterFields { gap: 7px; }
+  .reviewFilterFields label { flex: 1 1 120px; }
+  .reviewFilterActions { gap: 5px; }
+  .reviewFilterActions button { padding-left: 8px; padding-right: 8px; font-size: 12px; }
   .reviewFilters select { width: 100%; min-width: 0; }
   .reviewList article {
     position: relative;
@@ -852,7 +911,7 @@ tbody tr:hover { background: #faf9f3; }
   .searchBar { flex-wrap: wrap; }
   .searchBar select { flex: 1 1 130px; }
   .searchBar input { flex-basis: 100%; order: 3; }
-  .wordsPage .tableWrap { overflow: visible; border: 0; background: transparent; }
+  .wordsPage .tableWrap { overflow: hidden; border: 0; background: transparent; max-width: 100%; }
   .wordsPage .tableWrap.isLoading table { opacity: .25; }
   .wordsPage table { min-width: 0; }
   .wordsPage colgroup { display: none; }
@@ -860,13 +919,22 @@ tbody tr:hover { background: #faf9f3; }
   .wordsPage tbody { display: grid; gap: 10px; }
   .wordsPage tbody tr {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     column-gap: 12px;
     row-gap: 7px;
     padding: 15px 16px;
     border: 1px solid var(--line);
     border-radius: 9px;
     background: var(--card);
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .wordsPage td, .wordsPage .wordCellMain, .wordsPage .tableMemoryField {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
   .wordsPage tbody tr:hover { background: var(--card); }
   .wordsPage td {

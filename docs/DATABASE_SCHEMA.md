@@ -23,7 +23,7 @@
 | `learning_progress` | 用户对词汇的当前状态和累计答题次数 |
 | `favorite_groups` | 用户收藏组、备注和默认状态 |
 | `vocabulary_favorites` | 用户、收藏组与词汇的关系 |
-| `articles` | BJT 知识文章和项目文档 |
+| `articles` | BJT 等日语知识文章 |
 | `article_category_links` | 文章与类别的多对多关系 |
 
 ## 3. 实体关系

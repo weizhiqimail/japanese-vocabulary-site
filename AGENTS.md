@@ -12,8 +12,7 @@
 2. 词汇和文章都支持多个类别；类别不能物理删除，只能停用。
 3. 每次需求变化都同步更新：
    - 对应源码和测试；
-   - `docs/PRODUCT_REQUIREMENTS.md`；
-   - 管理页面中的“项目文档”文章，内容与仓库 PRD 一致。
+   - `docs/PRODUCT_REQUIREMENTS.md`。
 4. 每次数据库结构变化都同步更新：
    - 所有表与字段的 MySQL `COMMENT`；
    - `docs/DATABASE_SCHEMA.md`；
@@ -36,7 +35,7 @@
 
 1. 先查看 `git status`、相关源码和现有文档。
 2. 实现最小且完整的变更。
-3. 按职责更新 PRD、技术架构或数据库结构文档；同步数据库内项目文档文章。
+3. 按职责更新 PRD、技术架构或数据库结构文档；产品需求只维护仓库中的 PRD，不再同步为站内文章。
 4. 在 Windows PowerShell 中验证：
 
    ```powershell
@@ -51,6 +50,7 @@
 ## 关键实现约定
 
 - 主界面在 `app/KotobaApp.tsx`，公共通知组件在 `app/components/Notifications.tsx`。
+- 右上角 GitHub 入口组件在 `app/components/GitHubCorner.tsx`；站内静态图标统一保存在 `public/icons/`，运行时不直接引用第三方图标 URL。
 - 选词查询组件在 `app/components/SelectionLookup.tsx`；只允许带 `data-vocabulary-lookup="true"` 的学习、复习和词库词汇区域触发。第三方查询服务图标统一下载到 `public/icons/lookup/`，禁止运行时直接引用远程图标。
 - API 位于 `app/api`；数据库公共代码位于 `app/lib/db.ts`。
 - 当前站点是单用户个人词汇站，学习和收藏统一使用 `SITE_OWNER_KEY`；未配置时固定为 `site-owner`，不得再按请求头邮箱拆分成多个用户空间。

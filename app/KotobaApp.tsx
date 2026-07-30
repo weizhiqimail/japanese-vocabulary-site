@@ -10,7 +10,6 @@ type View = "home" | "learn" | "quiz" | "review" | "words" | "articles" | "manag
 type Mode = "reading" | "word" | "meaning";
 type DisplayField = "word" | "reading" | "meaning";
 type ReviewTab = "errors" | "mastered" | "favorites";
-type ManagementTab = "settings" | "development";
 type FavoriteGroup = {
   id: number;
   name: string;
@@ -101,17 +100,6 @@ function isMemoryFieldVisible(itemId: number, field: DisplayField, toggledFields
   return field === "word" ? !toggled : toggled;
 }
 
-function headingId(value: string) {
-  return `doc-${value.toLowerCase().replace(/[`*_()[\]{}:：，。、“”'"]/g, "").replace(/\s+/g, "-")}`;
-}
-
-function documentOutline(content: string) {
-  return content.split(/\r?\n/).flatMap((line) => {
-    const match = /^(#{1,3})\s+(.+)$/.exec(line.trim());
-    return match ? [{ level: match[1].length, title: match[2], id: headingId(match[2]) }] : [];
-  });
-}
-
 function createQuestions(items: Word[], pool: Word[]) {
   const modes: Mode[] = ["reading", "word", "meaning"];
   return shuffle(
@@ -156,6 +144,7 @@ export default function KotobaApp() {
   const [reviewErrors, setReviewErrors] = useState<Word[]>([]);
   const [reviewMastered, setReviewMastered] = useState<Word[]>([]);
   const [reviewFavorites, setReviewFavorites] = useState<Word[]>([]);
+  const [reviewLoading, setReviewLoading] = useState(false);
   const [favoriteGroups, setFavoriteGroups] = useState<FavoriteGroup[]>([]);
   const [selectedFavoriteGroupId, setSelectedFavoriteGroupId] = useState(0);
   const [favoriteGroupDialogOpen, setFavoriteGroupDialogOpen] = useState(false);
@@ -176,7 +165,7 @@ export default function KotobaApp() {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(30);
   const [pageJump, setPageJump] = useState("1");
   const [total, setTotal] = useState(0);
   const [listItems, setListItems] = useState<Word[]>([]);
@@ -191,9 +180,6 @@ export default function KotobaApp() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
-  const [developmentArticles, setDevelopmentArticles] = useState<Article[]>([]);
-  const [developmentLoading, setDevelopmentLoading] = useState(false);
-  const [managementTab, setManagementTab] = useState<ManagementTab>("settings");
   const [categoryOptions, setCategoryOptions] = useState<CategoryConfig[]>([]);
   const [categoryEditing, setCategoryEditing] = useState<CategoryConfig>(emptyCategoryForm);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -206,9 +192,6 @@ export default function KotobaApp() {
   const selectedCategory = studyCategories.find((item) => item.id === categoryId) ?? null;
   const articleRootCategory = categoryOptions.find(
     (item) => Boolean(item.enabled) && item.purpose === "study" && (item.scope === "article" || item.scope === "both"),
-  ) ?? null;
-  const developmentCategory = categoryOptions.find(
-    (item) => Boolean(item.enabled) && item.purpose === "development" && (item.scope === "article" || item.scope === "both"),
   ) ?? null;
   const defaultFavoriteGroup = favoriteGroups.find((group) => Boolean(group.isDefault)) ?? null;
 
@@ -287,8 +270,9 @@ export default function KotobaApp() {
     if (segments[0] === "review" && ["errors", "mastered", "favorites"].includes(segments[1])) {
       setReviewTab(segments[1] as ReviewTab);
     }
-    if (segments[0] === "management" && ["categories", "documents"].includes(segments[1])) {
-      setManagementTab(segments[1] === "categories" ? "settings" : "development");
+    if (segments[0] === "management" && segments[1] === "documents") {
+      router.replace("/management/categories");
+      return;
     }
     if (nextView === "quiz" && questions.length === 0) {
       setView("learn");
@@ -299,17 +283,25 @@ export default function KotobaApp() {
   }, [pathname, questions.length, router]);
   useEffect(() => {
     if (view !== "review") return;
+    let cancelled = false;
+    setReviewLoading(true);
     Promise.all([
       fetch(`/api/progress?categoryId=${reviewCategoryId}&status=error`).then((response) => response.json()),
       fetch(`/api/progress?categoryId=${reviewCategoryId}&status=mastered`).then((response) => response.json()),
       selectedFavoriteGroupId
         ? fetch(`/api/favorites?categoryId=${reviewCategoryId}&groupId=${selectedFavoriteGroupId}`).then((response) => response.json())
         : Promise.resolve({ items: [] }),
-    ]).then(([errorData, masteredData, favoriteData]) => {
-      setReviewErrors(errorData.items ?? []);
-      setReviewMastered(masteredData.items ?? []);
-      setReviewFavorites(favoriteData.items ?? []);
-    });
+    ])
+      .then(([errorData, masteredData, favoriteData]) => {
+        if (cancelled) return;
+        setReviewErrors(errorData.items ?? []);
+        setReviewMastered(masteredData.items ?? []);
+        setReviewFavorites(favoriteData.items ?? []);
+      })
+      .finally(() => {
+        if (!cancelled) setReviewLoading(false);
+      });
+    return () => { cancelled = true; };
   }, [view, reviewCategoryId, selectedFavoriteGroupId, favorites]);
   useEffect(() => {
     if (!studyCategories.length || studyCategories.some((item) => item.id === categoryId)) return;
@@ -329,14 +321,6 @@ export default function KotobaApp() {
       .finally(() => setArticlesLoading(false));
   }, [view, articles.length, articleRootCategory]);
   useEffect(() => {
-    if (view !== "management" || managementTab !== "development" || developmentArticles.length || !developmentCategory) return;
-    setDevelopmentLoading(true);
-    fetch(`/api/articles?categoryId=${developmentCategory.id}`)
-      .then((response) => response.json())
-      .then((data) => setDevelopmentArticles(data.items ?? []))
-      .finally(() => setDevelopmentLoading(false));
-  }, [view, managementTab, developmentArticles.length, developmentCategory]);
-  useEffect(() => {
     const studiedIds = new Set([...mastered, ...errors].map((item) => item.id));
     const pool = words.filter((item) => !studiedIds.has(item.id));
     setCurrentGroup(shuffle(pool).slice(0, groupSize));
@@ -348,10 +332,6 @@ export default function KotobaApp() {
   );
   const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.id)), [favorites]);
   const reviewFavoriteIds = useMemo(() => new Set(reviewFavorites.map((item) => item.id)), [reviewFavorites]);
-  const developmentOutline = useMemo(
-    () => documentOutline(developmentArticles[0]?.content ?? ""),
-    [developmentArticles],
-  );
   const pendingCount = words.filter((item) => !studiedIds.has(item.id)).length;
   const currentQuestion = questions[questionIndex];
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
@@ -605,7 +585,7 @@ export default function KotobaApp() {
                 </label>
                 <label>每组
                   <select value={groupSize} onChange={(event) => setGroupSize(Number(event.target.value))}>
-                    {[10, 20, 30, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+                    {[10, 20, 30, 40, 50, 100].map((size) => <option key={size} value={size}>{size}</option>)}
                   </select>
                   词
                 </label>
@@ -754,19 +734,23 @@ export default function KotobaApp() {
                   )}
                 </div>
                 <div className="reviewFilters">
-                  <label>词汇分类
-                    <select value={reviewCategoryId} onChange={(event) => setReviewCategoryId(Number(event.target.value))}>
-                      <option value={0}>全部</option>
-                      {studyCategories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                    </select>
-                  </label>
-                  {reviewTab === "favorites" && (
-                    <>
+                  <div className="reviewFilterFields">
+                    <label>词汇分类
+                      <select value={reviewCategoryId} onChange={(event) => setReviewCategoryId(Number(event.target.value))}>
+                        <option value={0}>全部</option>
+                        {studyCategories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                      </select>
+                    </label>
+                    {reviewTab === "favorites" && (
                       <label>收藏组
                         <select value={selectedFavoriteGroupId} onChange={(event) => setSelectedFavoriteGroupId(Number(event.target.value))}>
                           {favoriteGroups.map((group) => <option key={group.id} value={group.id}>{group.name}{group.isDefault ? "（默认）" : ""}</option>)}
                         </select>
                       </label>
+                    )}
+                  </div>
+                  {reviewTab === "favorites" && (
+                    <div className="reviewFilterActions">
                       <button className="ghost compact" onClick={() => {
                         setFavoriteGroupEditing({ id: 0, name: "", note: "", isDefault: false });
                         setFavoriteGroupDialogOpen(true);
@@ -778,32 +762,40 @@ export default function KotobaApp() {
                           setFavoriteGroupDialogOpen(true);
                         }}>编辑当前组</button>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
-                {reviewTab === "favorites" && favoriteGroups.find((group) => group.id === selectedFavoriteGroupId)?.note && (
-                  <p className="groupNote">{favoriteGroups.find((group) => group.id === selectedFavoriteGroupId)?.note}</p>
-                )}
-                <div className="list reviewList">
-                  {(reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).map((item) => (
-                    <article key={item.id} data-vocabulary-lookup="true">
-                      <div><h3>{item.word}</h3><span>{item.reading}</span></div>
-                      <p>{item.meaning}</p>
-                      <button
-                        className={`favoriteButton inlineFavorite ${(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? "active" : ""}`}
-                        onClick={() => void toggleFavorite(item, reviewTab === "favorites" ? selectedFavoriteGroupId : 0)}
-                        aria-label={(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? `取消收藏 ${item.word}` : `收藏 ${item.word}`}
-                      >
-                        {(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? "★" : "☆"}
-                      </button>
-                    </article>
-                  ))}
-                </div>
-                {(reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).length === 0 && (
-                  <div className="empty">
-                    {reviewTab === "errors" ? "还没有错题，继续保持。" : reviewTab === "mastered" ? "通过三种题型的词会出现在这里。" : "还没有收藏词汇。"}
+                <div className={`reviewResults ${reviewLoading ? "isLoading" : ""}`} aria-busy={reviewLoading}>
+                  {reviewLoading && (
+                    <div className="loadingOverlay">
+                      <span className="spinner" aria-hidden="true" />
+                      <b>加载中</b>
+                    </div>
+                  )}
+                  {reviewTab === "favorites" && favoriteGroups.find((group) => group.id === selectedFavoriteGroupId)?.note && (
+                    <p className="groupNote">{favoriteGroups.find((group) => group.id === selectedFavoriteGroupId)?.note}</p>
+                  )}
+                  <div className="list reviewList">
+                    {(reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).map((item) => (
+                      <article key={item.id} data-vocabulary-lookup="true">
+                        <div><h3>{item.word}</h3><span>{item.reading}</span></div>
+                        <p>{item.meaning}</p>
+                        <button
+                          className={`favoriteButton inlineFavorite ${(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? "active" : ""}`}
+                          onClick={() => void toggleFavorite(item, reviewTab === "favorites" ? selectedFavoriteGroupId : 0)}
+                          aria-label={(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? `取消收藏 ${item.word}` : `收藏 ${item.word}`}
+                        >
+                          {(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? "★" : "☆"}
+                        </button>
+                      </article>
+                    ))}
                   </div>
-                )}
+                  {!reviewLoading && (reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).length === 0 && (
+                    <div className="empty">
+                      {reviewTab === "errors" ? "还没有错题，继续保持。" : reviewTab === "mastered" ? "通过三种题型的词会出现在这里。" : "还没有收藏词汇。"}
+                    </div>
+                  )}
+                  </div>
               </div>
             </div>
           </section>
@@ -922,7 +914,7 @@ export default function KotobaApp() {
                   }}
                   aria-label="每页显示数量"
                 >
-                  {[20, 30, 40, 50].map((size) => <option key={size} value={size}>{size} 条</option>)}
+                  {[10, 20, 30, 40, 50, 100].map((size) => <option key={size} value={size}>{size} 条</option>)}
                 </select>
               </label>
               <form
@@ -984,16 +976,14 @@ export default function KotobaApp() {
         {view === "management" && (
           <section className="content managementPage">
             <div className="sectionHead">
-              <div><span className="eyebrow">MANAGEMENT</span><h2>管理</h2><p>维护系统配置并查看项目开发需求。</p></div>
+              <div><span className="eyebrow">MANAGEMENT</span><h2>管理</h2><p>维护系统类别配置。</p></div>
             </div>
             <div className="settingsLayout">
               <aside className="settingsNav" aria-label="管理页面">
-                <button className={managementTab === "settings" ? "active" : ""} onClick={() => router.push("/management/categories")}>类别</button>
-                <button className={managementTab === "development" ? "active" : ""} onClick={() => router.push("/management/documents")}>项目文档</button>
+                <button className="active" onClick={() => router.push("/management/categories")}>类别</button>
               </aside>
               <div className="settingsPanel">
-                {managementTab === "settings" ? (
-                  <>
+                <>
                     <div className="panelHead">
                       <div><h3>类别</h3><p>类别可用于词汇、文章或两者；学习类标签会出现在背词分类中。</p></div>
                       <button className="primary" onClick={() => { setCategoryEditing(emptyCategoryForm); setCategoryDialogOpen(true); }}>＋ 新增类别</button>
@@ -1016,37 +1006,7 @@ export default function KotobaApp() {
                       </table>
                     </div>
                     <p className="configNote">类别用于历史数据关联，因此不提供删除操作；不再使用时可将其停用。</p>
-                  </>
-                ) : developmentLoading ? (
-                  <div className="articleLoading"><span className="spinner" /><b>开发文档加载中</b></div>
-                ) : developmentArticles[0] ? (
-                  <div className="developmentLayout">
-                    <nav className="documentToc" aria-label="项目文档目录">
-                      <b>目录</b>
-                      {developmentOutline.map((item) => (
-                        <a key={item.id} className={`tocLevel${item.level}`} href={`#${item.id}`}>{item.title}</a>
-                      ))}
-                    </nav>
-                    <article className="articleReader developmentReader">
-                      <div className="articleTags">
-                        {developmentArticles[0].categories.map((tag) => <span key={tag}>{tag}</span>)}
-                      </div>
-                      <h1>{developmentArticles[0].title}</h1>
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          h1: ({ children }) => <h1 id={headingId(String(children))}>{children}</h1>,
-                          h2: ({ children }) => <h2 id={headingId(String(children))}>{children}</h2>,
-                          h3: ({ children }) => <h3 id={headingId(String(children))}>{children}</h3>,
-                        }}
-                      >
-                        {developmentArticles[0].content}
-                      </ReactMarkdown>
-                    </article>
-                  </div>
-                ) : (
-                  <div className="empty">暂无开发需求文档。</div>
-                )}
+                </>
               </div>
             </div>
           </section>
