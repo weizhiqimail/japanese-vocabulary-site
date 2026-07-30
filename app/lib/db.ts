@@ -15,10 +15,6 @@ export function getDb() {
   });
 }
 
-export function getUserKey(request: Request) {
-  return (
-    request.headers.get("oai-authenticated-user-email") ??
-    request.headers.get("x-forwarded-email") ??
-    "site-owner"
-  );
+export function getUserKey(_request: Request) {
+  return process.env.SITE_OWNER_KEY?.trim() || "site-owner";
 }

@@ -250,7 +250,11 @@ export default function KotobaApp() {
     const data = await response.json();
     const items = data.items ?? [];
     setFavoriteGroups(items);
-    setSelectedFavoriteGroupId((current) => current || Number(items.find((item: FavoriteGroup) => Boolean(item.isDefault))?.id || items[0]?.id || 0));
+    setSelectedFavoriteGroupId((current) => (
+      items.some((item: FavoriteGroup) => Number(item.id) === current)
+        ? current
+        : Number(items.find((item: FavoriteGroup) => Boolean(item.isDefault))?.id || items[0]?.id || 0)
+    ));
   }, []);
 
   const loadList = useCallback(async () => {

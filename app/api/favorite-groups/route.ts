@@ -4,7 +4,7 @@ import { getDb, getUserKey } from "@/app/lib/db";
 async function ensureDefaultGroup(db: Awaited<ReturnType<typeof getDb>>, userKey: string) {
   await db.execute(
     `INSERT INTO favorite_groups (user_key, name, note, is_default)
-     SELECT ?, '默认收藏组', '系统默认收藏组', 1
+     SELECT ?, '系统默认组', '未指定收藏组时使用', 1
      WHERE NOT EXISTS (SELECT 1 FROM favorite_groups WHERE user_key = ?)`,
     [userKey, userKey],
   );

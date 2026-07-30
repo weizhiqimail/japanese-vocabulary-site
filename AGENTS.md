@@ -52,7 +52,7 @@
 
 - 主界面在 `app/KotobaApp.tsx`，公共通知组件在 `app/components/Notifications.tsx`。
 - API 位于 `app/api`；数据库公共代码位于 `app/lib/db.ts`。
-- 用户身份优先读取 `oai-authenticated-user-email` 或 `x-forwarded-email`；仅在本地或缺失时使用明确的回退值。
+- 当前站点是单用户个人词汇站，学习和收藏统一使用 `SITE_OWNER_KEY`；未配置时固定为 `site-owner`，不得再按请求头邮箱拆分成多个用户空间。
 - 学习题目、选项和学习顺序必须随机；已学会的词汇不能再次进入普通学习组。
 - 收藏操作默认进入用户设置的默认收藏组，并在通知中显示收藏组名称。
 - 页面隐藏项与默记模式的行为应在学习页和词库页保持一致。

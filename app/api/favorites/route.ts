@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     if (groupId <= 0) {
       const [result] = await db.execute(
         `INSERT INTO favorite_groups (user_key, name, note, is_default)
-         VALUES (?, '默认收藏组', '系统默认收藏组', 1)`,
+         VALUES (?, '系统默认组', '未指定收藏组时使用', 1)`,
         [getUserKey(request)],
       );
       groupId = Number((result as { insertId: number }).insertId);
