@@ -36,11 +36,12 @@ test("server-renders the vocabulary application and local GitHub corner", async 
   assert.match(html, /src="\/icons\/github\/github\.png"/);
 });
 
-test("keeps the GitHub asset local and removes the project-document route", async () => {
-  const [component, route, css] = await Promise.all([
+test("keeps shared interactions local, responsive, and duplicate-safe", async () => {
+  const [component, route, css, app] = await Promise.all([
     readFile(new URL("../app/components/GitHubCorner.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/[view]/[subview]/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/KotobaApp.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.match(component, /src="\/icons\/github\/github\.png"/);
@@ -49,4 +50,9 @@ test("keeps the GitHub asset local and removes the project-document route", asyn
   assert.match(css, /\.githubCorner:hover \.githubCatTail/);
   assert.match(css, /@keyframes githubTailWag/);
   assert.match(css, /\.wordsPage \.tableWrap \{ overflow-x: hidden; \}/);
+  assert.match(css, /max-height:\s*calc\(100dvh - 20px\)/);
+  assert.match(css, /-webkit-overflow-scrolling:\s*touch/);
+  assert.match(app, /const apiFetch = useCallback/);
+  assert.match(app, /submitLocks\.current\.word/);
+  assert.match(app, /className="globalRequestLoading"/);
 });

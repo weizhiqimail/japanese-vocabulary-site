@@ -533,6 +533,25 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   transition: opacity .14s ease, transform .14s ease;
   backdrop-filter: blur(10px);
 }
+.globalRequestLoading {
+  position: fixed;
+  top: 82px;
+  left: 50%;
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 15px;
+  border: 1px solid #c9ddce;
+  border-radius: 999px;
+  color: var(--green);
+  background: rgba(240, 249, 241, .96);
+  box-shadow: 0 10px 28px rgba(22, 75, 60, .16);
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: pageFade .18s ease both;
+}
+.globalRequestLoading .spinner { width: 17px; height: 17px; }
 .selectionLookup.ready {
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -664,11 +683,16 @@ tbody tr:hover { background: #faf9f3; }
   display: grid;
   place-items: center;
   padding: 20px;
+  overflow-y: auto;
   background: rgba(25, 29, 24, .48);
   backdrop-filter: blur(4px);
 }
 .modal {
   width: min(560px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--card);
   padding: 28px;
   border-radius: 10px;
@@ -676,6 +700,10 @@ tbody tr:hover { background: #faf9f3; }
   display: grid;
   gap: 16px;
   animation: pageFade .22s ease both;
+}
+.modal .primary:disabled {
+  cursor: wait;
+  opacity: .62;
 }
 .modalHead { display: flex; align-items: center; justify-content: space-between; }
 .modalHead h2 { margin: 0; font-size: 32px; font-weight: 800; }
@@ -868,6 +896,25 @@ tbody tr:hover { background: #faf9f3; }
   .githubCorner img { top: 8px; right: 8px; width: 24px; height: 24px; }
   .githubCatTail { top: 29px; right: 22px; width: 14px; height: 10px; border-width: 0 2px 2px 0; }
   .topbar { height: auto; padding: 14px 64px 14px 18px; align-items: flex-start; }
+  .globalRequestLoading { top: 70px; padding: 8px 12px; font-size: 13px; }
+  .modalBackdrop {
+    place-items: start center;
+    padding: 10px;
+  }
+  .modal {
+    max-height: calc(100dvh - 20px);
+    padding: 20px 16px;
+    gap: 13px;
+  }
+  .modalHead {
+    position: sticky;
+    top: -20px;
+    z-index: 2;
+    margin: -20px -16px 0;
+    padding: 18px 16px 12px;
+    background: var(--card);
+  }
+  .modalHead h2 { font-size: 26px; }
   .brand span:last-child { display: none; }
   nav { flex-wrap: wrap; justify-content: flex-end; }
   nav button { padding: 8px 10px; font-size: 13px; }

@@ -181,6 +181,11 @@ export default function KotobaApp() {
   const [categoryOptions, setCategoryOptions] = useState<CategoryConfig[]>([]);
   const [categoryEditing, setCategoryEditing] = useState<CategoryConfig>(emptyCategoryForm);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [activeRequests, setActiveRequests] = useState(0);
+  const [savingWord, setSavingWord] = useState(false);
+  const [savingCategory, setSavingCategory] = useState(false);
+  const [savingFavoriteGroup, setSavingFavoriteGroup] = useState(false);
+  const submitLocks = useRef({ word: false, category: false, favoriteGroup: false });
   const studyCategories = categoryOptions.filter(
     (item) => Boolean(item.enabled) && item.purpose === "study" && (item.scope === "vocabulary" || item.scope === "both"),
   );
@@ -203,19 +208,28 @@ export default function KotobaApp() {
     setNotifications((items) => [...items, { id: notificationSequence.current, text }]);
   }
 
+  const apiFetch = useCallback(async (...args: Parameters<typeof fetch>) => {
+    setActiveRequests((count) => count + 1);
+    try {
+      return await fetch(...args);
+    } finally {
+      setActiveRequests((count) => Math.max(0, count - 1));
+    }
+  }, []);
+
   const loadCategories = useCallback(async () => {
-    const response = await fetch("/api/categories");
+    const response = await apiFetch("/api/categories");
     const data = await response.json();
     setCategoryOptions(data.items ?? []);
-  }, []);
+  }, [apiFetch]);
 
   const loadCategory = useCallback(async () => {
     if (!categoryId) return;
     setLoading(true);
     const [wordResponse, masteredResponse, errorResponse] = await Promise.all([
-      fetch(`/api/vocabulary?categoryId=${categoryId}&all=true`),
-      fetch(`/api/progress?categoryId=${categoryId}&status=mastered`),
-      fetch(`/api/progress?categoryId=${categoryId}&status=error`),
+      apiFetch(`/api/vocabulary?categoryId=${categoryId}&all=true`),
+      apiFetch(`/api/progress?categoryId=${categoryId}&status=mastered`),
+      apiFetch(`/api/progress?categoryId=${categoryId}&status=error`),
     ]);
     const [wordData, masteredData, errorData] = await Promise.all([
       wordResponse.json(), masteredResponse.json(), errorResponse.json(),
@@ -224,10 +238,10 @@ export default function KotobaApp() {
     setMastered(masteredData.items ?? []);
     setErrors(errorData.items ?? []);
     setLoading(false);
-  }, [categoryId]);
+  }, [apiFetch, categoryId]);
 
   const loadFavoriteGroups = useCallback(async () => {
-    const response = await fetch("/api/favorite-groups");
+    const response = await apiFetch("/api/favorite-groups");
     const data = await response.json();
     const items = data.items ?? [];
     setFavoriteGroups(items);
@@ -236,13 +250,13 @@ export default function KotobaApp() {
         ? current
         : Number(items.find((item: FavoriteGroup) => Boolean(item.isDefault))?.id || items[0]?.id || 0)
     ));
-  }, []);
+  }, [apiFetch]);
 
   const loadList = useCallback(async () => {
     if (!categoryId) return;
     setListLoading(true);
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/vocabulary?categoryId=${categoryId}&page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search.trim())}`,
       );
       const data = await response.json();
@@ -251,17 +265,17 @@ export default function KotobaApp() {
     } finally {
       setListLoading(false);
     }
-  }, [categoryId, page, pageSize, search]);
+  }, [apiFetch, categoryId, page, pageSize, search]);
 
   useEffect(() => { void loadCategory(); }, [loadCategory]);
   useEffect(() => { void loadCategories(); }, [loadCategories]);
   useEffect(() => { void loadFavoriteGroups(); }, [loadFavoriteGroups]);
   useEffect(() => {
     if (!defaultFavoriteGroup) return;
-    fetch(`/api/favorites?categoryId=0&groupId=${defaultFavoriteGroup.id}`)
+    apiFetch(`/api/favorites?categoryId=0&groupId=${defaultFavoriteGroup.id}`)
       .then((response) => response.json())
       .then((data) => setFavorites(data.items ?? []));
-  }, [defaultFavoriteGroup?.id]);
+  }, [apiFetch, defaultFavoriteGroup?.id]);
   useEffect(() => {
     const nextView = viewFromPath(pathname);
     const segments = pathname.split("/").filter(Boolean);
@@ -284,10 +298,10 @@ export default function KotobaApp() {
     let cancelled = false;
     setReviewLoading(true);
     Promise.all([
-      fetch(`/api/progress?categoryId=${reviewCategoryId}&status=error`).then((response) => response.json()),
-      fetch(`/api/progress?categoryId=${reviewCategoryId}&status=mastered`).then((response) => response.json()),
+      apiFetch(`/api/progress?categoryId=${reviewCategoryId}&status=error`).then((response) => response.json()),
+      apiFetch(`/api/progress?categoryId=${reviewCategoryId}&status=mastered`).then((response) => response.json()),
       selectedFavoriteGroupId
-        ? fetch(`/api/favorites?categoryId=${reviewCategoryId}&groupId=${selectedFavoriteGroupId}`).then((response) => response.json())
+        ? apiFetch(`/api/favorites?categoryId=${reviewCategoryId}&groupId=${selectedFavoriteGroupId}`).then((response) => response.json())
         : Promise.resolve({ items: [] }),
     ])
       .then(([errorData, masteredData, favoriteData]) => {
@@ -300,7 +314,7 @@ export default function KotobaApp() {
         if (!cancelled) setReviewLoading(false);
       });
     return () => { cancelled = true; };
-  }, [view, reviewCategoryId, selectedFavoriteGroupId, favorites]);
+  }, [apiFetch, view, reviewCategoryId, selectedFavoriteGroupId, favorites]);
   useEffect(() => {
     if (!studyCategories.length || studyCategories.some((item) => item.id === categoryId)) return;
     setCategoryId(studyCategories[0].id);
@@ -309,7 +323,7 @@ export default function KotobaApp() {
   useEffect(() => {
     if (view !== "articles" || articles.length || !articleRootCategory) return;
     setArticlesLoading(true);
-    fetch(`/api/articles?categoryId=${articleRootCategory.id}`)
+    apiFetch(`/api/articles?categoryId=${articleRootCategory.id}`)
       .then((response) => response.json())
       .then((data) => {
         const items = data.items ?? [];
@@ -317,7 +331,7 @@ export default function KotobaApp() {
         setSelectedArticleId(items[0]?.id ?? null);
       })
       .finally(() => setArticlesLoading(false));
-  }, [view, articles.length, articleRootCategory]);
+  }, [apiFetch, view, articles.length, articleRootCategory]);
   useEffect(() => {
     const studiedIds = new Set([...mastered, ...errors].map((item) => item.id));
     const pool = words.filter((item) => !studiedIds.has(item.id));
@@ -436,7 +450,7 @@ export default function KotobaApp() {
       correct: wrong.has(item.id) ? 0 : 3,
       wrong: wrong.has(item.id) ? 1 : 0,
     }));
-    await fetch("/api/progress", {
+    await apiFetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ results }),
@@ -447,50 +461,66 @@ export default function KotobaApp() {
 
   async function saveWord(event: React.FormEvent) {
     event.preventDefault();
+    if (submitLocks.current.word) return;
+    submitLocks.current.word = true;
+    setSavingWord(true);
     const payload = editing;
-    const response = await fetch(
-      editing.id ? `/api/vocabulary/${editing.id}` : "/api/vocabulary",
-      {
-        method: editing.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      },
-    );
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.error ?? "保存失败");
-      return;
+    try {
+      const response = await apiFetch(
+        editing.id ? `/api/vocabulary/${editing.id}` : "/api/vocabulary",
+        {
+          method: editing.id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.error ?? "保存失败");
+        return;
+      }
+      setDialogOpen(false);
+      setEditing(emptyForm);
+      setMessage("已保存");
+      await Promise.all([loadList(), loadCategory()]);
+    } finally {
+      submitLocks.current.word = false;
+      setSavingWord(false);
     }
-    setDialogOpen(false);
-    setEditing(emptyForm);
-    setMessage("已保存");
-    await Promise.all([loadList(), loadCategory()]);
   }
 
   async function saveCategory(event: React.FormEvent) {
     event.preventDefault();
-    const response = await fetch(
-      categoryEditing.id ? `/api/categories/${categoryEditing.id}` : "/api/categories",
-      {
-        method: categoryEditing.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categoryEditing),
-      },
-    );
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.error ?? "类别保存失败");
-      return;
+    if (submitLocks.current.category) return;
+    submitLocks.current.category = true;
+    setSavingCategory(true);
+    try {
+      const response = await apiFetch(
+        categoryEditing.id ? `/api/categories/${categoryEditing.id}` : "/api/categories",
+        {
+          method: categoryEditing.id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryEditing),
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.error ?? "类别保存失败");
+        return;
+      }
+      setCategoryDialogOpen(false);
+      setCategoryEditing(emptyCategoryForm);
+      setMessage("类别已保存");
+      await loadCategories();
+    } finally {
+      submitLocks.current.category = false;
+      setSavingCategory(false);
     }
-    setCategoryDialogOpen(false);
-    setCategoryEditing(emptyCategoryForm);
-    setMessage("类别已保存");
-    await loadCategories();
   }
 
   async function deleteWord(item: Word) {
     if (!window.confirm(`确定删除「${item.word}」吗？`)) return;
-    await fetch(`/api/vocabulary/${item.id}`, { method: "DELETE" });
+    await apiFetch(`/api/vocabulary/${item.id}`, { method: "DELETE" });
     setMessage("已删除");
     await Promise.all([loadList(), loadCategory()]);
   }
@@ -506,7 +536,7 @@ export default function KotobaApp() {
     } else {
       setFavorites((current) => favorite ? [item, ...current.filter((word) => word.id !== item.id)] : current.filter((word) => word.id !== item.id));
     }
-    const response = await fetch("/api/favorites", {
+    const response = await apiFetch("/api/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ vocabularyId: item.id, favorite, groupId }),
@@ -522,20 +552,28 @@ export default function KotobaApp() {
 
   async function saveFavoriteGroup(event: React.FormEvent) {
     event.preventDefault();
-    const response = await fetch("/api/favorite-groups", {
-      method: favoriteGroupEditing.id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(favoriteGroupEditing),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.error ?? "收藏组保存失败");
-      return;
+    if (submitLocks.current.favoriteGroup) return;
+    submitLocks.current.favoriteGroup = true;
+    setSavingFavoriteGroup(true);
+    try {
+      const response = await apiFetch("/api/favorite-groups", {
+        method: favoriteGroupEditing.id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(favoriteGroupEditing),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.error ?? "收藏组保存失败");
+        return;
+      }
+      setFavoriteGroupDialogOpen(false);
+      setFavoriteGroupEditing({ id: 0, name: "", note: "", isDefault: false });
+      await loadFavoriteGroups();
+      setMessage("收藏组已保存");
+    } finally {
+      submitLocks.current.favoriteGroup = false;
+      setSavingFavoriteGroup(false);
     }
-    setFavoriteGroupDialogOpen(false);
-    setFavoriteGroupEditing({ id: 0, name: "", note: "", isDefault: false });
-    await loadFavoriteGroups();
-    setMessage("收藏组已保存");
   }
 
   return (
@@ -1037,7 +1075,7 @@ export default function KotobaApp() {
               ))}
             </fieldset>
             <label>词性<input value={editing.partOfSpeech} onChange={(event) => setEditing({ ...editing, partOfSpeech: event.target.value })} /></label>
-            <button className="primary">保存单词</button>
+            <button className="primary" disabled={savingWord}>{savingWord ? "保存中…" : "保存单词"}</button>
           </form>
         </div>
       )}
@@ -1062,7 +1100,7 @@ export default function KotobaApp() {
               <label>排序<input type="number" min="0" value={categoryEditing.sortOrder} onChange={(event) => setCategoryEditing({ ...categoryEditing, sortOrder: Number(event.target.value) })} /></label>
               <label className="checkLine"><input type="checkbox" checked={Boolean(categoryEditing.enabled)} onChange={(event) => setCategoryEditing({ ...categoryEditing, enabled: event.target.checked })} />启用</label>
             </div>
-            <button className="primary">保存类别</button>
+            <button className="primary" disabled={savingCategory}>{savingCategory ? "保存中…" : "保存类别"}</button>
           </form>
         </div>
       )}
@@ -1083,8 +1121,14 @@ export default function KotobaApp() {
               <input type="checkbox" checked={favoriteGroupEditing.isDefault} onChange={(event) => setFavoriteGroupEditing({ ...favoriteGroupEditing, isDefault: event.target.checked })} />
               设为默认收藏组
             </label>
-            <button className="primary">保存收藏组</button>
+            <button className="primary" disabled={savingFavoriteGroup}>{savingFavoriteGroup ? "保存中…" : "保存收藏组"}</button>
           </form>
+        </div>
+      )}
+      {activeRequests > 0 && (
+        <div className="globalRequestLoading" role="status" aria-live="polite">
+          <span className="spinner" aria-hidden="true" />
+          <b>加载中</b>
         </div>
       )}
       <Notifications items={notifications} onDismiss={dismissNotification} />

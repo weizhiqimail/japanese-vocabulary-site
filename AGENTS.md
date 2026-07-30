@@ -31,6 +31,7 @@
 16. 在线 MySQL 是 1 GB 内存的测试实例；批量重建每批最多写入 30 条，禁止一次提交数百或数千行参数。
 17. 词汇类别关联必须保存 `sort_order`、`source_file`、`source_line`；查询按类别内来源顺序返回。固定搭配或句子没有可靠读音时 `reading` 使用 `NULL`，测试跳过假名题。
 18. `vocabulary.reading` 在数据库和编辑表单中均为可选；来源信息只存放在 `vocabulary_category_links`，不得新增 `familiarity` 或把来源说明写回词汇主体。
+19. 所有浏览器端 HTTP 请求必须通过统一请求包装器显示 Loading；新增操作必须使用同步提交锁与禁用按钮防止重复 POST。手机端弹窗必须限制视口高度并允许内部纵向滚动。
 
 ## 开发工作流
 
