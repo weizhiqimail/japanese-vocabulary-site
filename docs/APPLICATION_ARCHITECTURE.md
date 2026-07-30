@@ -165,7 +165,7 @@ flowchart TD
 
 收藏优先使用请求指定的收藏组；未指定时使用默认组；默认组不存在时自动创建。所有收藏查询和写入都限定当前用户。
 
-文章按类别 ID 查询，正文使用 Markdown。产品需求文档仅保存在仓库 `docs/PRODUCT_REQUIREMENTS.md`，不再作为站内文章同步。
+文章按类别 ID 查询，正文使用 Markdown。在线 MySQL 是网站运行时来源，数据库中的每篇文章同时导出到 `files/article/`，并通过目录清单记录文章 ID、文件、类别和排序；同步后逐字核验正文一致。产品需求文档仅保存在仓库 `docs/PRODUCT_REQUIREMENTS.md`，不再作为站内文章同步。
 
 ## 6. 数据库访问
 

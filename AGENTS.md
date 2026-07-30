@@ -24,7 +24,7 @@
 9. 只有用户明确“确认发布”后，才把已验证版本部署到生产 Sites。GitHub 推送不等同于生产发布。
 10. 不覆盖或回退用户未授权的现有改动；不使用 `git reset --hard` 或强制推送。
 11. 每次任务完成前检查并更新 `AGENTS.md`：新增的长期规则、目录、数据来源或工作流必须写入；交付时明确说明本次是否更新及更新内容。
-12. 原始词汇与文章来源统一保存在 `files/vocabulary/`。新增或替换来源文件时，同步更新 README 和项目需求文档中的链接。
+12. 原始词汇来源保存在 `files/vocabulary/`；数据库文章逐篇保存在 `files/article/`。新增或替换来源文件时，同步更新 README 和项目需求文档中的链接。
 13. 词汇导入不得只识别单个单词：固定搭配、短语和完整句子都必须进入候选。使用 `scripts/audit-and-import-vocabulary.mjs` 先审计、后事务导入、再反向核验。
 14. 来源导入顺序为 BJT 后 N1；只有审计结果 `missingCount=0` 且 `needsCategoryCount=0` 才能报告完成。
 15. 不得把 BJT 外来语括号统一当作假名；`アポ（イント）` 等表示可选后缀，必须保留完整词面。N1 必须保留第七列补充说明。
@@ -37,6 +37,7 @@
 22. 学习、复习和词库的筛选及分页必须同步 URL 查询参数；至少支持 `categoryId`、`pageNum`、`pageSize`，收藏页同时支持 `groupId`，刷新和浏览器历史导航后必须恢复。
 23. 手机主导航只常驻首页、学习和导航三项；其余页面及 GitHub 项目入口收纳在导航浮层。版本号和构建时间在手机端位于品牌名下方并分行显示。
 24. 站内文章正文使用结构化 Markdown：并列项用无序列表、流程用有序列表、对照信息用表格、补充说明用引用，避免连续平铺段落。
+25. 数据库每条文章都必须在 `files/article/` 存在对应 Markdown 文件；新增或修改文章时同步数据库与文件，逐字核验正文，并更新 `files/article/README.md` 的 ID、文件、类别和排序清单。
 
 ## 开发工作流
 
@@ -64,5 +65,5 @@
 - 学习题目、选项和学习顺序必须随机；已学会的词汇不能再次进入普通学习组。
 - 收藏操作默认进入用户设置的默认收藏组，并在通知中显示收藏组名称。
 - 页面隐藏项与默记模式的行为应在学习页和词库页保持一致。
-- 项目原始数据来源目录为 `files/vocabulary/`；网站运行时数据仍以在线 MySQL 为准。
+- 词汇来源目录为 `files/vocabulary/`，文章镜像目录为 `files/article/`；网站运行时数据仍以在线 MySQL 为准。
 - 词汇导入命令为 `npm run vocabulary:audit:bjt`、`vocabulary:import:bjt`、`vocabulary:audit:n1`、`vocabulary:import:n1`；完整重建先运行 `npm run vocabulary:preview:rebuild`，确认后运行 `npm run vocabulary:rebuild`，最后执行 `node --env-file=.env scripts/verify-vocabulary-rebuild.mjs`。审计输出位于 `work/vocabulary-import-audit/`。

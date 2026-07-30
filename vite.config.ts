@@ -10,7 +10,7 @@ const { d1, r2 } = hostingConfig;
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
-const appVersion = 23;
+const appVersion = 24;
 
 function formatBuildTime() {
   return new Intl.DateTimeFormat("sv-SE", {

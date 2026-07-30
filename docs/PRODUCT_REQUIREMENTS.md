@@ -60,7 +60,7 @@
 - BJT：[BJT 汇总](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/BJTSummary.md)及[BJT 补充词汇](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/BJT-%E8%AF%8D%E6%B1%87.txt)。
 - N1：[N1 词汇 CSV](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/N1-%E8%AF%8D%E6%B1%87.csv)，由原始 XLSX 直接转换。
 - BJT-外来语：[BJT 外来语](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/BJT-%E5%A4%96%E6%9D%A5%E8%AF%AD.txt)。
-- 文章：[文章来源文件](https://github.com/weizhiqimail/japanese-vocabulary-site/blob/main/files/vocabulary/%E6%96%87%E7%AB%A0.txt)。
+- 文章：[文章文件目录](https://github.com/weizhiqimail/japanese-vocabulary-site/tree/main/files/article)。目录中的每篇 Markdown 正文必须与在线数据库的对应文章逐字一致。
 
 这些文件是可追溯的原始来源；网站运行时使用已导入在线 MySQL 的数据。
 
@@ -251,6 +251,8 @@
 - 商取引の流れとその書類
 - 商品開発
 - 業績・景況
+- 攻略レシピ
+- BJTビジネス日本語能力テストについて
 
 ### 10.2 内容格式
 
@@ -262,6 +264,13 @@
 - 表格、代码块和分隔线。
 
 文章必须按内容语义组织层级。并列知识点使用无序列表，流程使用有序列表，对照信息优先使用表格，补充提示使用引用；不得将所有内容连续平铺为段落。
+
+### 10.3 文件与数据库同步
+
+- 每一条数据库文章都必须在 `files/article/` 中存在对应的 Markdown 文件。
+- 新增或修改文章时，数据库正文和文件正文必须同时更新并进行一致性核验。
+- 网站运行时以在线数据库为准，仓库文件用于版本管理、审查和恢复。
+- `files/article/README.md` 维护文章 ID、文件、类别和排序的对应清单。
 
 ## 11. 管理
 
