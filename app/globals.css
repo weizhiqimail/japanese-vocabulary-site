@@ -484,8 +484,19 @@ tbody tr:hover { background: #faf9f3; }
 .listVisibilityBar { margin-bottom: 12px; }
 .tableConcealed { color: #b8bbb3 !important; letter-spacing: .16em; user-select: none; }
 .wordCell { position: relative; }
-.wordCellMain { display: flex; align-items: flex-start; gap: 7px; min-width: 0; }
-.wordCellMain .tableMemoryField { flex: 0 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.wordCellMain {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+.wordCellMain .tableMemoryField {
+  width: auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .tableFavorite {
   margin-left: 0;
   vertical-align: middle;
