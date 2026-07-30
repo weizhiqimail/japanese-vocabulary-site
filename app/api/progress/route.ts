@@ -3,24 +3,27 @@ import { getDb, getUserKey } from "@/app/lib/db";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const category = url.searchParams.get("category") || "BJT";
+  const categoryId = Number(url.searchParams.get("categoryId"));
   const status = url.searchParams.get("status");
   const db = await getDb();
-  const clauses = ["p.user_key = ?", "c.name = ?"];
-  const params: unknown[] = [getUserKey(request), category];
+  if (!Number.isInteger(categoryId) || categoryId <= 0) {
+    return NextResponse.json({ error: "无效类别 ID" }, { status: 400 });
+  }
+  const clauses = ["p.user_key = ?", "c.id = ?"];
+  const params: unknown[] = [getUserKey(request), categoryId];
   if (status === "mastered" || status === "error") {
     clauses.push("p.status = ?");
     params.push(status);
   }
   const [rows] = await db.query(
-    `SELECT v.id, v.category, v.word, v.reading, v.meaning,
+    `SELECT v.id, v.word, v.reading, v.meaning,
             v.part_of_speech AS partOfSpeech, v.familiarity, p.status
      FROM learning_progress p
      JOIN vocabulary v ON v.id = p.vocabulary_id
      JOIN vocabulary_category_links vcl ON vcl.vocabulary_id = v.id
      JOIN categories c ON c.id = vcl.category_id
      WHERE ${clauses.join(" AND ")}
-     GROUP BY v.id, v.category, v.word, v.reading, v.meaning, v.part_of_speech, v.familiarity, p.status, p.updated_at
+     GROUP BY v.id, v.word, v.reading, v.meaning, v.part_of_speech, v.familiarity, p.status, p.updated_at
      ORDER BY p.updated_at DESC`,
     params,
   );

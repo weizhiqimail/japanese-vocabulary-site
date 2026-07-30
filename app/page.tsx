@@ -4,18 +4,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-type Category = string;
 type View = "home" | "learn" | "quiz" | "errors" | "mastered" | "words" | "articles" | "settings";
 type Mode = "reading" | "word" | "meaning";
 type Word = {
   id: number;
-  category: Category;
   word: string;
   reading: string;
   meaning: string;
   partOfSpeech: string;
   familiarity: string;
   categories: string[];
+  categoryIds: number[];
   status?: "mastered" | "error";
 };
 type Question = {
@@ -48,7 +47,7 @@ const emptyForm = {
   meaning: "",
   partOfSpeech: "",
   familiarity: "",
-  categories: ["BJT"],
+  categoryIds: [] as number[],
 };
 const emptyCategoryForm: CategoryConfig = {
   id: 0,
@@ -97,7 +96,7 @@ function createQuestions(items: Word[], pool: Word[]) {
 
 export default function Home() {
   const [view, setView] = useState<View>("home");
-  const [category, setCategory] = useState<Category>("BJT");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [words, setWords] = useState<Word[]>([]);
   const [mastered, setMastered] = useState<Word[]>([]);
   const [errors, setErrors] = useState<Word[]>([]);
@@ -133,6 +132,10 @@ export default function Home() {
   const vocabularyCategories = categoryOptions.filter(
     (item) => Boolean(item.enabled) && (item.scope === "vocabulary" || item.scope === "both"),
   );
+  const selectedCategory = studyCategories.find((item) => item.id === categoryId) ?? null;
+  const articleRootCategory = categoryOptions.find(
+    (item) => Boolean(item.enabled) && item.purpose === "study" && (item.scope === "article" || item.scope === "both"),
+  ) ?? null;
 
   const loadCategories = useCallback(async () => {
     const response = await fetch("/api/categories");
@@ -141,11 +144,12 @@ export default function Home() {
   }, []);
 
   const loadCategory = useCallback(async () => {
+    if (!categoryId) return;
     setLoading(true);
     const [wordResponse, masteredResponse, errorResponse] = await Promise.all([
-      fetch(`/api/vocabulary?category=${encodeURIComponent(category)}&all=true`),
-      fetch(`/api/progress?category=${encodeURIComponent(category)}&status=mastered`),
-      fetch(`/api/progress?category=${encodeURIComponent(category)}&status=error`),
+      fetch(`/api/vocabulary?categoryId=${categoryId}&all=true`),
+      fetch(`/api/progress?categoryId=${categoryId}&status=mastered`),
+      fetch(`/api/progress?categoryId=${categoryId}&status=error`),
     ]);
     const [wordData, masteredData, errorData] = await Promise.all([
       wordResponse.json(), masteredResponse.json(), errorResponse.json(),
@@ -154,13 +158,14 @@ export default function Home() {
     setMastered(masteredData.items ?? []);
     setErrors(errorData.items ?? []);
     setLoading(false);
-  }, [category]);
+  }, [categoryId]);
 
   const loadList = useCallback(async () => {
+    if (!categoryId) return;
     setListLoading(true);
     try {
       const response = await fetch(
-        `/api/vocabulary?category=${encodeURIComponent(category)}&page=${page}&pageSize=20&search=${encodeURIComponent(search.trim())}`,
+        `/api/vocabulary?categoryId=${categoryId}&page=${page}&pageSize=20&search=${encodeURIComponent(search.trim())}`,
       );
       const data = await response.json();
       setListItems(data.items ?? []);
@@ -168,19 +173,19 @@ export default function Home() {
     } finally {
       setListLoading(false);
     }
-  }, [category, page, search]);
+  }, [categoryId, page, search]);
 
   useEffect(() => { void loadCategory(); }, [loadCategory]);
   useEffect(() => { void loadCategories(); }, [loadCategories]);
   useEffect(() => {
-    if (!studyCategories.length || studyCategories.some((item) => item.name === category)) return;
-    setCategory(studyCategories[0].name);
-  }, [studyCategories, category]);
+    if (!studyCategories.length || studyCategories.some((item) => item.id === categoryId)) return;
+    setCategoryId(studyCategories[0].id);
+  }, [studyCategories, categoryId]);
   useEffect(() => { if (view === "words") void loadList(); }, [view, loadList]);
   useEffect(() => {
-    if (view !== "articles" || articles.length) return;
+    if (view !== "articles" || articles.length || !articleRootCategory) return;
     setArticlesLoading(true);
-    fetch("/api/articles?category=BJT")
+    fetch(`/api/articles?categoryId=${articleRootCategory.id}`)
       .then((response) => response.json())
       .then((data) => {
         const items = data.items ?? [];
@@ -188,7 +193,7 @@ export default function Home() {
         setSelectedArticleId(items[0]?.id ?? null);
       })
       .finally(() => setArticlesLoading(false));
-  }, [view, articles.length]);
+  }, [view, articles.length, articleRootCategory]);
   useEffect(() => {
     const studiedIds = new Set([...mastered, ...errors].map((item) => item.id));
     const pool = words.filter((item) => !studiedIds.has(item.id));
@@ -209,8 +214,8 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function selectCategory(next: Category) {
-    setCategory(next);
+  function selectCategory(nextId: number) {
+    setCategoryId(nextId);
     setPage(1);
     setSearch("");
     setSearchInput("");
@@ -229,8 +234,8 @@ export default function Home() {
         {studyCategories.map((item) => (
           <button
             key={item.id}
-            className={category === item.name ? "active" : ""}
-            onClick={() => selectCategory(item.name)}
+            className={categoryId === item.id ? "active" : ""}
+            onClick={() => selectCategory(item.id)}
           >
             {item.name}
           </button>
@@ -355,11 +360,11 @@ export default function Home() {
         </nav>
       </header>
 
-      <div key={`${view}-${category}`} className="pageFade">
+      <div key={`${view}-${categoryId ?? "loading"}`} className="pageFade">
         {view === "home" && (
           <section className="hero">
             <CategoryPicker />
-            <div className="eyebrow">{category} · 在线词库 · {words.length} 词</div>
+            <div className="eyebrow">{selectedCategory?.name ?? "加载中"} · 在线词库 · {words.length} 词</div>
             <h1>日本語言葉勉強</h1>
             <p>词汇与学习记录已连接在线数据库。每组随机检测假名、日语与中文释义，随时继续上次的进度。</p>
             <button className="primary" onClick={() => changeView("learn")}>开始今天的学习 <span>→</span></button>
@@ -368,7 +373,7 @@ export default function Home() {
               <div><strong>{mastered.length}</strong><span>已经掌握</span></div>
               <div><strong>{errors.length}</strong><span>需要复习</span></div>
             </div>
-            <div className="todayCard"><span className="kana">継続</span><div><b>坚持，比速度更重要。</b><small>当前分类：{category}</small></div></div>
+            <div className="todayCard"><span className="kana">継続</span><div><b>坚持，比速度更重要。</b><small>当前分类：{selectedCategory?.name ?? "—"}</small></div></div>
           </section>
         )}
 
@@ -376,7 +381,7 @@ export default function Home() {
           <section className="content">
             <CategoryPicker />
             <div className="sectionHead">
-              <div><span className="eyebrow">RANDOM LEARN · {category}</span><h2>随机学习一组</h2></div>
+              <div><span className="eyebrow">RANDOM LEARN · {selectedCategory?.name ?? "—"}</span><h2>随机学习一组</h2></div>
               <label>每组
                 <select value={groupSize} onChange={(event) => setGroupSize(Number(event.target.value))}>
                   {[10, 20, 30, 50].map((size) => <option key={size} value={size}>{size}</option>)}
@@ -445,7 +450,7 @@ export default function Home() {
           <section className="content">
             <CategoryPicker />
             <div className="sectionHead">
-              <div><span className="eyebrow">{view === "errors" ? "REVIEW" : "MASTERED"} · {category}</span><h2>{view === "errors" ? "错题本" : "背诵本"}</h2></div>
+              <div><span className="eyebrow">{view === "errors" ? "REVIEW" : "MASTERED"} · {selectedCategory?.name ?? "—"}</span><h2>{view === "errors" ? "错题本" : "背诵本"}</h2></div>
               {view === "errors" && errors.length > 0 && <button className="primary" onClick={() => startQuiz(errors)}>复习全部 <span>→</span></button>}
             </div>
             <div className="list">
@@ -461,12 +466,12 @@ export default function Home() {
           <section className="content wordsPage">
             <CategoryPicker />
             <div className="sectionHead">
-              <div><span className="eyebrow">DATABASE · {category}</span><h2>词库管理</h2><p>在线查看、搜索、新增、编辑和删除词汇。</p></div>
-              <button className="primary" onClick={() => { setEditing({ ...emptyForm, categories: [category] }); setDialogOpen(true); }}>＋ 新增单词</button>
+              <div><span className="eyebrow">DATABASE · {selectedCategory?.name ?? "—"}</span><h2>词库管理</h2><p>在线查看、搜索、新增、编辑和删除词汇。</p></div>
+              <button className="primary" disabled={!categoryId} onClick={() => { setEditing({ ...emptyForm, categoryIds: categoryId ? [categoryId] : [] }); setDialogOpen(true); }}>＋ 新增单词</button>
             </div>
             <form className="searchBar" onSubmit={(event) => { event.preventDefault(); setPage(1); setSearch(searchInput.trim()); }}>
-              <select value={category} onChange={(event) => selectCategory(event.target.value as Category)} aria-label="查询分类">
-                {vocabularyCategories.map((item) => <option key={item.id}>{item.name}</option>)}
+              <select value={categoryId ?? ""} onChange={(event) => selectCategory(Number(event.target.value))} aria-label="查询分类">
+                {vocabularyCategories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
               <input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="模糊查询日语、假名或翻译" aria-label="搜索词汇" />
               <button className="primary">查询</button>
@@ -502,7 +507,7 @@ export default function Home() {
           <section className="content articlePage">
             <div className="sectionHead">
               <div>
-                <span className="eyebrow">KNOWLEDGE · BJT</span>
+                <span className="eyebrow">KNOWLEDGE · {articleRootCategory?.name ?? "—"}</span>
                 <h2>文章与知识总结</h2>
                 <p>按模块整理的固定知识、商务表达与业务流程。</p>
               </div>
@@ -513,7 +518,7 @@ export default function Home() {
               <div className="articleLayout">
                 <aside className="articleNav">
                   <span>文章分类</span>
-                  <b>BJT</b>
+                  <b>{articleRootCategory?.name ?? "—"}</b>
                   {articles.map((article) => (
                     <button
                       key={article.id}
@@ -587,12 +592,12 @@ export default function Home() {
                 <label key={item.id}>
                   <input
                     type="checkbox"
-                    checked={editing.categories.includes(item.name)}
+                    checked={editing.categoryIds.includes(item.id)}
                     onChange={() => setEditing({
                       ...editing,
-                      categories: editing.categories.includes(item.name)
-                        ? editing.categories.filter((name) => name !== item.name)
-                        : [...editing.categories, item.name],
+                      categoryIds: editing.categoryIds.includes(item.id)
+                        ? editing.categoryIds.filter((id) => id !== item.id)
+                        : [...editing.categoryIds, item.id],
                     })}
                   />
                   {item.name}
