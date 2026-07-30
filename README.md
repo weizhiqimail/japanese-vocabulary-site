@@ -60,6 +60,7 @@ mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
 ## 文档
 
 - [系统架构](docs/ARCHITECTURE.md)
+- [前后端与数据库详细设计](docs/TECHNICAL_DESIGN.md)
 - [数据库设计](docs/DATABASE.md)
 - [开发与协作](docs/DEVELOPMENT.md)
 - [部署说明](docs/DEPLOYMENT.md)
