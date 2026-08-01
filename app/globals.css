@@ -479,6 +479,7 @@ nav button:hover, nav button.active { color: var(--green); background: #e5eadc; 
   color: var(--ink);
 }
 .reviewFilters .compact { padding: 9px 12px; }
+.favoriteVisibilityBar { margin: -7px 0 18px; }
 .reviewResults { position: relative; min-height: 112px; }
 .reviewResults.isLoading .reviewList, .reviewResults.isLoading .groupNote { opacity: .32; }
 .groupNote { margin: -7px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }

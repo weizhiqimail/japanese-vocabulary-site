@@ -148,6 +148,9 @@ export default function KotobaApp() {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewPage, setReviewPage] = useState(1);
   const [reviewPageSize, setReviewPageSize] = useState(30);
+  const [favoriteVisibility, setFavoriteVisibility] = useState({ word: true, reading: true, meaning: true });
+  const [favoriteMemoryMode, setFavoriteMemoryMode] = useState(false);
+  const [favoriteMemoryToggles, setFavoriteMemoryToggles] = useState<Set<string>>(new Set());
   const [favoriteGroups, setFavoriteGroups] = useState<FavoriteGroup[]>([]);
   const [selectedFavoriteGroupId, setSelectedFavoriteGroupId] = useState(0);
   const [favoriteGroupDialogOpen, setFavoriteGroupDialogOpen] = useState(false);
@@ -940,6 +943,33 @@ export default function KotobaApp() {
                     </div>
                   )}
                 </div>
+                {reviewTab === "favorites" && (
+                  <div className="visibilityBar favoriteVisibilityBar">
+                    <span>卡片显示</span>
+                    {([["word", "日语"], ["reading", "假名"], ["meaning", "翻译"]] as const).map(([field, label]) => (
+                      <label key={field}>
+                        <input
+                          type="checkbox"
+                          disabled={favoriteMemoryMode}
+                          checked={favoriteVisibility[field]}
+                          onChange={() => setFavoriteVisibility((value) => ({ ...value, [field]: !value[field] }))}
+                        />
+                        {label}
+                      </label>
+                    ))}
+                    <label className="memoryModeToggle">
+                      <input
+                        type="checkbox"
+                        checked={favoriteMemoryMode}
+                        onChange={(event) => {
+                          setFavoriteMemoryMode(event.target.checked);
+                          setFavoriteMemoryToggles(new Set());
+                        }}
+                      />
+                      默记模式
+                    </label>
+                  </div>
+                )}
                 <div className={`reviewResults ${reviewLoading ? "isLoading" : ""}`} aria-busy={reviewLoading}>
                   {reviewLoading && (
                     <div className="loadingOverlay">
@@ -951,10 +981,42 @@ export default function KotobaApp() {
                     <p className="groupNote">{favoriteGroups.find((group) => group.id === selectedFavoriteGroupId)?.note}</p>
                   )}
                   <div className="list reviewList">
-                    {reviewVisibleItems.map((item) => (
-                      <article key={item.id} data-vocabulary-lookup="true">
-                        <div><h3>{item.word}</h3><span>{item.reading}</span></div>
-                        <p>{item.meaning}</p>
+                    {reviewVisibleItems.map((item) => {
+                      const useFavoriteMemory = reviewTab === "favorites" && favoriteMemoryMode;
+                      const fieldVisible = (field: DisplayField) => reviewTab !== "favorites"
+                        || (useFavoriteMemory
+                          ? isMemoryFieldVisible(item.id, field, favoriteMemoryToggles)
+                          : favoriteVisibility[field]);
+                      return (
+                      <article className={useFavoriteMemory ? "memoryCard" : ""} key={item.id} data-vocabulary-lookup="true">
+                        <div>
+                          <h3
+                            className={`memoryField ${!fieldVisible("word") ? "memoryHidden" : ""}`}
+                            role={useFavoriteMemory ? "button" : undefined}
+                            tabIndex={useFavoriteMemory ? 0 : undefined}
+                            onClick={() => useFavoriteMemory && toggleMemoryField(item.id, "word", setFavoriteMemoryToggles)}
+                          >
+                            {fieldVisible("word") ? item.word : useFavoriteMemory ? "点击显示日语" : ""}
+                          </h3>
+                          {item.reading && (
+                            <span
+                              className={`memoryField ${!fieldVisible("reading") ? "memoryHidden" : ""}`}
+                              role={useFavoriteMemory ? "button" : undefined}
+                              tabIndex={useFavoriteMemory ? 0 : undefined}
+                              onClick={() => useFavoriteMemory && toggleMemoryField(item.id, "reading", setFavoriteMemoryToggles)}
+                            >
+                              {fieldVisible("reading") ? item.reading : useFavoriteMemory ? "点击显示假名" : ""}
+                            </span>
+                          )}
+                        </div>
+                        <p
+                          className={`memoryField ${!fieldVisible("meaning") ? "memoryHidden" : ""}`}
+                          role={useFavoriteMemory ? "button" : undefined}
+                          tabIndex={useFavoriteMemory ? 0 : undefined}
+                          onClick={() => useFavoriteMemory && toggleMemoryField(item.id, "meaning", setFavoriteMemoryToggles)}
+                        >
+                          {fieldVisible("meaning") ? item.meaning : useFavoriteMemory ? "点击显示翻译" : ""}
+                        </p>
                         <button
                           className={`favoriteButton inlineFavorite ${(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? "active" : ""}`}
                           onClick={() => void toggleFavorite(item, reviewTab === "favorites" ? selectedFavoriteGroupId : 0)}
@@ -963,7 +1025,7 @@ export default function KotobaApp() {
                           {(reviewTab === "favorites" ? reviewFavoriteIds : favoriteIds).has(item.id) ? "★" : "☆"}
                         </button>
                       </article>
-                    ))}
+                    )})}
                   </div>
                   {!reviewLoading && (reviewTab === "errors" ? reviewErrors : reviewTab === "mastered" ? reviewMastered : reviewFavorites).length === 0 && (
                     <div className="empty">
