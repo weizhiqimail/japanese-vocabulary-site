@@ -38,6 +38,7 @@
 23. 手机主导航只常驻首页、学习和导航三项；其余页面及 GitHub 项目入口收纳在导航浮层。版本号和构建时间在手机端位于品牌名下方并分行显示。
 24. 站内文章正文使用结构化 Markdown：并列项用无序列表、流程用有序列表、对照信息用表格、补充说明用引用，避免连续平铺段落。
 25. 数据库每条文章都必须在 `files/article/` 存在对应 Markdown 文件；新增或修改文章时同步数据库与文件，逐字核验正文，并更新 `files/article/README.md` 的 ID、文件、类别和排序清单。
+26. `demo/` 是 V2 独立纯前端交互工程，使用写死数据且不得连接正式 API、在线 MySQL 或 Sites 环境；在该目录修改后运行其独立的 `npm run build`，不能用 Demo 构建替代正式站点验证。
 
 ## 开发工作流
 
@@ -67,3 +68,4 @@
 - 页面隐藏项与默记模式的行为应在学习页和词库页保持一致。
 - 词汇来源目录为 `files/vocabulary/`，文章镜像目录为 `files/article/`；网站运行时数据仍以在线 MySQL 为准。
 - 词汇导入命令为 `npm run vocabulary:audit:bjt`、`vocabulary:import:bjt`、`vocabulary:audit:n1`、`vocabulary:import:n1`；完整重建先运行 `npm run vocabulary:preview:rebuild`，确认后运行 `npm run vocabulary:rebuild`，最后执行 `node --env-file=.env scripts/verify-vocabulary-rebuild.mjs`。审计输出位于 `work/vocabulary-import-audit/`。
+- V2 纯前端 Demo 位于 `demo/`，独立运行 `npm install`、`npm run dev` 和 `npm run build`；所有数据仅用于交互评审。

@@ -56,6 +56,7 @@ mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
 - `app/lib/db.ts`：数据库连接与公共数据访问
 - `.openai/hosting.json`：OpenAI Sites 项目标识，不要删除或重新生成
 - `docs/`：架构、数据库、开发和部署说明
+- `demo/`：V2 纯前端交互 Demo，使用写死数据，不连接正式 API 或数据库
 - `files/vocabulary/`：项目使用的原始词汇来源文件
 - `files/article/`：与在线数据库逐篇对应的文章 Markdown 文件
 
@@ -100,6 +101,18 @@ N1 原表另有 200 个只预填“陌生程度=9”的空白模板行，不包�
 - [项目需求文档](docs/PRODUCT_REQUIREMENTS.md)：产品目标、业务规则、页面需求和验收标准
 - [前后端技术架构](docs/APPLICATION_ARCHITECTURE.md)：前端、路由、API、数据库访问方式、开发和部署
 - [数据库结构](docs/DATABASE_SCHEMA.md)：数据表、字段、索引、约束、SQL 和表关系
+
+## V2 前端 Demo
+
+`demo/` 提供基于 [PRD V2](docs/PRD-V2.md) 的纯前端模拟页面，用于评审导航、词汇卡片、收藏通知、学习复习、测试、知识关联和 AI 导入审核等交互。
+
+```powershell
+cd demo
+npm install
+npm run dev
+```
+
+该 Demo 不连接在线 MySQL，不影响正式站点；构建验证使用 `npm run build`。
 
 ## 线上地址
 

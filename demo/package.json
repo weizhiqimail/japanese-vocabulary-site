@@ -1,0 +1,21 @@
+{
+  "name": "japanese-vocabulary-v2-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "6.0.2",
+    "bootstrap": "5.3.8",
+    "bootstrap-icons": "1.13.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "sass": "1.89.2",
+    "vite": "8.0.13"
+  },
+  "devDependencies": {}
+}
