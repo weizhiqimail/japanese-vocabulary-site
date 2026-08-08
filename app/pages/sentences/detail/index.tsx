@@ -1,0 +1,1 @@
+export { SentenceDetailPage } from "./SentenceDetailPage";

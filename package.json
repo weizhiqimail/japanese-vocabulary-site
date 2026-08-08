@@ -1,51 +1,37 @@
 {
-  "name": "site-creator-vinext-starter",
-  "version": "0.1.0",
+  "name": "japanese-vocabulary-site",
+  "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": ">=22.13.0"
-  },
+  "type": "module",
   "scripts": {
-    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
-    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
-    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate",
-    "vocabulary:audit:bjt": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs audit-bjt",
-    "vocabulary:import:bjt": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-bjt",
-    "vocabulary:audit:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs audit-n1",
-    "vocabulary:import:n1": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs import-n1",
-    "vocabulary:preview:rebuild": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs preview-rebuild",
-    "vocabulary:rebuild": "node --env-file=.env scripts/audit-and-import-vocabulary.mjs rebuild",
-    "articles:verify": "node --env-file=.env scripts/verify-article-files.mjs"
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext preview",
+    "db:migrate": "node --env-file=.env scripts/migrate-database.mjs",
+    "typecheck": "tsc --noEmit",
+    "prettier": "prettier --write ./app/**/* ./db/* ./scripts/*"
   },
   "dependencies": {
-    "drizzle-orm": "0.45.2",
+    "axios": "^1.19.0",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "mysql2": "^3.23.2",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "sass": "^1.90.0"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
-    "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
-    "drizzle-kit": "0.31.10",
-    "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
+    "prettier": "^3.9.6",
     "react-server-dom-webpack": "19.2.6",
-    "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "vinext": "0.0.50",
     "vite": "8.0.13",
     "wrangler": "4.92.0"
-  },
-  "type": "module"
+  }
 }

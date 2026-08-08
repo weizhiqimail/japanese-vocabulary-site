@@ -1,119 +1,93 @@
-# Japanese Vocabulary Site
+# 日本語言葉勉強
 
-「日本語言葉勉強」は、日语词汇学习、测试、复习、收藏和内容管理网站。项目使用在线 MySQL 保存词汇、分类、学习进度、收藏组和文章数据，并针对桌面端与手机端提供响应式界面。
-
-## 主要功能
-
-- 按分类学习词汇，支持每组 10、20、30、50 个词汇（默认 30）
-- 日语、假名、翻译三种方向的四选一测试，题目与选项随机
-- 已学习词汇自动排除；错题本、背诵本和收藏集中在复习页面
-- 默记模式：默认隐藏假名与翻译，单项点击显示或隐藏
-- 词库分页、模糊查询、分类筛选、增删改查和多标签
-- 多收藏组、默认收藏组、收藏提示通知
-- 文章与项目文档展示；类别配置只允许新增、修改和查询
-- 页面及二级页面采用真实路由，分页后平滑回到页面顶部
+单用户日语知识库与学习系统，用于维护词汇、语法、句子、词汇集合以及学习复习记录。产品需求以 `docs/PRD-V2.md` 为准。
 
 ## 技术栈
 
-- Next.js 16、React 19、TypeScript
-- vinext、Vite、Cloudflare Workers / OpenAI Sites
-- MySQL 8、`mysql2`
-- React Markdown、GFM
+- Vinext / Next.js App Router、React、TypeScript
+- Bootstrap、Bootstrap Icons、SCSS
+- Axios（浏览器 HTTP 客户端）
+- MySQL、`mysql2`
+- Prettier、TypeScript 类型检查
 
-## 本地启动
-
-要求 Node.js 22.13 或更高版本。
-
-```powershell
-npm install
-Copy-Item .env.example .env
-# 编辑 .env，填写 DATABASE_URL
-$env:WRANGLER_LOG_PATH='.wrangler/wrangler.log'
-npx vinext dev
-```
-
-Windows 下构建：
-
-```powershell
-$env:WRANGLER_LOG_PATH='.wrangler/wrangler.log'
-npx vinext build
-```
-
-`DATABASE_URL` 的格式：
+## 目录结构
 
 ```text
-mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
+app/
+  pages/                     # 页面组合与页面级样式
+  components/                # 可复用组件；组件目录由 index.tsx 对外暴露
+  http/                      # Axios request 与按业务划分的接口函数
+  server/
+    api/                     # 统一响应与请求处理
+    db/                      # 数据库连接
+    services/                # 服务与业务规则
+    repositories/            # SQL 与数据库数据映射
+  config/                    # 路由、枚举和模块配置
+  layout/                    # 应用外壳
+  assets/styles/             # 全局样式入口和基础样式
+  types/                     # 跨模块领域类型
+routes/app/                  # Vinext 路由表；仅映射 app/pages 与 app/server
+  api/                       # HTTP URL 入口适配
+  collections/, ...          # 页面 URL 入口适配
+db/schema.sql                # 完整 MySQL 正式结构
+scripts/migrate-database.mjs # 幂等结构迁移
+docs/                        # PRD、数据库及应用架构说明
+files/                       # 受保护的只读原始资料
 ```
 
-不要提交 `.env`、数据库密码、访问令牌或其他密钥。
+`app` 只保存按职责划分的业务源码。Vinext 通过 `vite.config.ts` 的 `appDir: "routes"` 扫描 `routes/app`；其中页面入口只导出 `app/pages` 页面，HTTP 入口只调用 `app/server`，不承载页面实现、业务规则或 SQL。
 
-## 目录
+## 前后端调用关系
 
-- `app/KotobaApp.tsx`：主要客户端界面与交互
-- `app/globals.css`：全站与响应式样式
-- `app/[view]`、`app/[view]/[subview]`：一级、二级页面路由
-- `app/api`：MySQL 数据 API
-- `app/lib/db.ts`：数据库连接与公共数据访问
-- `.openai/hosting.json`：OpenAI Sites 项目标识，不要删除或重新生成
-- `docs/`：架构、数据库、开发和部署说明
-- `demo/`：V2 纯前端交互 Demo，使用写死数据，不连接正式 API 或数据库
-- `files/vocabulary/`：项目使用的原始词汇来源文件
-- `files/article/`：与在线数据库逐篇对应的文章 Markdown 文件
-
-## 词汇来源文件
-
-来源文件统一保存在 [`files/vocabulary`](files/vocabulary/)：
-
-- [BJT 词汇](files/vocabulary/BJT-词汇.txt)
-- [BJT 外来语](files/vocabulary/BJT-外来语.txt)
-- [BJT 汇总](files/vocabulary/BJTSummary.md)
-- [N1 词汇 CSV](files/vocabulary/N1-词汇.csv)：由原始 `N1-词汇.xlsx` 直接转换，保留 3,208 行、7 列内容
-- [历史文章汇总原文](files/vocabulary/文章.txt)
-
-文章文件及数据库对应关系参见 [`files/article/README.md`](files/article/README.md)。在线 MySQL 是网站运行时数据源；仓库文件用于追溯原始数据、重新导入和核对。
-
-### 来源核对与导入
-
-导入工具会把单词、固定搭配、短语和完整句子全部作为学习条目。执行写入前先审计，写入后再次反向核验：
-
-```powershell
-npm run vocabulary:audit:bjt
-npm run vocabulary:import:bjt
-npm run vocabulary:audit:n1
-npm run vocabulary:import:n1
+```text
+app/pages
+  -> app/components
+  -> app/http/<business>（具名 Axios 接口函数）
+  -> routes/app/api/<resource>（解析 HTTP 请求的路由表适配层）
+  -> app/server/services
+  -> app/server/repositories
+  -> MySQL（DATABASE_URL）
 ```
 
-审计报告写入被 Git 忽略的 `work/vocabulary-import-audit/`。导入顺序固定为 BJT 后 N1，所有数据库操作读取本地 `.env` 中的 `DATABASE_URL`。
+接口统一返回：
 
-2026-07-30 全量核对结果：
+```json
+{
+  "success": true,
+  "data": {},
+  "message": ""
+}
+```
 
-| 来源 | 有效来源行/候选 | 唯一学习条目 | 本次新增 | 最终遗漏 |
-|---|---:|---:|---:|---:|
-| BJT 汇总、BJT 补充、BJT 外来语 | 804 个含日语汇总行 + 277 个词典项 | 1,134 | 523 | 0 |
-| N1 | 3,007 个有效数据行 | 2,118 | 5 | 0 |
+前端业务代码不拼接接口 URL，不直接使用 `fetch`；每项请求由 `app/http` 中的具名函数封装。服务层负责业务规则，仓储层负责 SQL 和数据映射。
 
-N1 原表另有 200 个只预填“陌生程度=9”的空白模板行，不包含日语、假名或翻译，不作为词汇。
+## 页面路由
 
-## 文档
+- `/`：首页
+- `/collections`、`/collections/:id/study`、`/collections/:id/test`：集合、学习与测试
+- `/vocabularies`、`/vocabularies/:id`：词库与词汇详情
+- `/grammars`、`/grammars/:id`：语法与详情
+- `/sentences`、`/sentences/:id`：句子与详情
+- `/review/*`：复习页面
+- `/manage/*`：导入、标签、词性与设置
 
-项目文档精简为三个互不重复的核心文件：
-
-- [项目需求文档](docs/PRODUCT_REQUIREMENTS.md)：产品目标、业务规则、页面需求和验收标准
-- [前后端技术架构](docs/APPLICATION_ARCHITECTURE.md)：前端、路由、API、数据库访问方式、开发和部署
-- [数据库结构](docs/DATABASE_SCHEMA.md)：数据表、字段、索引、约束、SQL 和表关系
-
-## V2 前端 Demo
-
-`demo/` 提供基于 [PRD V2](docs/PRD-V2.md) 的纯前端模拟页面，用于评审导航、词汇卡片、收藏通知、学习复习、测试、知识关联和 AI 导入审核等交互。
+## 本地运行
 
 ```powershell
-cd demo
 npm install
+npm run db:migrate
 npm run dev
 ```
 
-该 Demo 不连接在线 MySQL，不影响正式站点；构建验证使用 `npm run build`。
+应用统一读取 `DATABASE_URL`。不要提交 `.env`、密码或令牌。
 
-## 线上地址
+## 质量检查
 
-[日本語言葉勉強](https://kotoba-bjt-notebook.daziiiiiiiiiiii.chatgpt.site)
+```powershell
+npx prettier app db docs scripts README.md --write
+npm run typecheck
+npm run build
+git diff --check
+```
+
+数据库结构变化时同步维护 `db/schema.sql`、`docs/DATABASE_SCHEMA.md` 和 `docs/APPLICATION_ARCHITECTURE.md`。`files/` 禁止修改、移动或删除。

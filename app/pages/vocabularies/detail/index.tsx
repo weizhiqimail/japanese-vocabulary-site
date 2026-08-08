@@ -1,0 +1,1 @@
+export { VocabularyDetailPage } from "./VocabularyDetailPage";

@@ -1,0 +1,1 @@
+export { CollectionStudyPage } from "./CollectionStudyPage";
