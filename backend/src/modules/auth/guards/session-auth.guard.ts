@@ -15,6 +15,7 @@ export class SessionAuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly auth: AuthService,
   ) {}
+
   async canActivate(context: ExecutionContext) {
     if (
       this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -30,6 +31,7 @@ export class SessionAuthGuard implements CanActivate {
     const user = await this.auth.authenticate(cookies?.[this.auth.cookieName]);
     if (!user) throw new UnauthorizedException('请先登录');
     request.user = user;
+
     return true;
   }
 }

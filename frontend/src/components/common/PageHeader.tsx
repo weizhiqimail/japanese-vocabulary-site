@@ -1,4 +1,6 @@
 import { Button, Flex, Heading, Text, VStack } from "@chakra-ui/react";
+
+/** 列表和管理页面统一标题区。 */
 export function PageHeader({
   title,
   description,
@@ -19,12 +21,16 @@ export function PageHeader({
       direction={{ base: "column", md: "row" }}
     >
       <VStack align="start" spacing={1}>
-        <Heading size="lg">{title}</Heading>
-        {description && <Text color="gray.600">{description}</Text>}
+        <Heading size="xl">{title}</Heading>
+        {description && (
+          <Text color="slate.500" fontSize={{ base: "md", md: "lg" }}>
+            {description}
+          </Text>
+        )}
       </VStack>
       {actionLabel && (
         <Button alignSelf={{ base: "stretch", md: "auto" }} onClick={onAction}>
-          {actionLabel}
+          ＋ {actionLabel}
         </Button>
       )}
     </Flex>

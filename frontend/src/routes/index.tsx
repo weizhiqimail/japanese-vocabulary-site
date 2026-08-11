@@ -1,39 +1,72 @@
 import { Center, Spinner } from "@chakra-ui/react";
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { AppLayout } from "@/layouts/AppLayout";
+import { AppLayout } from "@/layout/app";
 import { ProtectedRoute } from "./ProtectedRoute";
 
-const LoginPage = lazy(() =>
-  import("@/pages/LoginPage").then((module) => ({ default: module.LoginPage })),
+const Login = lazy(() =>
+  import("@/pages/login").then((module) => ({ default: module.Login })),
 );
-const HomePage = lazy(() =>
-  import("@/pages/HomePage").then((module) => ({ default: module.HomePage })),
+const Home = lazy(() =>
+  import("@/pages/home").then((module) => ({ default: module.Home })),
 );
-const ResourcePage = lazy(() =>
-  import("@/pages/ResourcePage").then((module) => ({
-    default: module.ResourcePage,
+const Collections = lazy(() =>
+  import("@/pages/collections").then((module) => ({
+    default: module.Collections,
   })),
 );
-const DetailPage = lazy(() =>
-  import("@/pages/DetailPage").then((module) => ({
-    default: module.DetailPage,
+const Vocabularies = lazy(() =>
+  import("@/pages/vocabularies").then((module) => ({
+    default: module.Vocabularies,
   })),
 );
-const StudyPage = lazy(() =>
-  import("@/pages/StudyPage").then((module) => ({ default: module.StudyPage })),
-);
-const ReviewPage = lazy(() =>
-  import("@/pages/ReviewPage").then((module) => ({
-    default: module.ReviewPage,
+const VocabularyDetail = lazy(() =>
+  import("@/pages/vocabulary-detail").then((module) => ({
+    default: module.VocabularyDetail,
   })),
 );
-const SettingsPage = lazy(() =>
-  import("@/pages/SettingsPage").then((module) => ({
-    default: module.SettingsPage,
+const Grammars = lazy(() =>
+  import("@/pages/grammars").then((module) => ({ default: module.Grammars })),
+);
+const GrammarDetail = lazy(() =>
+  import("@/pages/grammar-detail").then((module) => ({
+    default: module.GrammarDetail,
   })),
+);
+const Sentences = lazy(() =>
+  import("@/pages/sentences").then((module) => ({ default: module.Sentences })),
+);
+const SentenceDetail = lazy(() =>
+  import("@/pages/sentence-detail").then((module) => ({
+    default: module.SentenceDetail,
+  })),
+);
+const CollectionStudy = lazy(() =>
+  import("@/pages/collection-study").then((module) => ({
+    default: module.CollectionStudy,
+  })),
+);
+const CollectionTest = lazy(() =>
+  import("@/pages/collection-test").then((module) => ({
+    default: module.CollectionTest,
+  })),
+);
+const Review = lazy(() =>
+  import("@/pages/review").then((module) => ({ default: module.Review })),
+);
+const Tags = lazy(() =>
+  import("@/pages/tags").then((module) => ({ default: module.Tags })),
+);
+const PartsOfSpeech = lazy(() =>
+  import("@/pages/parts-of-speech").then((module) => ({
+    default: module.PartsOfSpeech,
+  })),
+);
+const Settings = lazy(() =>
+  import("@/pages/settings").then((module) => ({ default: module.Settings })),
 );
 
+/** 每条页面路由均对应一个独立页面级组件。 */
 export function AppRoutes() {
   return (
     <Suspense
@@ -44,57 +77,27 @@ export function AppRoutes() {
       }
     >
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index element={<HomePage />} />
+            <Route index element={<Home />} />
+            <Route path="collections" element={<Collections />} />
+            <Route path="collections/:id/study" element={<CollectionStudy />} />
+            <Route path="collections/:id/test" element={<CollectionTest />} />
+            <Route path="vocabularies" element={<Vocabularies />} />
+            <Route path="vocabularies/:id" element={<VocabularyDetail />} />
+            <Route path="grammars" element={<Grammars />} />
+            <Route path="grammars/:id" element={<GrammarDetail />} />
+            <Route path="sentences" element={<Sentences />} />
+            <Route path="sentences/:id" element={<SentenceDetail />} />
+            <Route path="review/:mode" element={<Review />} />
             <Route
-              path="vocabularies"
-              element={<ResourcePage fixedResource="vocabularies" />}
+              path="manage"
+              element={<Navigate to="/manage/tags" replace />}
             />
-            <Route
-              path="vocabularies/:id"
-              element={<DetailPage fixedResource="vocabularies" />}
-            />
-            <Route
-              path="collections"
-              element={<ResourcePage fixedResource="collections" />}
-            />
-            <Route path="collections/:id/study" element={<StudyPage />} />
-            <Route
-              path="collections/:id/test"
-              element={<StudyPage testMode />}
-            />
-            <Route
-              path="grammars"
-              element={<ResourcePage fixedResource="grammars" />}
-            />
-            <Route
-              path="grammars/:id"
-              element={<DetailPage fixedResource="grammars" />}
-            />
-            <Route
-              path="sentences"
-              element={<ResourcePage fixedResource="sentences" />}
-            />
-            <Route
-              path="sentences/:id"
-              element={<DetailPage fixedResource="sentences" />}
-            />
-            <Route path="review/:mode" element={<ReviewPage />} />
-            <Route
-              path="manage/imports"
-              element={<ResourcePage fixedResource="imports" />}
-            />
-            <Route
-              path="manage/tags"
-              element={<ResourcePage fixedResource="tags" />}
-            />
-            <Route
-              path="manage/parts-of-speech"
-              element={<ResourcePage fixedResource="parts-of-speech" />}
-            />
-            <Route path="manage/settings" element={<SettingsPage />} />
+            <Route path="manage/tags" element={<Tags />} />
+            <Route path="manage/parts-of-speech" element={<PartsOfSpeech />} />
+            <Route path="manage/settings" element={<Settings />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

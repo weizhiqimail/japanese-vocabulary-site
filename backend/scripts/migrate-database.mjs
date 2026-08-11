@@ -73,7 +73,7 @@ async function prepareLegacySchema() {
       'updated_at',
       "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间'",
     ],
-    ['tags', 'color', "VARCHAR(24) NOT NULL DEFAULT 'info' COMMENT '颜色语义'"],
+    ['tags', 'color', "CHAR(7) NOT NULL DEFAULT '#FDE68A' COMMENT '固定浅色背景色'"],
     ['tags', 'enabled', "TINYINT(1) NOT NULL DEFAULT 1 COMMENT '启用'"],
     ['tags', 'deleted_at', "DATETIME(3) NULL COMMENT '逻辑删除时间'"],
     [

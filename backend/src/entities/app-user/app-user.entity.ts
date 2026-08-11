@@ -6,21 +6,47 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { AppUserEntityConfig } from './app-user.config';
-@Entity(AppUserEntityConfig.dbName)
+
+/** 单用户系统登录账号实体。 */
+@Entity({ name: AppUserEntityConfig.dbName, comment: '应用登录用户' })
 export class AppUserEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true }) id: string;
-  @Column({ type: 'varchar', length: 64, unique: true }) username: string;
+  @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true, comment: '主键' })
+  id: string;
+
+  @Column({ type: 'varchar', length: 64, unique: true, comment: '登录名' })
+  username: string;
+
   @Column({
     type: 'varchar',
     length: 255,
     comment: '按需求暂存明文密码，仅供测试',
   })
   password: string;
-  @Column({ name: 'display_name', type: 'varchar', length: 100 })
+
+  @Column({
+    name: 'display_name',
+    type: 'varchar',
+    length: 100,
+    comment: '显示名',
+  })
   displayName: string;
-  @Column({ type: 'boolean', default: true }) enabled: boolean;
-  @CreateDateColumn({ name: 'created_at', type: 'datetime', precision: 3 })
+
+  @Column({ type: 'boolean', default: true, comment: '是否启用' })
+  enabled: boolean;
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'datetime',
+    precision: 3,
+    comment: '创建时间',
+  })
   createdAt: Date;
-  @UpdateDateColumn({ name: 'updated_at', type: 'datetime', precision: 3 })
+
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'datetime',
+    precision: 3,
+    comment: '更新时间',
+  })
   updatedAt: Date;
 }

@@ -1,0 +1,1 @@
+export { GrammarDetail } from "./GrammarDetail";

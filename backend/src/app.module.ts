@@ -6,6 +6,7 @@ import databaseConfig from '@/config/database.config';
 import authConfig from '@/config/auth.config';
 import { SharedModules } from '@/shared-modules/shared.modules';
 import { BusinessModules } from '@/modules/business.modules';
+import { LoggingModule } from '@/shared-modules/logging/logging.module';
 
 const runtimeEnvironment = process.env.NODE_ENV || 'local';
 
@@ -19,6 +20,7 @@ const runtimeEnvironment = process.env.NODE_ENV || 'local';
           : [`.env.${runtimeEnvironment}`, '.env.local', '.env'],
       load: [databaseConfig, authConfig],
     }),
+    LoggingModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'web'),
       exclude: ['/api/{*path}'],

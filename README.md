@@ -7,6 +7,7 @@
 - `frontend/`：React、TypeScript、Vite、Chakra UI。
 - `backend/`：NestJS、TypeORM、MySQL、Swagger、登录认证和静态资源服务。
 - `docs/`：产品、数据库、架构、部署与数据同步说明。
+- `logs/`：运行时文件日志，按启动序号命名且不提交 Git。
 
 ## 本地开发
 
@@ -27,6 +28,8 @@ npm run start
 ```
 
 构建会先生成前端产物，再复制到 `backend/web`，最后构建 NestJS。生产环境只运行一个后端服务；`/api/*` 由 NestJS 处理，其他路径由 React SPA 处理。
+
+服务启动后会在控制台和根目录 `logs/jvs-YYYY-MM-DD-NNN.log` 中记录页面 URL 与 Swagger URL。日志分为 HTTP、DB、BUSINESS、EXCEPTION、STARTUP 和 SYSTEM，详细约定见 `docs/LOGGING.md`。
 
 ## 数据库同步
 

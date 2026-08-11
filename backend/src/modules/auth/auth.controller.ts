@@ -9,6 +9,7 @@ import { AuthService } from '@/modules/auth/auth.service';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
+
   @Public()
   @Post('login')
   @ApiOperation({ summary: '登录' })
@@ -24,8 +25,10 @@ export class AuthController {
       expires: result.expiresAt,
       path: '/',
     });
+
     return result.user;
   }
+
   @Post('logout')
   @ApiOperation({ summary: '退出登录' })
   async logout(
@@ -35,11 +38,13 @@ export class AuthController {
     const cookies = request.cookies as Record<string, string> | undefined;
     await this.auth.logout(cookies?.[this.auth.cookieName]);
     response.clearCookie(this.auth.cookieName, { path: '/' });
+
     return { ok: true };
   }
-  @Get('me') @ApiOperation({ summary: '当前登录用户' }) me(
-    @Req() request: Request & { user?: unknown },
-  ) {
+
+  @Get('me')
+  @ApiOperation({ summary: '当前登录用户' })
+  me(@Req() request: Request & { user?: unknown }) {
     return request.user;
   }
 }

@@ -6,6 +6,7 @@ import {
   CollectionVocabularyEntity,
   VocabularyEntity,
 } from '@/entities';
+
 @Injectable()
 export class DashboardService {
   constructor(
@@ -16,6 +17,7 @@ export class DashboardService {
     @InjectRepository(CollectionVocabularyEntity)
     private readonly members: Repository<CollectionVocabularyEntity>,
   ) {}
+
   async getStats() {
     const [vocabularies, collections, learned, errors] = await Promise.all([
       this.vocabularies.count({ where: { deletedAt: IsNull() } }),
@@ -34,6 +36,7 @@ export class DashboardService {
         .select('COUNT(DISTINCT member.vocabularyId)', 'count')
         .getRawOne<{ count: string }>(),
     ]);
+
     return {
       vocabularies,
       collections,

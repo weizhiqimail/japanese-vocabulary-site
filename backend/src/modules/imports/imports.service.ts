@@ -5,15 +5,28 @@ import {
   ImportCandidateEntity,
   VocabularyEntity,
 } from '@/entities';
+import { IMPORT_RESOURCE_NAME } from '@/modules/imports/config/import-resource.config';
+import type { ResourceQueryDto } from '@/modules/knowledge-resources/shared/dto/resource-query.dto';
+import { ResourceCrudService } from '@/modules/knowledge-resources/shared/resource-crud.service';
+import { AppLoggerService } from '@/shared-modules/logging/app-logger.service';
 
 interface CandidateInput {
   word: string;
   reading?: string;
   translation: string;
 }
+
 @Injectable()
 export class ImportsService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly resources: ResourceCrudService,
+    private readonly logger: AppLoggerService,
+  ) {}
+
+  list(query: ResourceQueryDto) {
+    return this.resources.list(IMPORT_RESOURCE_NAME, query);
+  }
 
   create(filename: string, candidates: CandidateInput[]) {
     return this.dataSource.transaction(async (manager) => {
@@ -60,6 +73,13 @@ export class ImportsService {
         accepted += 1;
       }
       if (!accepted) throw new BadRequestException('CSV 中没有有效数据');
+
+      this.logger.business('Import batch created', {
+        batchId: batch.id,
+        candidateCount: accepted,
+        filename,
+      });
+
       return { batchId: batch.id, candidateCount: accepted };
     });
   }
@@ -88,6 +108,9 @@ export class ImportsService {
         candidate.status = decision === 'reject' ? 'rejected' : 'not_needed';
       candidate.reviewedAt = new Date();
       await manager.getRepository(ImportCandidateEntity).save(candidate);
+
+      this.logger.business('Import candidate reviewed', { decision, id });
+
       return { id };
     });
   }

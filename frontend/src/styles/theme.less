@@ -1,0 +1,27 @@
+@brand-50: #fff9eb;
+@brand-100: #fdecc8;
+@brand-500: #de8616;
+@brand-700: #934a13;
+@page-background: #fffaf0;
+@surface: #ffffff;
+@text: #2f2923;
+
+:root {
+  --jvs-brand-soft: @brand-100;
+  --jvs-brand: @brand-500;
+  --jvs-brand-strong: @brand-700;
+  --jvs-page-bg: @page-background;
+  --jvs-surface: @surface;
+  --jvs-text: @text;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--jvs-page-bg);
+}

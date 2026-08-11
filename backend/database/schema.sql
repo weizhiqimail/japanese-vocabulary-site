@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS parts_of_speech (
 CREATE TABLE IF NOT EXISTS tags (
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
   name VARCHAR(64) NOT NULL UNIQUE COMMENT '标签名',
-  color VARCHAR(24) NOT NULL DEFAULT 'info' COMMENT '颜色语义',
+  color CHAR(7) NOT NULL DEFAULT '#FDE68A' COMMENT '固定浅色背景色',
   enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT '启用',
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
@@ -271,33 +271,85 @@ INSERT
   IGNORE INTO parts_of_speech(code, name, sort_order)
 VALUES
   ('noun', '名词', 10),
-('proper_noun', '专有名词', 20),
-('pronoun', '代词', 30),
-('numeral', '数词', 40),
-('intransitive_verb', '自動詞', 50),
-('transitive_verb', '他動詞', 60),
-('suru_verb', 'サ变动词', 70),
-('i_adjective', 'い形容词', 80),
-('na_adjective', 'な形容词', 90),
-('adverb', '副词', 100),
-('adnominal', '连体词', 110),
-('conjunction', '接续词', 120),
-('particle', '助词', 130),
-('auxiliary', '助动词', 140),
-('interjection', '感叹词', 150),
-('idiom', '惯用语', 160),
-('fixed_expression', '固定表达', 170),
-('other', '其他', 180);
+('intransitive_verb', '自動詞', 20),
+('transitive_verb', '他動詞', 30),
+('suru_verb', 'サ变动词', 40),
+('na_adjective', 'な形容词', 50),
+('i_adjective', 'い形容词', 60),
+('adverb', '副词', 70),
+('proper_noun', '专有名词', 100),
+('pronoun', '代词', 110),
+('numeral', '数词', 120),
+('adnominal', '连体词', 130),
+('conjunction', '接续词', 140),
+('particle', '助词', 150),
+('auxiliary', '助动词', 160),
+('interjection', '感叹词', 170),
+('idiom', '惯用语', 180),
+('fixed_expression', '固定表达', 190),
+('other', '其他', 200);
+
+UPDATE parts_of_speech
+SET sort_order = CASE name
+  WHEN '名词' THEN 10
+  WHEN '自動詞' THEN 20
+  WHEN '他動詞' THEN 30
+  WHEN 'サ变动词' THEN 40
+  WHEN 'な形容词' THEN 50
+  WHEN 'い形容词' THEN 60
+  WHEN '副词' THEN 70
+  WHEN '专有名词' THEN 100
+  WHEN '代词' THEN 110
+  WHEN '数词' THEN 120
+  WHEN '连体词' THEN 130
+  WHEN '接续词' THEN 140
+  WHEN '助词' THEN 150
+  WHEN '助动词' THEN 160
+  WHEN '感叹词' THEN 170
+  WHEN '惯用语' THEN 180
+  WHEN '固定表达' THEN 190
+  WHEN '其他' THEN 200
+  ELSE sort_order
+END;
 
 INSERT
   IGNORE INTO tags(name, color)
 VALUES
-  ('拟声词', 'info'),
-('拟态词', 'primary'),
-('书面语', 'secondary'),
-('口语', 'success'),
-('敬语', 'warning'),
-('易混淆', 'danger');
+  ('拟声词', '#FDE68A'),
+('拟态词', '#FDBA74'),
+('书面语', '#C4B5FD'),
+('口语', '#6EE7B7'),
+('敬语', '#93C5FD'),
+('易混淆', '#FCA5A5');
+
+UPDATE tags
+SET color = CASE name
+  WHEN '拟声词' THEN '#FDE68A'
+  WHEN '拟态词' THEN '#FDBA74'
+  WHEN '书面语' THEN '#C4B5FD'
+  WHEN '口语' THEN '#6EE7B7'
+  WHEN '敬语' THEN '#93C5FD'
+  WHEN '易混淆' THEN '#FCA5A5'
+  ELSE color
+END;
+
+UPDATE tags
+SET color = CASE MOD(id, 10)
+  WHEN 0 THEN '#FDE68A'
+  WHEN 1 THEN '#FDBA74'
+  WHEN 2 THEN '#FCA5A5'
+  WHEN 3 THEN '#F9A8D4'
+  WHEN 4 THEN '#C4B5FD'
+  WHEN 5 THEN '#93C5FD'
+  WHEN 6 THEN '#67E8F9'
+  WHEN 7 THEN '#6EE7B7'
+  WHEN 8 THEN '#BEF264'
+  ELSE '#D1D5DB'
+END
+WHERE color NOT IN (
+  '#FDE68A', '#FDBA74', '#FCA5A5', '#F9A8D4', '#C4B5FD',
+  '#93C5FD', '#67E8F9', '#6EE7B7', '#BEF264', '#D1D5DB'
+);
 
 INSERT INTO collections(name,type,description,is_default)
 SELECT '默认收藏本','favorite','系统默认收藏本',1

@@ -3,6 +3,7 @@ import {
   ArrayMaxSize,
   ArrayNotEmpty,
   IsArray,
+  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
@@ -11,6 +12,7 @@ import {
 
 class ImportCandidateDto {
   @IsString()
+  @IsNotEmpty()
   @MaxLength(255)
   word: string;
 
@@ -20,11 +22,13 @@ class ImportCandidateDto {
   reading?: string;
 
   @IsString()
+  @IsNotEmpty()
   translation: string;
 }
 
 export class CreateImportBatchDto {
   @IsString()
+  @IsNotEmpty()
   @MaxLength(255)
   filename: string;
 

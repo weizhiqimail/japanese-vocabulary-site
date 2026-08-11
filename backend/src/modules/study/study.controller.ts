@@ -2,41 +2,49 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { TestAnswerDto } from './dto/test-answer.dto';
-import { StudyService } from './study.service';
+import { RecordStudyDto } from '@/modules/study/dto/record-study.dto';
+import { TestAnswerDto } from '@/modules/study/dto/test-answer.dto';
+import { ReviewQueryDto } from '@/modules/study/dto/review-query.dto';
+import { StudyService } from '@/modules/study/study.service';
+
 @ApiTags('学习与复习')
 @ApiCookieAuth('jvs_session')
-@Controller()
+@Controller('study')
 export class StudyController {
   constructor(private readonly study: StudyService) {}
-  @Get('collections/:id/members')
-  @ApiOperation({ summary: '集合成员' })
-  members(@Param('id', ParseIntPipe) id: number) {
-    return this.study.collectionMembers(id);
+
+  @Get('collection-members')
+  @ApiOperation({ summary: '查询集合词汇' })
+  members(@Query('collectionId', ParseIntPipe) collectionId: number) {
+    return this.study.collectionMembers(collectionId);
   }
-  @Post('vocabularies/:id/learn') @ApiOperation({ summary: '记录学习' }) learn(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.study.record(id, 'learn');
+
+  @Get('test')
+  @ApiOperation({ summary: '生成一组十题词汇测试' })
+  test(@Query('collectionId', ParseIntPipe) collectionId: number) {
+    return this.study.testQuestions(collectionId);
   }
-  @Post('vocabularies/:id/review')
-  @ApiOperation({ summary: '记录复习' })
-  review(@Param('id', ParseIntPipe) id: number) {
-    return this.study.record(id, 'review');
+
+  @Post('record')
+  @ApiOperation({ summary: '记录学习或复习' })
+  record(@Body() dto: RecordStudyDto) {
+    return this.study.record(dto.vocabularyId, dto.eventType);
   }
-  @Post('test-answers') @ApiOperation({ summary: '提交测试答案' }) answer(
-    @Body() dto: TestAnswerDto,
-  ) {
+
+  @Post('test-answer')
+  @ApiOperation({ summary: '提交测试答案并归集错题' })
+  answer(@Body() dto: TestAnswerDto) {
     return this.study.submitAnswer(dto.vocabularyId, dto.correct);
   }
-  @Get('review/:mode') @ApiOperation({ summary: '复习列表' }) reviewList(
-    @Param('mode') mode: string,
-  ) {
-    return this.study.reviewList(mode);
+
+  @Get('review')
+  @ApiOperation({ summary: '查询复习列表' })
+  review(@Query() query: ReviewQueryDto) {
+    return this.study.reviewList(query.mode);
   }
 }

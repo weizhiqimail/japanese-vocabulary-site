@@ -1,0 +1,1 @@
+export { PartsOfSpeech } from "./PartsOfSpeech";

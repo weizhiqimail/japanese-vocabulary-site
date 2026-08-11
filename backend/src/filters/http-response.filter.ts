@@ -4,12 +4,21 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Injectable,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
+import { AppLoggerService } from '@/shared-modules/logging/app-logger.service';
+
+/** 统一转换异常响应，并把完整异常上下文写入 EXCEPTION 日志。 */
+@Injectable()
 @Catch()
 export class HttpResponseFilter implements ExceptionFilter {
+  constructor(private readonly logger: AppLoggerService) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
-    const response = host.switchToHttp().getResponse<Response>();
+    const http = host.switchToHttp();
+    const request = http.getRequest<Request>();
+    const response = http.getResponse<Response>();
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -26,6 +35,16 @@ export class HttpResponseFilter implements ExceptionFilter {
           : exception instanceof Error
             ? exception.message
             : '服务器内部错误';
+
+    this.logger.exception(message, {
+      exceptionName:
+        exception instanceof Error ? exception.name : 'UnknownException',
+      method: request.method,
+      stack: exception instanceof Error ? exception.stack : undefined,
+      statusCode: status,
+      url: request.originalUrl,
+    });
+
     response.status(status).json({ success: false, data: null, message });
   }
 }
