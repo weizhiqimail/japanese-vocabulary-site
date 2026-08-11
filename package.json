@@ -1,38 +1,17 @@
 {
   "name": "japanese-vocabulary-site",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vinext dev",
-    "build": "vinext build",
-    "start": "vinext preview",
-    "db:migrate": "node --env-file=.env scripts/migrate-database.mjs",
-    "typecheck": "tsc --noEmit",
-    "prettier": "prettier --write ./app/**/* docs/db/* ./scripts/*"
-  },
-  "dependencies": {
-    "axios": "^1.19.0",
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
-    "mysql2": "^3.23.2",
-    "next": "16.2.6",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "sass": "^1.90.0"
+    "install:all": "npm install --prefix frontend && npm install --prefix backend",
+    "dev": "concurrently -n frontend,backend -c cyan,blue \"npm run dev --prefix frontend\" \"npm run start:dev:local --prefix backend\"",
+    "typecheck": "npm run build --prefix frontend && npm run build --prefix backend",
+    "build": "node scripts/build.mjs",
+    "start": "npm run start:prod --prefix backend",
+    "db:migrate": "npm run db:migrate --prefix backend",
+    "db:sync:online": "node backend/scripts/sync-local-to-online.mjs"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.51.1",
-    "@types/node": "22.19.19",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.2",
-    "@vitejs/plugin-rsc": "0.5.26",
-    "prettier": "^3.9.6",
-    "react-server-dom-webpack": "19.2.6",
-    "typescript": "5.9.3",
-    "vinext": "0.0.50",
-    "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "concurrently": "^9.2.1"
   }
 }

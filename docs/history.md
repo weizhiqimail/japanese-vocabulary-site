@@ -4,7 +4,7 @@ DB_HOST=127.0.0.1
 DB_PORT=3307
 DB_NAME=daziwordsapp
 DB_USER=root
-DB_PASSWORD=12345678
+DB_PASSWORD=<local-password>
 DB_POOL_SIZE=10
 DB_CONNECT_TIMEOUT_MS=5000
 
@@ -38,7 +38,11 @@ modules 里，每一个 module 有 service controller dto config，但是，只�
 
 11. 还需要 swagger 的接口文档。
 
-12. 这次项目改造。
+12. 这次项目改造。把原来的 D:\program\japanese-vocabulary-site 的 git 拷贝过来，沿用旧有的 git 记录，我不放在一块，是因为我可能还要用到一些代码。但是你要知道，我只是把代码放在另一个目录里，不是新启一个项目。
+
+13. 本地数据库如果连不上，先不考虑数据库的问题，主要是改造代码。
+
+开始执行，授予你访问 D:\program\dazi_words_app 目录下的所有文件的查看权限。授予你 D:\program\japanese-vocabulary-site-v2 目录下的读写权限。
 
 
 

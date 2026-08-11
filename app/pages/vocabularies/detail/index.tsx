@@ -1,1 +1,0 @@
-export { VocabularyDetailPage } from "./VocabularyDetailPage";

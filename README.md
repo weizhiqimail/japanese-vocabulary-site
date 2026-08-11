@@ -1,93 +1,33 @@
 # 日本語言葉勉強
 
-单用户日语知识库与学习系统，用于维护词汇、语法、句子、词汇集合以及学习复习记录。产品需求以 `docs/PRD-V2.md` 为准。
+个人日语知识库与学习系统。项目沿用原仓库 Git 历史，技术架构改为 Vite React SPA + NestJS API，同仓库开发、单服务生产部署。
 
-## 技术栈
+## 目录
 
-- Vinext / Next.js App Router、React、TypeScript
-- Bootstrap、Bootstrap Icons、SCSS
-- Axios（浏览器 HTTP 客户端）
-- MySQL、`mysql2`
-- Prettier、TypeScript 类型检查
+- `frontend/`：React、TypeScript、Vite、Chakra UI。
+- `backend/`：NestJS、TypeORM、MySQL、Swagger、登录认证和静态资源服务。
+- `docs/`：产品、数据库、架构、部署与数据同步说明。
 
-## 目录结构
+## 本地开发
 
-```text
-app/
-  pages/                     # 页面组合与页面级样式
-  components/                # 可复用组件；组件目录由 index.tsx 对外暴露
-  http/                      # Axios request 与按业务划分的接口函数
-  server/
-    api/                     # 统一响应与请求处理
-    db/                      # 数据库连接
-    services/                # 服务与业务规则
-    repositories/            # SQL 与数据库数据映射
-  config/                    # 路由、枚举和模块配置
-  layout/                    # 应用外壳
-  assets/styles/             # 全局样式入口和基础样式
-  types/                     # 跨模块领域类型
-routes/app/                  # Vinext 路由表；仅映射 app/pages 与 app/server
-  api/                       # HTTP URL 入口适配
-  collections/, ...          # 页面 URL 入口适配
-db/schema.sql                # 完整 MySQL 正式结构
-scripts/migrate-database.mjs # 幂等结构迁移
-docs/                        # PRD、数据库及应用架构说明
-files/                       # 受保护的只读原始资料
-```
+1. 确认 `backend/.env.local` 中的本地数据库连接。
+2. 执行 `npm run install:all`。
+3. 执行 `npm run db:migrate`，数据库不可用时可暂时跳过。
+4. 执行 `npm run dev`。
 
-`app` 只保存按职责划分的业务源码。Vinext 通过 `vite.config.ts` 的 `appDir: "routes"` 扫描 `routes/app`；其中页面入口只导出 `app/pages` 页面，HTTP 入口只调用 `app/server`，不承载页面实现、业务规则或 SQL。
+前端访问 `http://localhost:5173`，Vite 将 `/api` 代理到 `http://localhost:3000`。Swagger 位于 `http://localhost:3000/api/docs`。
 
-## 前后端调用关系
+初始管理员通过环境变量创建。开发环境默认用户名和密码均为 `admin`，仅用于本地测试。
 
-```text
-app/pages
-  -> app/components
-  -> app/http/<business>（具名 Axios 接口函数）
-  -> routes/app/api/<resource>（解析 HTTP 请求的路由表适配层）
-  -> app/server/services
-  -> app/server/repositories
-  -> MySQL（DATABASE_URL）
-```
+## 构建与运行
 
-接口统一返回：
-
-```json
-{
-  "success": true,
-  "data": {},
-  "message": ""
-}
-```
-
-前端业务代码不拼接接口 URL，不直接使用 `fetch`；每项请求由 `app/http` 中的具名函数封装。服务层负责业务规则，仓储层负责 SQL 和数据映射。
-
-## 页面路由
-
-- `/`：首页
-- `/collections`、`/collections/:id/study`、`/collections/:id/test`：集合、学习与测试
-- `/vocabularies`、`/vocabularies/:id`：词库与词汇详情
-- `/grammars`、`/grammars/:id`：语法与详情
-- `/sentences`、`/sentences/:id`：句子与详情
-- `/review/*`：复习页面
-- `/manage/*`：导入、标签、词性与设置
-
-## 本地运行
-
-```powershell
-npm install
-npm run db:migrate
-npm run dev
-```
-
-应用统一读取 `DATABASE_URL`。不要提交 `.env`、密码或令牌。
-
-## 质量检查
-
-```powershell
-npx prettier app db docs scripts README.md --write
-npm run typecheck
+```bash
 npm run build
-git diff --check
+npm run start
 ```
 
-数据库结构变化时同步维护 `db/schema.sql`、`docs/DATABASE_SCHEMA.md` 和 `docs/APPLICATION_ARCHITECTURE.md`。`files/` 禁止修改、移动或删除。
+构建会先生成前端产物，再复制到 `backend/web`，最后构建 NestJS。生产环境只运行一个后端服务；`/api/*` 由 NestJS 处理，其他路径由 React SPA 处理。
+
+## 数据库同步
+
+本地全量覆盖线上数据库属于破坏性操作，不会随构建或部署自动执行。详见 `docs/DATABASE_SYNC.md`。

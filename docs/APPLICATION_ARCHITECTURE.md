@@ -1,40 +1,34 @@
 # 应用架构
 
-## 技术栈
+## 总体结构
 
-- Vinext / React / TypeScript
-- Bootstrap、Bootstrap Icons、SCSS
-- Axios HTTP 客户端
-- MySQL（`mysql2` 连接池）
+```text
+开发环境
+浏览器 → Vite React :5173 ──/api 代理──> NestJS :3000 → 本地 MySQL :3307
 
-## 目录边界
+生产环境
+浏览器 → NestJS 单服务
+          ├─ /api/* → Controller / Service / TypeORM → 在线 MySQL
+          └─ 其他路径 → backend/web React SPA
+```
 
-- `app/pages/`：页面模块；真实 `app/**/page.tsx` 只负责路由参数和页面映射。
-- `app/components/`：独立 UI 组件；组件目录通过 `index.tsx` 暴露，并在 `types/` 保存 Props。
-- `app/layout/`：应用壳、导航和公共布局。
-- `app/http/`：Axios `request`、统一响应类型和按资源划分的前端接口。
-- `app/config/`：路由、资源、枚举、分页选项和 UI 配置。
-- `app/assets/styles/`：Bootstrap 入口和全局基础样式；组件专属样式与组件同目录。
-- `app/server/api/`：统一成功/失败响应和控制器。
-- `app/server/db/`：数据库连接池和事务。
-- `app/server/repositories/`：SQL 和数据映射。
-- `app/server/services/`：导入、关联创建等业务规则。
+前后端独立开发与构建，生产环境同域部署，不需要生产 CORS。History 页面路由由静态资源服务回退到 `index.html`；`/api` 不进入页面回退。
 
-## 路由与 API
+## 后端边界
 
-所有页面使用真实目录路由，不再使用页面内路径判断或万能 History 路由。资源 REST API 使用独立 URL，例如：
+- Controller：HTTP 参数、Swagger 描述和状态边界。
+- Service：业务规则、事务和跨实体协作。
+- Entity：数据库映射，每个实体都有独立配置并由统一索引导出。
+- SharedDatabaseModule：统一注册 TypeORM 和全部实体 Repository。
+- Guard：除登录接口外，所有 API 必须具有有效会话 Cookie。
+- Filter/Interceptor/Pipe：统一错误、响应和输入校验。
 
-- `/api/vocabularies`、`/api/vocabularies/[id]`
-- `/api/grammars`、`/api/grammars/[id]`
-- `/api/sentences`、`/api/sentences/[id]`
-- `/api/collections`、`/api/tags`、`/api/parts-of-speech`
-- `/api/settings`、`/api/imports`、`/api/test-answers`
-- `/api/vocabularies/[id]/grammars`、`/api/vocabularies/[id]/sentences`
+普通数据访问使用 TypeORM Repository 与 QueryBuilder；动态表名和字段名只来自服务端白名单。复杂数据库特性如必须使用 SQL，应限制在 Repository/Service 内并绑定参数。
 
-接口统一返回 `{ success, data, message }`。查询参数统一使用 `pageNum`、`pageSize`、`q`；删除采用逻辑删除。前端不直接使用 `fetch`，全部请求经 `app/http/request.ts` 的 Axios 实例发出。
+## 前端边界
 
-## 数据与交互
-
-词汇写入同时维护词性、标签和集合关系；语法与句子写入维护标签。详情内造句在事务中创建句子及知识关系。列表默认分页由设置表中的 `pagination_defaults` 按模块读取，未配置时为 20。
-
-所有新增和编辑使用 85% 可视区域的 Bootstrap 模态框；删除使用小型确认模态框。桌面详情为左右布局，手机端依次显示基本信息、分类、关联和维护信息。
+- React Router 负责页面路由和登录前置拦截。
+- AuthContext 只保存当前用户，不读取 HttpOnly 会话 Cookie。
+- Axios 统一调用相对 `/api`，遇到 401 返回登录页。
+- ResourcePage 通过服务端白名单资源配置复用列表、搜索、分页和维护交互。
+- Chakra UI 主题统一使用浅蓝品牌色，PC 和手机采用不同的信息密度。
