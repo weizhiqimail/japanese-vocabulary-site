@@ -9,7 +9,7 @@
     "start": "vinext preview",
     "db:migrate": "node --env-file=.env scripts/migrate-database.mjs",
     "typecheck": "tsc --noEmit",
-    "prettier": "prettier --write ./app/**/* ./db/* ./scripts/*"
+    "prettier": "prettier --write ./app/**/* docs/db/* ./scripts/*"
   },
   "dependencies": {
     "axios": "^1.19.0",
