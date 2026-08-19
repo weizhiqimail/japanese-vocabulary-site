@@ -21,7 +21,7 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { PageLoading } from "@/components/common/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
-import { MANAGEMENT_ITEMS, NAV_ITEMS } from "./config";
+import { MANAGEMENT_ITEMS, NAV_ITEMS, WORD_ITEMS } from "./config";
 
 function NavigationBreadcrumb({
   mobile = false,
@@ -86,6 +86,29 @@ function ManagementBreadcrumb() {
   );
 }
 
+function WordsBreadcrumb() {
+  return (
+    <Breadcrumb
+      separator="·"
+      mb={{ base: 5, md: 7 }}
+      overflowX="auto"
+      whiteSpace="nowrap"
+    >
+      {WORD_ITEMS.map((item) => (
+        <BreadcrumbItem key={item.path}>
+          <BreadcrumbLink
+            as={NavLink}
+            to={item.path}
+            _activeLink={{ color: "brand.700", fontWeight: "700" }}
+          >
+            {item.label}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      ))}
+    </Breadcrumb>
+  );
+}
+
 export function AppLayout() {
   const drawer = useDisclosure();
   const { user, logout } = useAuth();
@@ -129,7 +152,7 @@ export function AppLayout() {
           />
           <Text
             as={Link}
-            to="/"
+            to="/words"
             flexShrink={0}
             mr={{ lg: 8 }}
             fontWeight="800"
@@ -162,7 +185,10 @@ export function AppLayout() {
         py={{ base: 6, md: 10 }}
         px={{ base: 4, md: 7, xl: 8 }}
       >
-        {location.pathname.startsWith("/manage") && <ManagementBreadcrumb />}
+        {location.pathname.startsWith("/words") && <WordsBreadcrumb />}
+        {location.pathname.startsWith("/words/manage") && (
+          <ManagementBreadcrumb />
+        )}
         <Outlet />
       </Container>
       <Drawer isOpen={drawer.isOpen} placement="left" onClose={drawer.onClose}>

@@ -7,7 +7,7 @@ import { PaginationQueryDto } from '@/common/dto/pagination-query.dto';
 
 @ApiTags('导入审核')
 @ApiCookieAuth('jvs_session')
-@Controller('imports')
+@Controller(['imports', 'words/imports'])
 export class ImportsController {
   constructor(private readonly imports: ImportsService) {}
 

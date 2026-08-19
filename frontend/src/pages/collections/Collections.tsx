@@ -143,8 +143,7 @@ export function Collections() {
   const update = <Key extends keyof SaveCollectionInput>(
     key: Key,
     value: SaveCollectionInput[Key],
-  ) =>
-    setForm((current) => ({ ...current, [key]: value }));
+  ) => setForm((current) => ({ ...current, [key]: value }));
 
   return (
     <VStack align="stretch" spacing={6}>
@@ -211,13 +210,17 @@ export function Collections() {
                   <Button
                     flex="1"
                     variant="outline"
-                    onClick={() => navigate(`/collections/${item.id}/study`)}
+                    onClick={() =>
+                      navigate(`/words/collections/${item.id}/words/study`)
+                    }
                   >
                     学习
                   </Button>
                   <Button
                     flex="1"
-                    onClick={() => navigate(`/collections/${item.id}/test`)}
+                    onClick={() =>
+                      navigate(`/words/collections/${item.id}/test`)
+                    }
                   >
                     测试
                   </Button>

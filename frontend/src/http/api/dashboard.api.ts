@@ -8,5 +8,5 @@ export interface DashboardStatistics {
 }
 
 export function getDashboardStatistics() {
-  return request<DashboardStatistics>({ url: "/dashboard" });
+  return request<DashboardStatistics>({ url: "/words/dashboard" });
 }

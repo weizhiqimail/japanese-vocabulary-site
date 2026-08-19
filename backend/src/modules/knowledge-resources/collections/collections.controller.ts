@@ -15,7 +15,7 @@ import { CollectionsService } from '@/modules/knowledge-resources/collections/co
 /** 集合接口统一使用 GET 查询和 POST 变更。 */
 @ApiTags('集合')
 @ApiCookieAuth('jvs_session')
-@Controller(COLLECTION_RESOURCE_NAME)
+@Controller([COLLECTION_RESOURCE_NAME, `words/${COLLECTION_RESOURCE_NAME}`])
 export class CollectionsController {
   constructor(private readonly collections: CollectionsService) {}
 

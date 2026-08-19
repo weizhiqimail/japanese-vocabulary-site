@@ -51,7 +51,7 @@ export function VocabularyStudyList({
               <CardBody>
                 <Text
                   as={Link}
-                  to={`/vocabularies/${item.id}`}
+                  to={`/words/vocabularies/${item.id}`}
                   color="brand.800"
                   fontWeight="700"
                   fontSize="lg"
@@ -95,7 +95,7 @@ export function VocabularyStudyList({
                     ) : (
                       <Text
                         as={Link}
-                        to={`/vocabularies/${item.id}`}
+                        to={`/words/vocabularies/${item.id}`}
                         color="brand.800"
                         fontWeight="700"
                       >

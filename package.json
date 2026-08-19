@@ -9,7 +9,10 @@
     "build": "node scripts/build.mjs",
     "start": "npm run start:prod --prefix backend",
     "db:migrate": "npm run db:migrate --prefix backend",
-    "db:sync:online": "node backend/scripts/sync-local-to-online.mjs"
+    "db:sync:online": "node backend/scripts/sync-local-to-online.mjs",
+    "questions:validate": "node backend/scripts/import-question-bank.mjs --dry-run",
+    "questions:import": "node backend/scripts/import-question-bank.mjs",
+    "questions:verify": "node backend/scripts/verify-question-bank.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -16,7 +16,7 @@ import { LinkRelationDto } from '@/modules/knowledge-resources/shared/dto/link-r
 /** 句子接口统一使用 GET 查询和 POST 变更。 */
 @ApiTags('句子')
 @ApiCookieAuth('jvs_session')
-@Controller(SENTENCE_RESOURCE_NAME)
+@Controller([SENTENCE_RESOURCE_NAME, `words/${SENTENCE_RESOURCE_NAME}`])
 export class SentencesController {
   constructor(private readonly sentences: SentencesService) {}
 

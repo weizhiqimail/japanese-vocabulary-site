@@ -22,19 +22,22 @@ export interface SaveVocabularyInput {
 
 export function getVocabularies(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/vocabularies",
+    url: "/words/vocabularies",
     params: listQuery(params),
   });
 }
 
 export function getVocabulary(wordId: number) {
-  return request<ResourceItem>({ url: "/vocabularies", params: { wordId } });
+  return request<ResourceItem>({
+    url: "/words/vocabularies",
+    params: { wordId },
+  });
 }
 
 export function saveVocabulary(input: SaveVocabularyInput) {
   return request<ResourceItem>({
     method: "POST",
-    url: "/vocabularies/save",
+    url: "/words/vocabularies/save",
     data: {
       ...(input.wordId ? { wordId: input.wordId } : undefined),
       word: input.word,
@@ -53,7 +56,7 @@ export function saveVocabulary(input: SaveVocabularyInput) {
 export function deleteVocabulary(wordId: number) {
   return request({
     method: "POST",
-    url: "/vocabularies/delete",
+    url: "/words/vocabularies/delete",
     data: { wordId },
   });
 }
@@ -64,7 +67,7 @@ export function saveVocabularyRelation(
 ) {
   return request({
     method: "POST",
-    url: "/vocabularies/relations/save",
+    url: "/words/vocabularies/relations/save",
     data: {
       wordId,
       targetResource: relation.targetResource,
@@ -79,7 +82,7 @@ export function deleteVocabularyRelation(
 ) {
   return request({
     method: "POST",
-    url: "/vocabularies/relations/delete",
+    url: "/words/vocabularies/relations/delete",
     data: {
       wordId,
       targetResource: relation.targetResource,

@@ -8,7 +8,10 @@ import { PartsOfSpeechService } from '@/modules/knowledge-resources/parts-of-spe
 /** 词性接口统一使用 GET 查询和 POST 保存。 */
 @ApiTags('词性')
 @ApiCookieAuth('jvs_session')
-@Controller(PART_OF_SPEECH_RESOURCE_NAME)
+@Controller([
+  PART_OF_SPEECH_RESOURCE_NAME,
+  `words/${PART_OF_SPEECH_RESOURCE_NAME}`,
+])
 export class PartsOfSpeechController {
   constructor(private readonly partsOfSpeech: PartsOfSpeechService) {}
 

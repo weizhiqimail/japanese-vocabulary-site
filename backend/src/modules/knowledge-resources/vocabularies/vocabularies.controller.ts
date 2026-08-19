@@ -16,7 +16,7 @@ import { LinkRelationDto } from '@/modules/knowledge-resources/shared/dto/link-r
 /** 词汇接口统一使用 GET 查询和 POST 变更，不把操作编码为 REST 路径。 */
 @ApiTags('词汇')
 @ApiCookieAuth('jvs_session')
-@Controller(VOCABULARY_RESOURCE_NAME)
+@Controller([VOCABULARY_RESOURCE_NAME, `words/${VOCABULARY_RESOURCE_NAME}`])
 export class VocabulariesController {
   constructor(private readonly vocabularies: VocabulariesService) {}
 

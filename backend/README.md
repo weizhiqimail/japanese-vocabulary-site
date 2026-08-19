@@ -42,7 +42,7 @@ Swagger：`/api/docs`。
 
 服务日志写入仓库根目录 `logs/`，文件名为 `jvs-YYYY-MM-DD-NNN.log`。HTTP 生命周期、最终 SQL 与绑定参数、业务判断、异常和启动信息使用不同类别前缀；写文件走异步缓冲流，不在请求链路中同步写盘。密码、令牌、Cookie 与 Authorization 元数据会被脱敏。
 
-服务启动日志包含本地访问 URL、Swagger URL 和当前日志文件路径。完整说明见 `../docs/LOGGING.md`。
+服务启动日志包含本地访问 URL、Swagger URL 和当前日志文件路径。完整说明见 `../docs/05-开发部署与运维.md`。
 
 ## 全接口回归
 

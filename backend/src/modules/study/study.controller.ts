@@ -14,7 +14,7 @@ import { StudyService } from '@/modules/study/study.service';
 
 @ApiTags('学习与复习')
 @ApiCookieAuth('jvs_session')
-@Controller('study')
+@Controller(['study', 'words/study'])
 export class StudyController {
   constructor(private readonly study: StudyService) {}
 

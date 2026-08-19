@@ -38,6 +38,9 @@ async function bootstrap() {
 
   await app.listen(port, '0.0.0.0');
 
+  logger.log(`server is running at ${localUrl}`);
+  logger.log(`server docs is running at ${swaggerUrl}`);
+
   logger.startup('Service started', {
     apiDocumentationUrl: swaggerUrl,
     localUrl,

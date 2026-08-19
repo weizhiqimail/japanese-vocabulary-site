@@ -380,3 +380,151 @@ CREATE TABLE IF NOT EXISTS auth_sessions (
   INDEX idx_auth_session_expiry(expires_at),
   FOREIGN KEY(user_id) REFERENCES app_users(id)
 ) COMMENT = '登录会话';
+
+
+CREATE TABLE IF NOT EXISTS question_groups (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  parent_id BIGINT UNSIGNED NULL COMMENT '父分组ID',
+  code VARCHAR(100) NOT NULL COMMENT '稳定分组代码',
+  name VARCHAR(255) NOT NULL COMMENT '分组名称',
+  group_level ENUM('provider','certification') NOT NULL COMMENT '分组层级',
+  description TEXT NULL COMMENT '分组说明',
+  sort_order INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
+  enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  deleted_at DATETIME(3) NULL COMMENT '逻辑删除时间',
+  UNIQUE KEY uk_question_group_parent_code(parent_id,code),
+  INDEX idx_question_group_parent(parent_id),
+  FOREIGN KEY(parent_id) REFERENCES question_groups(id)
+) COMMENT = '题库大小组';
+
+CREATE TABLE IF NOT EXISTS question_banks (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  group_id BIGINT UNSIGNED NOT NULL COMMENT '所属最末级分组ID',
+  code VARCHAR(100) NOT NULL UNIQUE COMMENT '稳定题库代码',
+  name VARCHAR(255) NOT NULL COMMENT '题库名称',
+  description TEXT NULL COMMENT '题库说明',
+  source VARCHAR(500) NULL COMMENT '来源说明',
+  content_version VARCHAR(64) NOT NULL COMMENT '内容版本',
+  supported_languages JSON NOT NULL COMMENT '支持语言',
+  default_language VARCHAR(10) NOT NULL DEFAULT 'zh' COMMENT '默认语言',
+  question_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '有效题数',
+  enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  deleted_at DATETIME(3) NULL COMMENT '逻辑删除时间',
+  INDEX idx_question_bank_group(group_id),
+  FOREIGN KEY(group_id) REFERENCES question_groups(id)
+) COMMENT = '固定题库';
+
+CREATE TABLE IF NOT EXISTS questions (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  bank_id BIGINT UNSIGNED NOT NULL COMMENT '题库ID',
+  external_key VARCHAR(150) NOT NULL COMMENT '来源稳定题号',
+  sort_order INT UNSIGNED NOT NULL COMMENT '题库内顺序',
+  topic_code VARCHAR(100) NULL COMMENT '来源主题代码',
+  question_type ENUM('single_choice','multiple_choice','true_false') NOT NULL COMMENT '题型',
+  question_texts JSON NOT NULL COMMENT '多语言题干',
+  rationale_texts JSON NOT NULL COMMENT '多语言解析',
+  source_explanation_texts JSON NULL COMMENT '来源多语言解析',
+  source_answer VARCHAR(50) NULL COMMENT '来源答案',
+  answer_confidence VARCHAR(30) NULL COMMENT '答案置信度',
+  community_conflict TINYINT(1) NOT NULL DEFAULT 0 COMMENT '社区答案是否存在争议',
+  rationale_note TEXT NULL COMMENT '解析来源说明',
+  content_hash CHAR(64) NOT NULL COMMENT '规范化内容SHA-256',
+  enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  deleted_at DATETIME(3) NULL COMMENT '逻辑删除时间',
+  UNIQUE KEY uk_question_bank_external(bank_id,external_key),
+  UNIQUE KEY uk_question_bank_order(bank_id,sort_order),
+  INDEX idx_question_bank_enabled(bank_id,enabled,sort_order),
+  FOREIGN KEY(bank_id) REFERENCES question_banks(id)
+) COMMENT = '固定题目';
+
+CREATE TABLE IF NOT EXISTS question_options (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  question_id BIGINT UNSIGNED NOT NULL COMMENT '题目ID',
+  option_key VARCHAR(20) NOT NULL COMMENT '稳定选项键',
+  content_texts JSON NOT NULL COMMENT '多语言选项内容',
+  is_correct TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否正确选项',
+  sort_order INT UNSIGNED NOT NULL COMMENT '展示顺序',
+  UNIQUE KEY uk_question_option_key(question_id,option_key),
+  UNIQUE KEY uk_question_option_order(question_id,sort_order),
+  FOREIGN KEY(question_id) REFERENCES questions(id)
+) COMMENT = '固定题目选项';
+
+CREATE TABLE IF NOT EXISTS question_progress (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  user_id BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  bank_id BIGINT UNSIGNED NOT NULL COMMENT '题库ID',
+  status ENUM('not_started','in_progress','completed') NOT NULL DEFAULT 'not_started' COMMENT '主线状态',
+  current_question_id BIGINT UNSIGNED NULL COMMENT '下一道未完成题ID',
+  current_position INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '下一题展示位置',
+  answered_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '主线已答题数',
+  correct_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '主线正确题数',
+  started_at DATETIME(3) NULL COMMENT '开始时间',
+  last_answered_at DATETIME(3) NULL COMMENT '最近作答时间',
+  completed_at DATETIME(3) NULL COMMENT '完成时间',
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  UNIQUE KEY uk_question_progress_user_bank(user_id,bank_id),
+  FOREIGN KEY(user_id) REFERENCES app_users(id),
+  FOREIGN KEY(bank_id) REFERENCES question_banks(id),
+  FOREIGN KEY(current_question_id) REFERENCES questions(id)
+) COMMENT = '用户题库主线进度';
+
+CREATE TABLE IF NOT EXISTS question_attempts (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  request_key CHAR(36) NOT NULL UNIQUE COMMENT '幂等请求键',
+  user_id BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  bank_id BIGINT UNSIGNED NOT NULL COMMENT '题库ID',
+  question_id BIGINT UNSIGNED NOT NULL COMMENT '题目ID',
+  mode ENUM('sequential','error_review','favorite_review') NOT NULL COMMENT '作答模式',
+  selected_option_keys JSON NOT NULL COMMENT '用户选项键快照',
+  correct_option_keys JSON NOT NULL COMMENT '标准答案键快照',
+  is_correct TINYINT(1) NOT NULL COMMENT '是否正确',
+  duration_ms INT UNSIGNED NULL COMMENT '答题耗时毫秒',
+  answered_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '作答时间',
+  INDEX idx_question_attempt_user_bank(user_id,bank_id,answered_at),
+  INDEX idx_question_attempt_question(user_id,question_id,answered_at),
+  FOREIGN KEY(user_id) REFERENCES app_users(id),
+  FOREIGN KEY(bank_id) REFERENCES question_banks(id),
+  FOREIGN KEY(question_id) REFERENCES questions(id)
+) COMMENT = '不可变题目作答流水';
+
+CREATE TABLE IF NOT EXISTS question_states (
+  user_id BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  question_id BIGINT UNSIGNED NOT NULL COMMENT '题目ID',
+  attempt_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '累计作答次数',
+  correct_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '累计正确次数',
+  wrong_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '累计错误次数',
+  last_is_correct TINYINT(1) NULL COMMENT '最近是否正确',
+  first_wrong_at DATETIME(3) NULL COMMENT '首次错误时间',
+  last_wrong_at DATETIME(3) NULL COMMENT '最近错误时间',
+  is_in_error_book TINYINT(1) NOT NULL DEFAULT 0 COMMENT '当前是否在错题本',
+  error_resolved_at DATETIME(3) NULL COMMENT '最近移出错题时间',
+  is_favorite TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否收藏',
+  favorited_at DATETIME(3) NULL COMMENT '收藏时间',
+  last_answered_at DATETIME(3) NULL COMMENT '最近作答时间',
+  PRIMARY KEY(user_id,question_id),
+  INDEX idx_question_state_error(user_id,is_in_error_book),
+  INDEX idx_question_state_favorite(user_id,is_favorite),
+  FOREIGN KEY(user_id) REFERENCES app_users(id),
+  FOREIGN KEY(question_id) REFERENCES questions(id)
+) COMMENT = '用户题目汇总状态';
+
+CREATE TABLE IF NOT EXISTS question_import_batches (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  bank_id BIGINT UNSIGNED NULL COMMENT '题库ID',
+  content_version VARCHAR(64) NOT NULL COMMENT '内容版本',
+  original_filename VARCHAR(255) NOT NULL COMMENT '原文件名',
+  file_hash CHAR(64) NOT NULL COMMENT '文件SHA-256',
+  question_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '题数',
+  status ENUM('validating','completed','failed') NOT NULL DEFAULT 'validating' COMMENT '导入状态',
+  summary_json JSON NULL COMMENT '校验与差异摘要',
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  completed_at DATETIME(3) NULL COMMENT '完成时间',
+  INDEX idx_question_import_bank(bank_id,created_at),
+  FOREIGN KEY(bank_id) REFERENCES question_banks(id)
+) COMMENT = '题库导入审计';

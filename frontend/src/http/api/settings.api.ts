@@ -1,7 +1,7 @@
 import { request } from "@/http/request";
 
 export function getSettings() {
-  return request<Record<string, unknown>>({ url: "/settings" });
+  return request<Record<string, unknown>>({ url: "/words/settings" });
 }
 
 export interface PaginationDefaults {
@@ -18,7 +18,7 @@ export function saveSetting(
 ) {
   return request({
     method: "POST",
-    url: "/settings/save",
+    url: "/words/settings/save",
     data: { key, value },
   });
 }

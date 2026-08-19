@@ -17,10 +17,10 @@ import {
 } from "@/http/api/dashboard.api";
 
 const cards = [
-  { key: "vocabularies", label: "词汇", path: "/vocabularies" },
-  { key: "collections", label: "集合", path: "/collections" },
-  { key: "grammars", label: "语法", path: "/grammars" },
-  { key: "sentences", label: "句子", path: "/sentences" },
+  { key: "vocabularies", label: "词汇", path: "/words/vocabularies" },
+  { key: "collections", label: "集合", path: "/words/collections" },
+  { key: "grammars", label: "语法", path: "/words/grammars" },
+  { key: "sentences", label: "句子", path: "/words/sentences" },
 ] as const;
 
 /** 首页独立页面级组件。 */
@@ -58,7 +58,7 @@ export function Home() {
           <Text mt={2} color="slate.600">
             学习、测试并把错误词汇自动加入错题本。
           </Text>
-          <Button as={Link} to="/collections" mt={5}>
+          <Button as={Link} to="/words/collections" mt={5}>
             查看集合
           </Button>
         </CardBody>

@@ -11,6 +11,14 @@ import { ImportCandidateEntity } from '@/entities/import-candidate/import-candid
 import { ImportBatchEntity } from '@/entities/import-batch/import-batch.entity';
 import { AppUserEntity } from '@/entities/app-user/app-user.entity';
 import { AuthSessionEntity } from '@/entities/auth-session/auth-session.entity';
+import { QuestionGroupEntity } from '@/entities/question-group/question-group.entity';
+import { QuestionBankEntity } from '@/entities/question-bank/question-bank.entity';
+import { QuestionEntity } from '@/entities/question/question.entity';
+import { QuestionOptionEntity } from '@/entities/question-option/question-option.entity';
+import { QuestionProgressEntity } from '@/entities/question-progress/question-progress.entity';
+import { QuestionAttemptEntity } from '@/entities/question-attempt/question-attempt.entity';
+import { QuestionStateEntity } from '@/entities/question-state/question-state.entity';
+import { QuestionImportBatchEntity } from '@/entities/question-import-batch/question-import-batch.entity';
 
 export * from '@/entities/vocabulary/vocabulary.entity';
 export * from '@/entities/collection/collection.entity';
@@ -25,6 +33,14 @@ export * from '@/entities/import-candidate/import-candidate.entity';
 export * from '@/entities/import-batch/import-batch.entity';
 export * from '@/entities/app-user/app-user.entity';
 export * from '@/entities/auth-session/auth-session.entity';
+export * from '@/entities/question-group/question-group.entity';
+export * from '@/entities/question-bank/question-bank.entity';
+export * from '@/entities/question/question.entity';
+export * from '@/entities/question-option/question-option.entity';
+export * from '@/entities/question-progress/question-progress.entity';
+export * from '@/entities/question-attempt/question-attempt.entity';
+export * from '@/entities/question-state/question-state.entity';
+export * from '@/entities/question-import-batch/question-import-batch.entity';
 export const ALL_ENTITIES = [
   VocabularyEntity,
   CollectionEntity,
@@ -39,4 +55,12 @@ export const ALL_ENTITIES = [
   ImportBatchEntity,
   AppUserEntity,
   AuthSessionEntity,
+  QuestionGroupEntity,
+  QuestionBankEntity,
+  QuestionEntity,
+  QuestionOptionEntity,
+  QuestionProgressEntity,
+  QuestionAttemptEntity,
+  QuestionStateEntity,
+  QuestionImportBatchEntity,
 ];

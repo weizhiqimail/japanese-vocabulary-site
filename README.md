@@ -29,8 +29,8 @@ npm run start
 
 构建会先生成前端产物，再复制到 `backend/web`，最后构建 NestJS。生产环境只运行一个后端服务；`/api/*` 由 NestJS 处理，其他路径由 React SPA 处理。
 
-服务启动后会在控制台和根目录 `logs/jvs-YYYY-MM-DD-NNN.log` 中记录页面 URL 与 Swagger URL。日志分为 HTTP、DB、BUSINESS、EXCEPTION、STARTUP 和 SYSTEM，详细约定见 `docs/LOGGING.md`。
+服务启动后会在控制台和根目录 `logs/jvs-YYYY-MM-DD-NNN.log` 中记录页面 URL 与 Swagger URL。日志分为 HTTP、DB、BUSINESS、EXCEPTION、STARTUP 和 SYSTEM，详细约定见 `docs/05-开发部署与运维.md`。
 
 ## 数据库同步
 
-本地全量覆盖线上数据库属于破坏性操作，不会随构建或部署自动执行。详见 `docs/DATABASE_SYNC.md`。
+本地全量覆盖线上数据库属于破坏性操作，不会随构建或部署自动执行。详见 `docs/05-开发部署与运维.md`。

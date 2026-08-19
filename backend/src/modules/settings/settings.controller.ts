@@ -5,7 +5,7 @@ import { SettingsService } from './settings.service';
 
 @ApiTags('设置')
 @ApiCookieAuth('jvs_session')
-@Controller('settings')
+@Controller(['settings', 'words/settings'])
 export class SettingsController {
   constructor(private readonly settings: SettingsService) {}
 

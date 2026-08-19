@@ -15,7 +15,7 @@ import { TagsService } from '@/modules/knowledge-resources/tags/tags.service';
 /** 标签接口统一使用 GET 查询和 POST 变更。 */
 @ApiTags('标签')
 @ApiCookieAuth('jvs_session')
-@Controller(TAG_RESOURCE_NAME)
+@Controller([TAG_RESOURCE_NAME, `words/${TAG_RESOURCE_NAME}`])
 export class TagsController {
   constructor(private readonly tags: TagsService) {}
 

@@ -4,7 +4,7 @@ import { DashboardService } from './dashboard.service';
 
 @ApiTags('首页')
 @ApiCookieAuth('jvs_session')
-@Controller('dashboard')
+@Controller(['dashboard', 'words/dashboard'])
 export class DashboardController {
   constructor(private readonly dashboard: DashboardService) {}
 

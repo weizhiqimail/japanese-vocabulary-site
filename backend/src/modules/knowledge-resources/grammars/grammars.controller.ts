@@ -16,7 +16,7 @@ import { LinkRelationDto } from '@/modules/knowledge-resources/shared/dto/link-r
 /** 语法接口统一使用 GET 查询和 POST 变更。 */
 @ApiTags('语法')
 @ApiCookieAuth('jvs_session')
-@Controller(GRAMMAR_RESOURCE_NAME)
+@Controller([GRAMMAR_RESOURCE_NAME, `words/${GRAMMAR_RESOURCE_NAME}`])
 export class GrammarsController {
   constructor(private readonly grammars: GrammarsService) {}
 

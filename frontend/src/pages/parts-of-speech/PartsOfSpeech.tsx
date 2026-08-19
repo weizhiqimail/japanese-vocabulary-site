@@ -92,7 +92,10 @@ export function PartsOfSpeech() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: "管理", path: "/manage/tags" }, { label: "词性" }]}
+        items={[
+          { label: "管理", path: "/words/manage/words/tags" },
+          { label: "词性" },
+        ]}
       />
       <PageHeader
         title="词性"
@@ -200,8 +203,7 @@ export function PartsOfSpeech() {
                     form.partOfSpeechId
                       ? String(
                           items.find(
-                            (item) =>
-                              Number(item.id) === form.partOfSpeechId,
+                            (item) => Number(item.id) === form.partOfSpeechId,
                           )?.sort_order || "—",
                         )
                       : "保存时自动生成"

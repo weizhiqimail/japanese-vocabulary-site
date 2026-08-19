@@ -13,10 +13,10 @@ http.interceptors.response.use(
   (error) => {
     if (
       error.response?.status === 401 &&
-      window.location.pathname !== "/login"
+      window.location.pathname !== "/account/login"
     ) {
       window.location.assign(
-        `/login?from=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+        `/account/login?from=${encodeURIComponent(window.location.pathname + window.location.search)}`,
       );
     }
 
