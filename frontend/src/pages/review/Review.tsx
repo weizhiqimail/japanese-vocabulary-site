@@ -42,7 +42,7 @@ export function Review() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: '首页', path: '/' }, { label: '复习' }]}
+        items={[{ label: '首页', path: '/w/words' }, { label: '复习' }]}
       />
       <Breadcrumb separator="/">
         <BreadcrumbItem>

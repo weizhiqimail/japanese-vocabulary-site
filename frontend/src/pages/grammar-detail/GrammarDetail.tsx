@@ -62,7 +62,7 @@ export function GrammarDetail() {
     setBusy(true);
     try {
       await deleteGrammar(grammarId);
-      navigate('/grammars');
+      navigate('/w/words/grammars');
     } finally {
       setBusy(false);
     }
@@ -76,7 +76,7 @@ export function GrammarDetail() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: '语法', path: '/grammars' },
+          { label: '语法', path: '/w/words/grammars' },
           { label: String(item?.pattern || '详情') },
         ]}
       />

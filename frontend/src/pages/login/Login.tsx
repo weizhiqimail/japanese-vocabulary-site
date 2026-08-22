@@ -32,7 +32,7 @@ export function Login() {
 
     try {
       await login(username, password);
-      navigate(search.get('from') || '/', { replace: true });
+      navigate(search.get('from') || '/w/words', { replace: true });
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : '登录失败');
     } finally {

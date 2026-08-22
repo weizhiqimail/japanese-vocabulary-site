@@ -198,7 +198,7 @@ export function KnowledgeResourceList({
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: '首页', path: '/' }, { label: config.title }]}
+        items={[{ label: '首页', path: '/w/words' }, { label: config.title }]}
       />
       <PageHeader
         title={config.title}
@@ -242,7 +242,7 @@ export function KnowledgeResourceList({
             <Card
               key={String(item.id)}
               as={Link}
-              to={`/${resource}/${item.id}`}
+              to={`/w/words/${resource}/${item.id}`}
               bg="white"
               _hover={{ borderColor: 'brand.300' }}
             >
@@ -312,7 +312,7 @@ export function KnowledgeResourceList({
                         {column.key === config.primary && content !== '•••' ? (
                           <Text
                             as={Link}
-                            to={`/${resource}/${item.id}`}
+                            to={`/w/words/${resource}/${item.id}`}
                             color="brand.800"
                             fontWeight="700"
                           >

@@ -1,0 +1,1 @@
+export { WordsLayout } from './WordsLayout';

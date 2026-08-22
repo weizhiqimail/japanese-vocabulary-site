@@ -113,7 +113,10 @@ export function Tags() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: '管理', path: '/manage/tags' }, { label: '标签' }]}
+        items={[
+          { label: '管理', path: '/w/words/manage/tags' },
+          { label: '标签' },
+        ]}
       />
       <PageHeader
         title="标签"

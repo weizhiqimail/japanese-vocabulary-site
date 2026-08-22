@@ -3,7 +3,6 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  Button,
   Container,
   Drawer,
   DrawerBody,
@@ -11,48 +10,25 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  HStack,
   IconButton,
   Spacer,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { PageLoading } from '@/components/common/PageLoading';
-import { useAuth } from '@/contexts/AuthContext';
-import { MANAGEMENT_ITEMS, NAV_ITEMS } from './config';
+import { UserMenu } from '@/layout/shared/UserMenu';
+import { MANAGEMENT_ITEMS, WORD_ITEMS } from './config';
 
-function NavigationBreadcrumb({
-  mobile = false,
-  close,
-}: {
-  mobile?: boolean;
-  close?: () => void;
-}) {
+function WordsNavigation({ close }: { close?: () => void }) {
   return (
-    <Breadcrumb
-      separator={mobile ? '' : '·'}
-      display={mobile ? 'block' : 'flex'}
-      spacing={mobile ? 0 : 2}
-    >
-      {NAV_ITEMS.map((item) => (
-        <BreadcrumbItem
-          key={item.path}
-          display={mobile ? 'block' : 'flex'}
-          mb={mobile ? 2 : 0}
-        >
+    <Breadcrumb separator="·" overflowX="auto" whiteSpace="nowrap">
+      {WORD_ITEMS.map((item) => (
+        <BreadcrumbItem key={item.path}>
           <BreadcrumbLink
             as={NavLink}
             to={item.path}
             onClick={close}
-            px={3}
-            py={2}
-            borderRadius="md"
-            fontWeight="600"
-            color="slate.600"
-            _activeLink={{ bg: 'brand.100', color: 'brand.800' }}
-            _hover={{ bg: 'brand.50', textDecoration: 'none' }}
+            _activeLink={{ color: 'brand.700', fontWeight: '700' }}
           >
             {item.label}
           </BreadcrumbLink>
@@ -62,14 +38,14 @@ function NavigationBreadcrumb({
   );
 }
 
-function ManagementBreadcrumb() {
+function ManagementNavigation() {
   return (
     <Breadcrumb
       separator="/"
       mb={{ base: 6, md: 8 }}
+      pb={3}
       borderBottomWidth="1px"
       borderColor="brand.100"
-      pb={3}
     >
       {MANAGEMENT_ITEMS.map((item) => (
         <BreadcrumbItem key={item.path}>
@@ -86,21 +62,10 @@ function ManagementBreadcrumb() {
   );
 }
 
-export function AppLayout() {
+/** 仅承载词汇模块的布局。 */
+export function WordsLayout() {
   const drawer = useDisclosure();
-  const { user, logout } = useAuth();
   const location = useLocation();
-  const [loggingOut, setLoggingOut] = useState(false);
-
-  const exit = async () => {
-    setLoggingOut(true);
-
-    try {
-      await logout();
-    } finally {
-      setLoggingOut(false);
-    }
-  };
 
   return (
     <Box minH="100vh">
@@ -122,14 +87,14 @@ export function AppLayout() {
         >
           <IconButton
             display={{ base: 'inline-flex', lg: 'none' }}
-            aria-label="打开菜单"
+            aria-label="打开词汇菜单"
             mr={3}
             onClick={drawer.onOpen}
             icon={<Text fontSize="xl">☰</Text>}
           />
           <Text
             as={Link}
-            to="/"
+            to="/w/words"
             flexShrink={0}
             mr={{ lg: 8 }}
             fontWeight="800"
@@ -139,22 +104,10 @@ export function AppLayout() {
             dazi study
           </Text>
           <Box display={{ base: 'none', lg: 'block' }}>
-            <NavigationBreadcrumb />
+            <WordsNavigation />
           </Box>
           <Spacer />
-          <HStack spacing={3}>
-            <Text display={{ base: 'none', sm: 'block' }} color="slate.600">
-              {user?.displayName}
-            </Text>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => void exit()}
-              isDisabled={loggingOut}
-            >
-              退出
-            </Button>
-          </HStack>
+          <UserMenu />
         </Flex>
       </Box>
       <Container
@@ -162,19 +115,20 @@ export function AppLayout() {
         py={{ base: 6, md: 10 }}
         px={{ base: 4, md: 7, xl: 8 }}
       >
-        {location.pathname.startsWith('/manage') && <ManagementBreadcrumb />}
+        {location.pathname.startsWith('/w/words/manage') && (
+          <ManagementNavigation />
+        )}
         <Outlet />
       </Container>
       <Drawer isOpen={drawer.isOpen} placement="left" onClose={drawer.onClose}>
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader color="brand.700">日本語言葉勉強</DrawerHeader>
+          <DrawerHeader color="brand.700">词汇模块</DrawerHeader>
           <DrawerBody>
-            <NavigationBreadcrumb mobile close={drawer.onClose} />
+            <WordsNavigation close={drawer.onClose} />
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-      <PageLoading visible={loggingOut} label="正在退出…" />
     </Box>
   );
 }

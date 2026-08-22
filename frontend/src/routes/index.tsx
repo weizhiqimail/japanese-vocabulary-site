@@ -1,7 +1,8 @@
 import { Center, Spinner } from '@chakra-ui/react';
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { AppLayout } from '@/layout/app';
+import { QuestionsLayout } from '@/layout/questions';
+import { WordsLayout } from '@/layout/words';
 import { ProtectedRoute } from './ProtectedRoute';
 
 const Login = lazy(() =>
@@ -65,8 +66,22 @@ const PartsOfSpeech = lazy(() =>
 const Settings = lazy(() =>
   import('@/pages/settings').then((module) => ({ default: module.Settings })),
 );
+const QuestionBanks = lazy(() =>
+  import('@/pages/question-banks').then((module) => ({
+    default: module.QuestionBanks,
+  })),
+);
+const QuestionBankDetail = lazy(() =>
+  import('@/pages/question-bank-detail').then((module) => ({
+    default: module.QuestionBankDetail,
+  })),
+);
+const QuestionPractice = lazy(() =>
+  import('@/pages/question-practice').then((module) => ({
+    default: module.QuestionPractice,
+  })),
+);
 
-/** 每条页面路由均对应一个独立页面级组件。 */
 export function AppRoutes() {
   return (
     <Suspense
@@ -79,28 +94,61 @@ export function AppRoutes() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
-          <Route element={<AppLayout />}>
-            <Route index element={<Home />} />
-            <Route path="collections" element={<Collections />} />
-            <Route path="collections/:id/study" element={<CollectionStudy />} />
-            <Route path="collections/:id/test" element={<CollectionTest />} />
-            <Route path="vocabularies" element={<Vocabularies />} />
-            <Route path="vocabularies/:id" element={<VocabularyDetail />} />
-            <Route path="grammars" element={<Grammars />} />
-            <Route path="grammars/:id" element={<GrammarDetail />} />
-            <Route path="sentences" element={<Sentences />} />
-            <Route path="sentences/:id" element={<SentenceDetail />} />
-            <Route path="review/:mode" element={<Review />} />
+          <Route path="w" element={<WordsLayout />}>
+            <Route index element={<Navigate to="/w/words" replace />} />
+            <Route path="words" element={<Home />} />
+            <Route path="words/collections" element={<Collections />} />
             <Route
-              path="manage"
-              element={<Navigate to="/manage/tags" replace />}
+              path="words/collections/:id/study"
+              element={<CollectionStudy />}
             />
-            <Route path="manage/tags" element={<Tags />} />
-            <Route path="manage/parts-of-speech" element={<PartsOfSpeech />} />
-            <Route path="manage/settings" element={<Settings />} />
+            <Route
+              path="words/collections/:id/test"
+              element={<CollectionTest />}
+            />
+            <Route path="words/vocabularies" element={<Vocabularies />} />
+            <Route
+              path="words/vocabularies/:id"
+              element={<VocabularyDetail />}
+            />
+            <Route path="words/grammars" element={<Grammars />} />
+            <Route path="words/grammars/:id" element={<GrammarDetail />} />
+            <Route path="words/sentences" element={<Sentences />} />
+            <Route path="words/sentences/:id" element={<SentenceDetail />} />
+            <Route path="words/review/:mode" element={<Review />} />
+            <Route
+              path="words/manage"
+              element={<Navigate to="/w/words/manage/tags" replace />}
+            />
+            <Route path="words/manage/tags" element={<Tags />} />
+            <Route
+              path="words/manage/parts-of-speech"
+              element={<PartsOfSpeech />}
+            />
+            <Route path="words/manage/settings" element={<Settings />} />
+          </Route>
+          <Route path="q" element={<QuestionsLayout />}>
+            <Route index element={<Navigate to="/q/questions" replace />} />
+            <Route path="questions" element={<QuestionBanks />} />
+            <Route
+              path="questions/banks/:id"
+              element={<QuestionBankDetail />}
+            />
+            <Route
+              path="questions/banks/:id/practice"
+              element={<QuestionPractice />}
+            />
+            <Route
+              path="questions/banks/:id/errors"
+              element={<QuestionPractice />}
+            />
+            <Route
+              path="questions/banks/:id/favorites"
+              element={<QuestionPractice />}
+            />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/w/words" replace />} />
       </Routes>
     </Suspense>
   );

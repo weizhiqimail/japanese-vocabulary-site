@@ -37,7 +37,7 @@ export function RelationCard({
               <Text
                 key={String(item.id)}
                 as={Link}
-                to={`/${resource}/${item.id}`}
+                to={`/w/words/${resource}/${item.id}`}
                 bg="brand.50"
                 borderRadius="md"
                 px={3}

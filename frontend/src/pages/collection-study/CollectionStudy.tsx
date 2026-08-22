@@ -49,7 +49,7 @@ export function CollectionStudy() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: '集合', path: '/collections' },
+          { label: '集合', path: '/w/words/collections' },
           { label: String(collection?.name || '学习') },
         ]}
       />
