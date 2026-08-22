@@ -25,7 +25,7 @@ export class HttpResponseFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
     const payload =
       exception instanceof HttpException ? exception.getResponse() : null;
-    const message =
+    const internalMessage =
       typeof payload === 'string'
         ? payload
         : payload && typeof payload === 'object' && 'message' in payload
@@ -35,8 +35,12 @@ export class HttpResponseFilter implements ExceptionFilter {
           : exception instanceof Error
             ? exception.message
             : '服务器内部错误';
+    const message =
+      status >= 500 && process.env.NODE_ENV === 'production'
+        ? '服务器内部错误'
+        : internalMessage;
 
-    this.logger.exception(message, {
+    this.logger.exception(internalMessage, {
       exceptionName:
         exception instanceof Error ? exception.name : 'UnknownException',
       method: request.method,

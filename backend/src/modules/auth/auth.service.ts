@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash, randomBytes } from 'node:crypto';
+import { compare, hash } from 'bcryptjs';
 import { MoreThan, IsNull, Repository } from 'typeorm';
 import { AppUserEntity, AuthSessionEntity } from '@/entities';
 import type { LoginDto } from '@/modules/auth/dto/login.dto';
@@ -23,7 +24,7 @@ export class AuthService {
     const user = await this.users.findOne({
       where: { username: dto.username, enabled: true },
     });
-    if (!user || user.password !== dto.password) {
+    if (!user || !(await this.verifyPassword(user.password, dto.password))) {
       this.logger.business(
         'Login rejected',
         { username: dto.username },
@@ -31,6 +32,12 @@ export class AuthService {
       );
 
       throw new UnauthorizedException('用户名或密码错误');
+    }
+
+    // 兼容升级前的本地数据：首次成功登录后立即把旧明文替换为哈希。
+    if (!this.isPasswordHash(user.password)) {
+      user.password = await hash(dto.password, 12);
+      await this.users.save(user);
     }
 
     const token = randomBytes(32).toString('hex');
@@ -102,6 +109,16 @@ export class AuthService {
 
   private hash(token: string) {
     return createHash('sha256').update(token).digest('hex');
+  }
+
+  private isPasswordHash(value: string) {
+    return /^\$2[aby]\$\d{2}\$/.test(value);
+  }
+
+  private verifyPassword(stored: string, supplied: string) {
+    return this.isPasswordHash(stored)
+      ? compare(supplied, stored)
+      : Promise.resolve(stored === supplied);
   }
 
   private serializeUser(user: AppUserEntity) {

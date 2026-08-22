@@ -28,7 +28,10 @@ import { TypeOrmFileLogger } from '@/shared-modules/logging/typeorm-file.logger'
           ...connection,
           entities: ALL_ENTITIES,
           synchronize: false,
-          logging: 'all' as const,
+          logging:
+            process.env.NODE_ENV === 'production'
+              ? (['error', 'warn'] as const)
+              : ('all' as const),
           logger: new TypeOrmFileLogger(logger),
           extra: {
             connectionLimit: config.get<number>('database.poolSize', 10),

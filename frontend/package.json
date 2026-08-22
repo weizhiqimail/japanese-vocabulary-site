@@ -1,6 +1,10 @@
 {
   "name": "dazi-study-frontend",
   "private": true,
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x || 11.x"
+  },
   "version": "0.0.0",
   "type": "module",
   "scripts": {

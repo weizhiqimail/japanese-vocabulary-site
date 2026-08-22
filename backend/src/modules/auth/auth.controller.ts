@@ -4,20 +4,34 @@ import type { Request, Response } from 'express';
 import { Public } from '@/common/decorators/public.decorator';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
 import { AuthService } from '@/modules/auth/auth.service';
+import { LoginAttemptService } from '@/modules/auth/login-attempt.service';
 
 @ApiTags('登录认证')
 @Controller(['auth', 'account'])
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly loginAttempts: LoginAttemptService,
+  ) {}
 
   @Public()
   @Post('login')
   @ApiOperation({ summary: '登录' })
   async login(
     @Body() dto: LoginDto,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.auth.login(dto);
+    const ip = request.ip || request.socket.remoteAddress || 'unknown';
+    this.loginAttempts.assertAllowed(ip, dto.username);
+    let result: Awaited<ReturnType<AuthService['login']>>;
+    try {
+      result = await this.auth.login(dto);
+    } catch (error) {
+      this.loginAttempts.recordFailure(ip, dto.username);
+      throw error;
+    }
+    this.loginAttempts.recordSuccess(ip, dto.username);
     response.cookie(this.auth.cookieName, result.token, {
       httpOnly: true,
       sameSite: 'lax',

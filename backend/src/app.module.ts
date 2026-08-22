@@ -9,6 +9,15 @@ import { BusinessModules } from '@/modules/business.modules';
 import { LoggingModule } from '@/shared-modules/logging/logging.module';
 
 const runtimeEnvironment = process.env.NODE_ENV || 'local';
+const staticHostingModules = process.env.VERCEL
+  ? []
+  : [
+      ServeStaticModule.forRoot({
+        rootPath: join(process.cwd(), 'web'),
+        exclude: ['/api/{*path}'],
+        serveStaticOptions: { fallthrough: true },
+      }),
+    ];
 
 @Module({
   imports: [
@@ -21,11 +30,7 @@ const runtimeEnvironment = process.env.NODE_ENV || 'local';
       load: [databaseConfig, authConfig],
     }),
     LoggingModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'web'),
-      exclude: ['/api/{*path}'],
-      serveStaticOptions: { fallthrough: true },
-    }),
+    ...staticHostingModules,
     SharedModules,
     BusinessModules,
   ],

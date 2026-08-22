@@ -2,6 +2,7 @@ import mysql from 'mysql2/promise';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { hash } from 'bcryptjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const envPath = path.join(root, `.env.${process.env.NODE_ENV || 'local'}`);
@@ -18,7 +19,20 @@ const parseEnv = (text) =>
         return [line.slice(0, index).trim(), line.slice(index + 1).trim()];
       }),
   );
-const env = { ...parseEnv(await readFile(envPath, 'utf8')), ...process.env };
+const fileEnv = await readFile(envPath, 'utf8').then(parseEnv).catch((error) => {
+  if (error?.code === 'ENOENT') return {};
+  throw error;
+});
+const env = { ...fileEnv, ...process.env };
+const runtimeEnvironment = process.env.NODE_ENV || 'local';
+if (
+  runtimeEnvironment === 'production' &&
+  (!env.INITIAL_ADMIN_USERNAME || !env.INITIAL_ADMIN_PASSWORD)
+) {
+  throw new Error(
+    '生产迁移必须显式设置 INITIAL_ADMIN_USERNAME 和 INITIAL_ADMIN_PASSWORD',
+  );
+}
 function databaseConfig(source) {
   if (!source.DATABASE_URL)
     return {
@@ -101,6 +115,9 @@ async function prepareLegacySchema() {
   );
 }
 try {
+  const initialAdminPassword =
+    env.INITIAL_ADMIN_PASSWORD || (runtimeEnvironment === 'local' ? 'admin' : '');
+  const initialAdminPasswordHash = await hash(initialAdminPassword, 12);
   const [legacyTables] = await connection.query(
     "SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='vocabulary'",
   );
@@ -114,10 +131,10 @@ try {
     await readFile(path.join(root, 'database', 'schema.sql'), 'utf8'),
   );
   await connection.query(
-    'INSERT INTO app_users(username,password,display_name,enabled) VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE display_name=VALUES(display_name)',
+    'INSERT INTO app_users(username,password,display_name,enabled) VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE password=VALUES(password),display_name=VALUES(display_name)',
     [
       env.INITIAL_ADMIN_USERNAME || 'admin',
-      env.INITIAL_ADMIN_PASSWORD || 'admin',
+      initialAdminPasswordHash,
       env.INITIAL_ADMIN_DISPLAY_NAME || '管理员',
     ],
   );

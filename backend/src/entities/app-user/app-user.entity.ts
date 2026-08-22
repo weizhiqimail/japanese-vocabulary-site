@@ -19,7 +19,7 @@ export class AppUserEntity {
   @Column({
     type: 'varchar',
     length: 255,
-    comment: '按需求暂存明文密码，仅供测试',
+    comment: 'bcrypt 密码哈希',
   })
   password: string;
 

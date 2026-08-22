@@ -2,8 +2,12 @@
   "name": "japanese-vocabulary-site",
   "version": "2.0.0",
   "private": true,
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x || 11.x"
+  },
   "scripts": {
-    "install:all": "npm install --prefix frontend && npm install --prefix backend",
+    "install:all": "npm ci --prefix frontend && npm ci --prefix backend",
     "dev": "concurrently -n frontend,backend -c cyan,blue \"npm run dev --prefix frontend\" \"npm run start:dev:local --prefix backend\"",
     "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
     "format": "npm run format --prefix frontend && npm run format --prefix backend",
@@ -11,6 +15,8 @@
     "build": "node scripts/build.mjs",
     "start": "npm run start:prod --prefix backend",
     "db:migrate": "npm run db:migrate --prefix backend",
+    "db:backup": "npm run db:backup --prefix backend",
+    "db:restore": "npm run db:restore --prefix backend",
     "db:sync:online": "node backend/scripts/sync-local-to-online.mjs",
     "questions:validate": "node backend/scripts/import-question-bank.mjs --dry-run",
     "questions:import": "node backend/scripts/import-question-bank.mjs",

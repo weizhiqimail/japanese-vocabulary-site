@@ -9,6 +9,9 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
+  statfsSync,
+  statSync,
+  unlinkSync,
   type WriteStream,
 } from 'node:fs';
 import { join } from 'node:path';
@@ -30,16 +33,25 @@ type LogMetadata = Record<string, unknown>;
 export class AppLoggerService implements LoggerService, OnApplicationShutdown {
   private readonly consoleLogger = new ConsoleLogger('JVS');
 
-  private readonly stream: WriteStream;
+  private readonly stream?: WriteStream;
 
   readonly filePath: string;
 
   constructor() {
+    if (process.env.VERCEL) {
+      this.filePath = 'vercel-console';
+
+      return;
+    }
+
     const logDirectory = join(resolveProjectRoot(), 'logs');
 
     if (!existsSync(logDirectory)) {
       mkdirSync(logDirectory, { recursive: true });
     }
+
+    this.removeExpiredLogs(logDirectory);
+    this.warnOnLowDiskSpace(logDirectory);
 
     this.filePath = this.createLogFilePath(logDirectory);
     this.stream = createWriteStream(this.filePath, {
@@ -136,7 +148,7 @@ export class AppLoggerService implements LoggerService, OnApplicationShutdown {
   }
 
   onApplicationShutdown() {
-    this.stream.end();
+    this.stream?.end();
   }
 
   private createLogFilePath(logDirectory: string) {
@@ -155,6 +167,28 @@ export class AppLoggerService implements LoggerService, OnApplicationShutdown {
       logDirectory,
       `${LOG_FILE_PREFIX}-${date}-${String(sequence).padStart(3, '0')}.log`,
     );
+  }
+
+  private removeExpiredLogs(logDirectory: string) {
+    const retentionDays = Number(process.env.LOG_RETENTION_DAYS || 30);
+    if (!Number.isFinite(retentionDays) || retentionDays < 1) return;
+    const cutoff = Date.now() - retentionDays * 86_400_000;
+    for (const filename of readdirSync(logDirectory)) {
+      if (!/^jvs-\d{4}-\d{2}-\d{2}-\d{3}\.log$/.test(filename)) continue;
+      const filePath = join(logDirectory, filename);
+      if (statSync(filePath).mtimeMs < cutoff) unlinkSync(filePath);
+    }
+  }
+
+  private warnOnLowDiskSpace(logDirectory: string) {
+    const threshold = Number(process.env.DISK_FREE_WARN_PERCENT || 10);
+    const stats = statfsSync(logDirectory);
+    const availablePercent = Math.floor((stats.bavail * 100) / stats.blocks);
+    if (availablePercent < threshold) {
+      this.consoleLogger.warn(
+        `日志磁盘剩余 ${availablePercent}%，低于告警阈值 ${threshold}%`,
+      );
+    }
   }
 
   private localDate() {
@@ -188,7 +222,14 @@ export class AppLoggerService implements LoggerService, OnApplicationShutdown {
       .filter(Boolean)
       .join(' ');
 
-    queueMicrotask(() => this.stream.write(`${line}\n`));
+    if (this.stream) {
+      queueMicrotask(() => this.stream?.write(`${line}\n`));
+    } else if (
+      category !== LOG_CATEGORY.system &&
+      category !== LOG_CATEGORY.startup
+    ) {
+      process.stdout.write(`${line}\n`);
+    }
   }
 
   private stringify(value: unknown) {
