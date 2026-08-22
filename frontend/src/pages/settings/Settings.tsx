@@ -58,10 +58,7 @@ export function Settings() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[
-          { label: "管理", path: "/words/manage/words/tags" },
-          { label: "设置" },
-        ]}
+        items={[{ label: "管理", path: "/manage/tags" }, { label: "设置" }]}
       />
       <Heading size="xl">设置</Heading>
       <Text color="slate.500">维护各模块默认分页数量。</Text>

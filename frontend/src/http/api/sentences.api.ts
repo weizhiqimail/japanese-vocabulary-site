@@ -20,22 +20,19 @@ export interface SaveSentenceInput {
 
 export function getSentences(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/words/sentences",
+    url: "/sentences",
     params: listQuery(params),
   });
 }
 
 export function getSentence(sentenceId: number) {
-  return request<ResourceItem>({
-    url: "/words/sentences",
-    params: { sentenceId },
-  });
+  return request<ResourceItem>({ url: "/sentences", params: { sentenceId } });
 }
 
 export function saveSentence(input: SaveSentenceInput) {
   return request<ResourceItem>({
     method: "POST",
-    url: "/words/sentences/save",
+    url: "/sentences/save",
     data: {
       ...(input.sentenceId ? { sentenceId: input.sentenceId } : undefined),
       japanese: input.japanese,
@@ -52,7 +49,7 @@ export function saveSentence(input: SaveSentenceInput) {
 export function deleteSentence(sentenceId: number) {
   return request({
     method: "POST",
-    url: "/words/sentences/delete",
+    url: "/sentences/delete",
     data: { sentenceId },
   });
 }
@@ -63,7 +60,7 @@ export function saveSentenceRelation(
 ) {
   return request({
     method: "POST",
-    url: "/words/sentences/relations/save",
+    url: "/sentences/relations/save",
     data: {
       sentenceId,
       targetResource: relation.targetResource,
@@ -78,7 +75,7 @@ export function deleteSentenceRelation(
 ) {
   return request({
     method: "POST",
-    url: "/words/sentences/relations/delete",
+    url: "/sentences/relations/delete",
     data: {
       sentenceId,
       targetResource: relation.targetResource,

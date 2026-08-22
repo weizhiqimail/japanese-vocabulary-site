@@ -20,22 +20,19 @@ export interface SaveGrammarInput {
 
 export function getGrammars(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/words/grammars",
+    url: "/grammars",
     params: listQuery(params),
   });
 }
 
 export function getGrammar(grammarId: number) {
-  return request<ResourceItem>({
-    url: "/words/grammars",
-    params: { grammarId },
-  });
+  return request<ResourceItem>({ url: "/grammars", params: { grammarId } });
 }
 
 export function saveGrammar(input: SaveGrammarInput) {
   return request<ResourceItem>({
     method: "POST",
-    url: "/words/grammars/save",
+    url: "/grammars/save",
     data: {
       ...(input.grammarId ? { grammarId: input.grammarId } : undefined),
       pattern: input.pattern,
@@ -52,7 +49,7 @@ export function saveGrammar(input: SaveGrammarInput) {
 export function deleteGrammar(grammarId: number) {
   return request({
     method: "POST",
-    url: "/words/grammars/delete",
+    url: "/grammars/delete",
     data: { grammarId },
   });
 }
@@ -63,7 +60,7 @@ export function saveGrammarRelation(
 ) {
   return request({
     method: "POST",
-    url: "/words/grammars/relations/save",
+    url: "/grammars/relations/save",
     data: {
       grammarId,
       targetResource: relation.targetResource,
@@ -78,7 +75,7 @@ export function deleteGrammarRelation(
 ) {
   return request({
     method: "POST",
-    url: "/words/grammars/relations/delete",
+    url: "/grammars/relations/delete",
     data: {
       grammarId,
       targetResource: relation.targetResource,

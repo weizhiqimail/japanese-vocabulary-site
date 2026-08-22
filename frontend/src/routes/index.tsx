@@ -65,21 +65,6 @@ const PartsOfSpeech = lazy(() =>
 const Settings = lazy(() =>
   import("@/pages/settings").then((module) => ({ default: module.Settings })),
 );
-const QuestionBanks = lazy(() =>
-  import("@/pages/question-banks").then((module) => ({
-    default: module.QuestionBanks,
-  })),
-);
-const QuestionBankDetail = lazy(() =>
-  import("@/pages/question-bank-detail").then((module) => ({
-    default: module.QuestionBankDetail,
-  })),
-);
-const QuestionPractice = lazy(() =>
-  import("@/pages/question-practice").then((module) => ({
-    default: module.QuestionPractice,
-  })),
-);
 
 /** 每条页面路由均对应一个独立页面级组件。 */
 export function AppRoutes() {
@@ -92,97 +77,30 @@ export function AppRoutes() {
       }
     >
       <Routes>
-        <Route path="/account/login" element={<Login />} />
-        <Route
-          path="/login"
-          element={<Navigate to="/account/login" replace />}
-        />
+        <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index element={<Navigate to="/words" replace />} />
-            <Route path="words" element={<Home />} />
-            <Route path="words/words/collections" element={<Collections />} />
+            <Route index element={<Home />} />
+            <Route path="collections" element={<Collections />} />
+            <Route path="collections/:id/study" element={<CollectionStudy />} />
+            <Route path="collections/:id/test" element={<CollectionTest />} />
+            <Route path="vocabularies" element={<Vocabularies />} />
+            <Route path="vocabularies/:id" element={<VocabularyDetail />} />
+            <Route path="grammars" element={<Grammars />} />
+            <Route path="grammars/:id" element={<GrammarDetail />} />
+            <Route path="sentences" element={<Sentences />} />
+            <Route path="sentences/:id" element={<SentenceDetail />} />
+            <Route path="review/:mode" element={<Review />} />
             <Route
-              path="words/words/collections/:id/words/study"
-              element={<CollectionStudy />}
+              path="manage"
+              element={<Navigate to="/manage/tags" replace />}
             />
-            <Route
-              path="words/words/collections/:id/test"
-              element={<CollectionTest />}
-            />
-            <Route path="words/words/vocabularies" element={<Vocabularies />} />
-            <Route
-              path="words/words/vocabularies/:id"
-              element={<VocabularyDetail />}
-            />
-            <Route path="words/words/grammars" element={<Grammars />} />
-            <Route
-              path="words/words/grammars/:id"
-              element={<GrammarDetail />}
-            />
-            <Route path="words/words/sentences" element={<Sentences />} />
-            <Route
-              path="words/words/sentences/:id"
-              element={<SentenceDetail />}
-            />
-            <Route path="words/words/review/:mode" element={<Review />} />
-            <Route
-              path="words/words/manage"
-              element={<Navigate to="/words/manage/words/tags" replace />}
-            />
-            <Route path="words/words/manage/words/tags" element={<Tags />} />
-            <Route
-              path="words/words/manage/words/parts-of-speech"
-              element={<PartsOfSpeech />}
-            />
-            <Route
-              path="words/words/manage/words/settings"
-              element={<Settings />}
-            />
-            <Route path="questions" element={<QuestionBanks />} />
-            <Route
-              path="questions/banks/:id"
-              element={<QuestionBankDetail />}
-            />
-            <Route
-              path="questions/banks/:id/practice"
-              element={<QuestionPractice />}
-            />
-            <Route
-              path="questions/banks/:id/errors"
-              element={<QuestionPractice />}
-            />
-            <Route
-              path="questions/banks/:id/favorites"
-              element={<QuestionPractice />}
-            />
-            <Route
-              path="collections/*"
-              element={<Navigate to="/words/collections" replace />}
-            />
-            <Route
-              path="vocabularies/*"
-              element={<Navigate to="/words/vocabularies" replace />}
-            />
-            <Route
-              path="grammars/*"
-              element={<Navigate to="/words/grammars" replace />}
-            />
-            <Route
-              path="sentences/*"
-              element={<Navigate to="/words/sentences" replace />}
-            />
-            <Route
-              path="review/*"
-              element={<Navigate to="/words/review/errors" replace />}
-            />
-            <Route
-              path="manage/*"
-              element={<Navigate to="/words/manage/words/tags" replace />}
-            />
+            <Route path="manage/tags" element={<Tags />} />
+            <Route path="manage/parts-of-speech" element={<PartsOfSpeech />} />
+            <Route path="manage/settings" element={<Settings />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/words" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
   );

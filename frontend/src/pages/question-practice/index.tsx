@@ -1,1 +1,0 @@
-export { QuestionPractice } from "./QuestionPractice";

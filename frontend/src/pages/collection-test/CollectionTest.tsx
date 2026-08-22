@@ -80,7 +80,7 @@ export function CollectionTest() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: "集合", path: "/words/collections" },
+          { label: "集合", path: "/collections" },
           { label: String(collection?.name || "测试") },
         ]}
       />

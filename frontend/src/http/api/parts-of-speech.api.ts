@@ -11,7 +11,7 @@ export interface SavePartOfSpeechInput {
 
 export function getPartsOfSpeech(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/words/parts-of-speech",
+    url: "/parts-of-speech",
     params: listQuery(params),
   });
 }
@@ -19,7 +19,7 @@ export function getPartsOfSpeech(params: ListQuery = {}) {
 export function savePartOfSpeech(input: SavePartOfSpeechInput) {
   return request<ResourceItem>({
     method: "POST",
-    url: "/words/parts-of-speech/save",
+    url: "/parts-of-speech/save",
     data: {
       ...(input.partOfSpeechId
         ? { partOfSpeechId: input.partOfSpeechId }

@@ -23,7 +23,7 @@ export interface SaveTagInput {
 
 export function getTags(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/words/tags",
+    url: "/tags",
     params: listQuery(params),
   });
 }
@@ -31,7 +31,7 @@ export function getTags(params: ListQuery = {}) {
 export function saveTag(input: SaveTagInput) {
   return request<ResourceItem>({
     method: "POST",
-    url: "/words/tags/save",
+    url: "/tags/save",
     data: {
       ...(input.tagId ? { tagId: input.tagId } : undefined),
       name: input.name,
@@ -41,9 +41,5 @@ export function saveTag(input: SaveTagInput) {
 }
 
 export function deleteTag(tagId: number) {
-  return request({
-    method: "POST",
-    url: "/words/tags/delete",
-    data: { tagId },
-  });
+  return request({ method: "POST", url: "/tags/delete", data: { tagId } });
 }

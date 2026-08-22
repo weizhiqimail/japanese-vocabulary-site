@@ -19,7 +19,7 @@ export function ProtectedRoute() {
     <Outlet />
   ) : (
     <Navigate
-      to={`/account/login?from=${encodeURIComponent(location.pathname + location.search)}`}
+      to={`/login?from=${encodeURIComponent(location.pathname + location.search)}`}
       replace
     />
   );

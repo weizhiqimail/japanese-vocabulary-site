@@ -61,7 +61,7 @@ export function SentenceDetail() {
     setBusy(true);
     try {
       await deleteSentence(sentenceId);
-      navigate("/words/sentences");
+      navigate("/sentences");
     } finally {
       setBusy(false);
     }
@@ -75,7 +75,7 @@ export function SentenceDetail() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: "句子", path: "/words/sentences" },
+          { label: "句子", path: "/sentences" },
           { label: String(item?.japanese || "详情") },
         ]}
       />

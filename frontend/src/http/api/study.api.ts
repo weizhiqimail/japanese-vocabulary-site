@@ -10,14 +10,14 @@ export interface TestQuestion extends ResourceItem {
 
 export function getCollectionMembers(collectionId: number) {
   return request<ResourceItem[]>({
-    url: "/words/study/collection-members",
+    url: "/study/collection-members",
     params: { collectionId },
   });
 }
 
 export function getTestQuestions(collectionId: number) {
   return request<TestQuestion[]>({
-    url: "/words/study/test",
+    url: "/study/test",
     params: { collectionId },
   });
 }
@@ -28,7 +28,7 @@ export function recordStudy(
 ) {
   return request({
     method: "POST",
-    url: "/words/study/record",
+    url: "/study/record",
     data: { vocabularyId, eventType },
   });
 }
@@ -36,14 +36,11 @@ export function recordStudy(
 export function submitTestAnswer(vocabularyId: number, correct: boolean) {
   return request({
     method: "POST",
-    url: "/words/study/test-answer",
+    url: "/study/test-answer",
     data: { vocabularyId, correct },
   });
 }
 
 export function getReviewList(mode: string) {
-  return request<ResourceItem[]>({
-    url: "/words/study/words/review",
-    params: { mode },
-  });
+  return request<ResourceItem[]>({ url: "/study/review", params: { mode } });
 }

@@ -62,7 +62,7 @@ export function VocabularyDetail() {
     setBusy(true);
     try {
       await deleteVocabulary(wordId);
-      navigate("/words/vocabularies");
+      navigate("/vocabularies");
     } finally {
       setBusy(false);
     }
@@ -80,7 +80,7 @@ export function VocabularyDetail() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: "词库", path: "/words/vocabularies" },
+          { label: "词库", path: "/vocabularies" },
           { label: String(item?.word || "详情") },
         ]}
       />

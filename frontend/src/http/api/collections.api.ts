@@ -14,14 +14,14 @@ export interface SaveCollectionInput {
 
 export function getCollections(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/words/collections",
+    url: "/collections",
     params: listQuery(params),
   });
 }
 
 export function getCollection(collectionId: number) {
   return request<ResourceItem>({
-    url: "/words/collections",
+    url: "/collections",
     params: { collectionId },
   });
 }
@@ -29,7 +29,7 @@ export function getCollection(collectionId: number) {
 export function saveCollection(input: SaveCollectionInput) {
   return request<ResourceItem>({
     method: "POST",
-    url: "/words/collections/save",
+    url: "/collections/save",
     data: {
       ...(input.collectionId
         ? { collectionId: input.collectionId }
@@ -45,7 +45,7 @@ export function saveCollection(input: SaveCollectionInput) {
 export function deleteCollection(collectionId: number) {
   return request({
     method: "POST",
-    url: "/words/collections/delete",
+    url: "/collections/delete",
     data: { collectionId },
   });
 }

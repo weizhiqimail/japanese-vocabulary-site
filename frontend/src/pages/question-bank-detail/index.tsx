@@ -1,1 +1,0 @@
-export { QuestionBankDetail } from "./QuestionBankDetail";
