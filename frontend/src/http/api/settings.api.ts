@@ -1,7 +1,7 @@
-import { request } from "@/http/request";
+import { request } from '@/http/request';
 
 export function getSettings() {
-  return request<Record<string, unknown>>({ url: "/settings" });
+  return request<Record<string, unknown>>({ url: '/settings' });
 }
 
 export interface PaginationDefaults {
@@ -13,12 +13,12 @@ export interface PaginationDefaults {
 }
 
 export function saveSetting(
-  key: "pagination_defaults",
+  key: 'pagination_defaults',
   value: PaginationDefaults,
 ) {
   return request({
-    method: "POST",
-    url: "/settings/save",
+    method: 'POST',
+    url: '/settings/save',
     data: { key, value },
   });
 }

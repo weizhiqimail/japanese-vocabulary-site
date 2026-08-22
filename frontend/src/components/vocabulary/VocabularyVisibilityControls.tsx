@@ -1,4 +1,4 @@
-import { Card, CardBody, Checkbox, HStack, Text } from "@chakra-ui/react";
+import { Card, CardBody, Checkbox, HStack, Text } from '@chakra-ui/react';
 
 export interface VocabularyVisibility {
   memory: boolean;
@@ -17,7 +17,7 @@ export function VocabularyVisibilityControls({
   onChange,
   value,
 }: VocabularyVisibilityControlsProps) {
-  const toggle = (key: "word" | "reading" | "translation") => {
+  const toggle = (key: 'word' | 'reading' | 'translation') => {
     onChange({ ...value, [key]: !value[key] });
   };
 
@@ -31,21 +31,21 @@ export function VocabularyVisibilityControls({
           <Checkbox
             isChecked={value.word}
             isDisabled={value.memory}
-            onChange={() => toggle("word")}
+            onChange={() => toggle('word')}
           >
             词汇
           </Checkbox>
           <Checkbox
             isChecked={value.reading}
             isDisabled={value.memory}
-            onChange={() => toggle("reading")}
+            onChange={() => toggle('reading')}
           >
             假名
           </Checkbox>
           <Checkbox
             isChecked={value.translation}
             isDisabled={value.memory}
-            onChange={() => toggle("translation")}
+            onChange={() => toggle('translation')}
           >
             翻译
           </Checkbox>

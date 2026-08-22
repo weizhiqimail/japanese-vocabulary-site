@@ -1,4 +1,4 @@
-import type { ListQuery } from "@/types/api.types";
+import type { ListQuery } from '@/types/api.types';
 
 /** 查询接口也只发送调用方明确支持的分页和筛选字段。 */
 export function listQuery(query: ListQuery) {

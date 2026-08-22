@@ -1,11 +1,11 @@
-import { request } from "@/http/request";
-import { listQuery } from "@/http/api/api.utils";
+import { request } from '@/http/request';
+import { listQuery } from '@/http/api/api.utils';
 import type {
   ListQuery,
   PaginatedData,
   RelationPayload,
   ResourceItem,
-} from "@/types/api.types";
+} from '@/types/api.types';
 
 export interface SaveSentenceInput {
   grammarIds: number[];
@@ -20,19 +20,19 @@ export interface SaveSentenceInput {
 
 export function getSentences(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/sentences",
+    url: '/sentences',
     params: listQuery(params),
   });
 }
 
 export function getSentence(sentenceId: number) {
-  return request<ResourceItem>({ url: "/sentences", params: { sentenceId } });
+  return request<ResourceItem>({ url: '/sentences', params: { sentenceId } });
 }
 
 export function saveSentence(input: SaveSentenceInput) {
   return request<ResourceItem>({
-    method: "POST",
-    url: "/sentences/save",
+    method: 'POST',
+    url: '/sentences/save',
     data: {
       ...(input.sentenceId ? { sentenceId: input.sentenceId } : undefined),
       japanese: input.japanese,
@@ -48,8 +48,8 @@ export function saveSentence(input: SaveSentenceInput) {
 
 export function deleteSentence(sentenceId: number) {
   return request({
-    method: "POST",
-    url: "/sentences/delete",
+    method: 'POST',
+    url: '/sentences/delete',
     data: { sentenceId },
   });
 }
@@ -59,8 +59,8 @@ export function saveSentenceRelation(
   relation: RelationPayload,
 ) {
   return request({
-    method: "POST",
-    url: "/sentences/relations/save",
+    method: 'POST',
+    url: '/sentences/relations/save',
     data: {
       sentenceId,
       targetResource: relation.targetResource,
@@ -74,8 +74,8 @@ export function deleteSentenceRelation(
   relation: RelationPayload,
 ) {
   return request({
-    method: "POST",
-    url: "/sentences/relations/delete",
+    method: 'POST',
+    url: '/sentences/relations/delete',
     data: {
       sentenceId,
       targetResource: relation.targetResource,

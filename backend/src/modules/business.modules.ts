@@ -5,11 +5,7 @@ import { QuestionsModule } from '@/modules/questions/questions.module';
 import { WordsModule } from '@/modules/words/words.module';
 
 @Module({
-  imports: [
-    AccountModule,
-    WordsModule,
-    QuestionsModule,
-  ],
+  imports: [AccountModule, WordsModule, QuestionsModule],
 })
 export class BusinessModules implements NestModule {
   configure(consumer: MiddlewareConsumer) {

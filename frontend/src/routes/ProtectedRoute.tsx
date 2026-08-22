@@ -1,6 +1,6 @@
-import { Center, Spinner } from "@chakra-ui/react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { Center, Spinner } from '@chakra-ui/react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 /** 在受保护页面渲染前完成会话恢复与登录跳转。 */
 export function ProtectedRoute() {

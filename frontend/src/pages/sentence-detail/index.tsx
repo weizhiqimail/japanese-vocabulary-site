@@ -1,1 +1,1 @@
-export { SentenceDetail } from "./SentenceDetail";
+export { SentenceDetail } from './SentenceDetail';

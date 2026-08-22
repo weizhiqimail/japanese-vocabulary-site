@@ -1,1 +1,1 @@
-export { Grammars } from "./Grammars";
+export { Grammars } from './Grammars';

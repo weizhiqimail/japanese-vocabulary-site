@@ -1,11 +1,11 @@
-import { request } from "@/http/request";
-import { listQuery } from "@/http/api/api.utils";
+import { request } from '@/http/request';
+import { listQuery } from '@/http/api/api.utils';
 import type {
   ListQuery,
   PaginatedData,
   RelationPayload,
   ResourceItem,
-} from "@/types/api.types";
+} from '@/types/api.types';
 
 export interface SaveVocabularyInput {
   collectionIds: number[];
@@ -22,19 +22,19 @@ export interface SaveVocabularyInput {
 
 export function getVocabularies(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/vocabularies",
+    url: '/vocabularies',
     params: listQuery(params),
   });
 }
 
 export function getVocabulary(wordId: number) {
-  return request<ResourceItem>({ url: "/vocabularies", params: { wordId } });
+  return request<ResourceItem>({ url: '/vocabularies', params: { wordId } });
 }
 
 export function saveVocabulary(input: SaveVocabularyInput) {
   return request<ResourceItem>({
-    method: "POST",
-    url: "/vocabularies/save",
+    method: 'POST',
+    url: '/vocabularies/save',
     data: {
       ...(input.wordId ? { wordId: input.wordId } : undefined),
       word: input.word,
@@ -52,8 +52,8 @@ export function saveVocabulary(input: SaveVocabularyInput) {
 
 export function deleteVocabulary(wordId: number) {
   return request({
-    method: "POST",
-    url: "/vocabularies/delete",
+    method: 'POST',
+    url: '/vocabularies/delete',
     data: { wordId },
   });
 }
@@ -63,8 +63,8 @@ export function saveVocabularyRelation(
   relation: RelationPayload,
 ) {
   return request({
-    method: "POST",
-    url: "/vocabularies/relations/save",
+    method: 'POST',
+    url: '/vocabularies/relations/save',
     data: {
       wordId,
       targetResource: relation.targetResource,
@@ -78,8 +78,8 @@ export function deleteVocabularyRelation(
   relation: RelationPayload,
 ) {
   return request({
-    method: "POST",
-    url: "/vocabularies/relations/delete",
+    method: 'POST',
+    url: '/vocabularies/relations/delete',
     data: {
       wordId,
       targetResource: relation.targetResource,

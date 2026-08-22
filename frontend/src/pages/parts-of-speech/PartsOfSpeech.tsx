@@ -26,27 +26,27 @@ import {
   useDisclosure,
   useMediaQuery,
   VStack,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { InlineField } from "@/components/common/InlineField";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageHeader } from "@/components/common/PageHeader";
-import { PageLoading } from "@/components/common/PageLoading";
+} from '@chakra-ui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { InlineField } from '@/components/common/InlineField';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { PageLoading } from '@/components/common/PageLoading';
 import {
   getPartsOfSpeech,
   savePartOfSpeech,
   type SavePartOfSpeechInput,
-} from "@/http/api/parts-of-speech.api";
-import type { ResourceItem } from "@/types/api.types";
+} from '@/http/api/parts-of-speech.api';
+import type { ResourceItem } from '@/types/api.types';
 
 /** 词性独立页面：服务端按序号升序，序号只读且新增时自动最大值加十。 */
 export function PartsOfSpeech() {
   const modal = useDisclosure();
-  const [mobile] = useMediaQuery("(max-width: 767px)");
+  const [mobile] = useMediaQuery('(max-width: 767px)');
   const [items, setItems] = useState<ResourceItem[]>([]);
   const [form, setForm] = useState<SavePartOfSpeechInput>({
-    name: "",
-    code: "",
+    name: '',
+    code: '',
     enabled: true,
   });
   const [busy, setBusy] = useState(true);
@@ -69,11 +69,11 @@ export function PartsOfSpeech() {
       item
         ? {
             partOfSpeechId: Number(item.id),
-            name: String(item.name || ""),
-            code: String(item.code || ""),
+            name: String(item.name || ''),
+            code: String(item.code || ''),
             enabled: Boolean(item.enabled),
           }
-        : { name: "", code: "", enabled: true },
+        : { name: '', code: '', enabled: true },
     );
     modal.onOpen();
   };
@@ -92,7 +92,7 @@ export function PartsOfSpeech() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: "管理", path: "/manage/tags" }, { label: "词性" }]}
+        items={[{ label: '管理', path: '/manage/tags' }, { label: '词性' }]}
       />
       <PageHeader
         title="词性"
@@ -111,8 +111,8 @@ export function PartsOfSpeech() {
                 </Text>
                 <HStack mt={3}>
                   <Badge>序号 {String(item.sort_order)}</Badge>
-                  <Badge colorScheme={item.enabled ? "green" : "gray"}>
-                    {item.enabled ? "启用" : "停用"}
+                  <Badge colorScheme={item.enabled ? 'green' : 'gray'}>
+                    {item.enabled ? '启用' : '停用'}
                   </Badge>
                 </HStack>
               </CardBody>
@@ -143,8 +143,8 @@ export function PartsOfSpeech() {
                   <Td>{String(item.code)}</Td>
                   <Td>{String(item.sort_order)}</Td>
                   <Td>
-                    <Badge colorScheme={item.enabled ? "green" : "gray"}>
-                      {item.enabled ? "启用" : "停用"}
+                    <Badge colorScheme={item.enabled ? 'green' : 'gray'}>
+                      {item.enabled ? '启用' : '停用'}
                     </Badge>
                   </Td>
                   <Td>
@@ -166,14 +166,14 @@ export function PartsOfSpeech() {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            {form.partOfSpeechId ? "编辑词性" : "新增词性"}
+            {form.partOfSpeechId ? '编辑词性' : '新增词性'}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={4}>
               <InlineField label="名称" isRequired>
                 <Input
-                  value={String(form.name || "")}
+                  value={String(form.name || '')}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
@@ -184,7 +184,7 @@ export function PartsOfSpeech() {
               </InlineField>
               <InlineField label="代码" isRequired={!form.partOfSpeechId}>
                 <Input
-                  value={String(form.code || "")}
+                  value={String(form.code || '')}
                   isReadOnly={Boolean(form.partOfSpeechId)}
                   onChange={(event) =>
                     setForm((current) => ({
@@ -200,11 +200,10 @@ export function PartsOfSpeech() {
                     form.partOfSpeechId
                       ? String(
                           items.find(
-                            (item) =>
-                              Number(item.id) === form.partOfSpeechId,
-                          )?.sort_order || "—",
+                            (item) => Number(item.id) === form.partOfSpeechId,
+                          )?.sort_order || '—',
                         )
-                      : "保存时自动生成"
+                      : '保存时自动生成'
                   }
                   isReadOnly
                 />

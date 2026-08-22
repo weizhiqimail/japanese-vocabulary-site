@@ -1,69 +1,69 @@
-import { Center, Spinner } from "@chakra-ui/react";
-import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { AppLayout } from "@/layout/app";
-import { ProtectedRoute } from "./ProtectedRoute";
+import { Center, Spinner } from '@chakra-ui/react';
+import { lazy, Suspense } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { AppLayout } from '@/layout/app';
+import { ProtectedRoute } from './ProtectedRoute';
 
 const Login = lazy(() =>
-  import("@/pages/login").then((module) => ({ default: module.Login })),
+  import('@/pages/login').then((module) => ({ default: module.Login })),
 );
 const Home = lazy(() =>
-  import("@/pages/home").then((module) => ({ default: module.Home })),
+  import('@/pages/home').then((module) => ({ default: module.Home })),
 );
 const Collections = lazy(() =>
-  import("@/pages/collections").then((module) => ({
+  import('@/pages/collections').then((module) => ({
     default: module.Collections,
   })),
 );
 const Vocabularies = lazy(() =>
-  import("@/pages/vocabularies").then((module) => ({
+  import('@/pages/vocabularies').then((module) => ({
     default: module.Vocabularies,
   })),
 );
 const VocabularyDetail = lazy(() =>
-  import("@/pages/vocabulary-detail").then((module) => ({
+  import('@/pages/vocabulary-detail').then((module) => ({
     default: module.VocabularyDetail,
   })),
 );
 const Grammars = lazy(() =>
-  import("@/pages/grammars").then((module) => ({ default: module.Grammars })),
+  import('@/pages/grammars').then((module) => ({ default: module.Grammars })),
 );
 const GrammarDetail = lazy(() =>
-  import("@/pages/grammar-detail").then((module) => ({
+  import('@/pages/grammar-detail').then((module) => ({
     default: module.GrammarDetail,
   })),
 );
 const Sentences = lazy(() =>
-  import("@/pages/sentences").then((module) => ({ default: module.Sentences })),
+  import('@/pages/sentences').then((module) => ({ default: module.Sentences })),
 );
 const SentenceDetail = lazy(() =>
-  import("@/pages/sentence-detail").then((module) => ({
+  import('@/pages/sentence-detail').then((module) => ({
     default: module.SentenceDetail,
   })),
 );
 const CollectionStudy = lazy(() =>
-  import("@/pages/collection-study").then((module) => ({
+  import('@/pages/collection-study').then((module) => ({
     default: module.CollectionStudy,
   })),
 );
 const CollectionTest = lazy(() =>
-  import("@/pages/collection-test").then((module) => ({
+  import('@/pages/collection-test').then((module) => ({
     default: module.CollectionTest,
   })),
 );
 const Review = lazy(() =>
-  import("@/pages/review").then((module) => ({ default: module.Review })),
+  import('@/pages/review').then((module) => ({ default: module.Review })),
 );
 const Tags = lazy(() =>
-  import("@/pages/tags").then((module) => ({ default: module.Tags })),
+  import('@/pages/tags').then((module) => ({ default: module.Tags })),
 );
 const PartsOfSpeech = lazy(() =>
-  import("@/pages/parts-of-speech").then((module) => ({
+  import('@/pages/parts-of-speech').then((module) => ({
     default: module.PartsOfSpeech,
   })),
 );
 const Settings = lazy(() =>
-  import("@/pages/settings").then((module) => ({ default: module.Settings })),
+  import('@/pages/settings').then((module) => ({ default: module.Settings })),
 );
 
 /** 每条页面路由均对应一个独立页面级组件。 */

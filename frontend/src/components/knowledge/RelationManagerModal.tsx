@@ -11,26 +11,26 @@ import {
   Select,
   Stack,
   Text,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { knowledgeName } from "@/components/common/format";
-import { PageLoading } from "@/components/common/PageLoading";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { knowledgeName } from '@/components/common/format';
+import { PageLoading } from '@/components/common/PageLoading';
 import {
   deleteGrammarRelation,
   getGrammars,
   saveGrammarRelation,
-} from "@/http/api/grammars.api";
+} from '@/http/api/grammars.api';
 import {
   deleteSentenceRelation,
   getSentences,
   saveSentenceRelation,
-} from "@/http/api/sentences.api";
+} from '@/http/api/sentences.api';
 import {
   deleteVocabularyRelation,
   getVocabularies,
   saveVocabularyRelation,
-} from "@/http/api/vocabularies.api";
-import type { KnowledgeResource, ResourceItem } from "@/types/api.types";
+} from '@/http/api/vocabularies.api';
+import type { KnowledgeResource, ResourceItem } from '@/types/api.types';
 
 interface RelationManagerModalProps {
   existing: ResourceItem[];
@@ -43,16 +43,16 @@ interface RelationManagerModalProps {
 }
 
 const labels: Record<KnowledgeResource, string> = {
-  vocabularies: "词汇",
-  grammars: "语法",
-  sentences: "句子",
+  vocabularies: '词汇',
+  grammars: '语法',
+  sentences: '句子',
 };
 
 async function loadCandidates(resource: KnowledgeResource) {
   const result =
-    resource === "vocabularies"
+    resource === 'vocabularies'
       ? await getVocabularies({ pageNum: 1, pageSize: 100 })
-      : resource === "grammars"
+      : resource === 'grammars'
         ? await getGrammars({ pageNum: 1, pageSize: 100 })
         : await getSentences({ pageNum: 1, pageSize: 100 });
 
@@ -94,9 +94,9 @@ export function RelationManagerModal({
     try {
       const payload = { targetId, targetResource };
 
-      if (sourceResource === "vocabularies") {
+      if (sourceResource === 'vocabularies') {
         await saveVocabularyRelation(sourceId, payload);
-      } else if (sourceResource === "grammars") {
+      } else if (sourceResource === 'grammars') {
         await saveGrammarRelation(sourceId, payload);
       } else {
         await saveSentenceRelation(sourceId, payload);
@@ -115,9 +115,9 @@ export function RelationManagerModal({
     try {
       const payload = { targetId: id, targetResource };
 
-      if (sourceResource === "vocabularies") {
+      if (sourceResource === 'vocabularies') {
         await deleteVocabularyRelation(sourceId, payload);
-      } else if (sourceResource === "grammars") {
+      } else if (sourceResource === 'grammars') {
         await deleteGrammarRelation(sourceId, payload);
       } else {
         await deleteSentenceRelation(sourceId, payload);
@@ -146,9 +146,9 @@ export function RelationManagerModal({
           <ModalHeader>关联{labels[targetResource]}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Flex gap={3} mb={5} direction={{ base: "column", md: "row" }}>
+            <Flex gap={3} mb={5} direction={{ base: 'column', md: 'row' }}>
               <Select
-                value={targetId || ""}
+                value={targetId || ''}
                 onChange={(event) => setTargetId(Number(event.target.value))}
                 placeholder={`输入或选择${labels[targetResource]}`}
               >

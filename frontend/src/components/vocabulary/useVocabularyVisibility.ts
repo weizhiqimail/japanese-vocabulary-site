@@ -1,6 +1,6 @@
-import { useState } from "react";
-import type { ResourceItem } from "@/types/api.types";
-import type { VocabularyVisibility } from "./VocabularyVisibilityControls";
+import { useState } from 'react';
+import type { ResourceItem } from '@/types/api.types';
+import type { VocabularyVisibility } from './VocabularyVisibilityControls';
 
 const initialVisibility: VocabularyVisibility = {
   memory: false,
@@ -16,14 +16,14 @@ export function useVocabularyVisibility() {
 
   const value = (
     item: ResourceItem,
-    key: "word" | "reading" | "translation",
+    key: 'word' | 'reading' | 'translation',
   ) => {
     const marker = `${String(item.id)}:${key}`;
     const visible = visibility.memory
-      ? key === "word" || revealed[marker]
+      ? key === 'word' || revealed[marker]
       : visibility[key] || revealed[marker];
 
-    return visible ? String(item[key] || "—") : "•••";
+    return visible ? String(item[key] || '—') : '•••';
   };
 
   const toggle = (item: ResourceItem, key: string) => {

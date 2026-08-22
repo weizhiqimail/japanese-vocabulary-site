@@ -26,6 +26,7 @@ const normalizeLocalized = (value: unknown): Record<string, string> => {
   const parsed = parseJson<unknown>(value);
   if (typeof parsed === 'string') return parsed.trim() ? { en: parsed } : {};
   if (!parsed || typeof parsed !== 'object') return {};
+
   return Object.fromEntries(
     Object.entries(parsed).filter(
       (entry): entry is [string, string] =>
@@ -52,6 +53,7 @@ export class QuestionsService {
       clauses.push('group_level=?');
       values.push(query.level);
     }
+
     return this.dataSource.query(
       `SELECT id,parent_id AS parentId,code,name,group_level AS groupLevel,description,sort_order AS sortOrder FROM question_groups WHERE ${clauses.join(' AND ')} ORDER BY sort_order,id`,
       values,
@@ -82,6 +84,7 @@ export class QuestionsService {
       `SELECT COUNT(*) AS total ${from}`,
       values,
     );
+
     return {
       data: rows.map((row: Record<string, unknown>) => ({
         ...row,
@@ -101,6 +104,7 @@ export class QuestionsService {
       [userId, userId, userId, bankId],
     );
     if (!direct[0]) throw new NotFoundException('题库不存在');
+
     return {
       ...direct[0],
       supportedLanguages: parseJson(direct[0].supportedLanguages),
@@ -124,6 +128,7 @@ export class QuestionsService {
       questionId = rows[0]?.id;
       if (!questionId) return { completed: true };
     }
+
     return this.questionPayload(userId, questionId!, query.mode);
   }
 
@@ -142,6 +147,7 @@ export class QuestionsService {
       `SELECT COUNT(*) AS total ${from}`,
       values,
     );
+
     return {
       data: rows,
       pagination: {
@@ -162,6 +168,7 @@ export class QuestionsService {
       'SELECT COUNT(*) AS total FROM question_attempts WHERE user_id=? AND bank_id=?',
       [userId, query.bankId],
     );
+
     return {
       data: rows.map((row: Record<string, unknown>) => ({
         ...row,
@@ -193,6 +200,7 @@ export class QuestionsService {
           String(existing[0].mode),
           true,
         );
+
         return {
           ...this.attemptResult(existing[0]),
           explanationTexts: detail.explanationTexts,
@@ -287,6 +295,7 @@ export class QuestionsService {
         dto.mode,
         true,
       );
+
       return {
         requestKey: dto.requestKey,
         correct,
@@ -336,6 +345,7 @@ export class QuestionsService {
           ],
         );
     });
+
     return {
       questionId: dto.questionId,
       isFavorite: dto.isFavorite,
@@ -366,6 +376,7 @@ export class QuestionsService {
         "INSERT IGNORE INTO question_progress(user_id,bank_id,status,current_question_id,current_position,started_at) VALUES(?,?,'in_progress',?,?,CURRENT_TIMESTAMP(3))",
         [userId, bankId, first[0].id, first[0].sortOrder],
       );
+
       return (
         await runner.query(
           'SELECT id,status,current_question_id AS currentQuestionId,current_position AS currentPosition,answered_count AS answeredCount FROM question_progress WHERE user_id=? AND bank_id=? LIMIT 1',
@@ -394,6 +405,7 @@ export class QuestionsService {
       'SELECT option_key AS optionKey,content_texts AS contentTexts,is_correct AS isCorrect FROM question_options WHERE question_id=? ORDER BY sort_order',
       [questionId],
     );
+
     return {
       id: row.id,
       bankId: row.bank_id,
@@ -404,6 +416,7 @@ export class QuestionsService {
       questionTexts: texts,
       options: options.map((option: Record<string, unknown>) => {
         const content = normalizeLocalized(option.contentTexts);
+
         return {
           key: option.optionKey,
           contentTexts: content,
@@ -422,6 +435,7 @@ export class QuestionsService {
       },
     };
   }
+
   private attemptResult(row: Record<string, unknown>) {
     return {
       requestKey: row.request_key,
@@ -429,6 +443,7 @@ export class QuestionsService {
       correctOptionKeys: parseJson(row.correct_option_keys),
     };
   }
+
   private async bankCount(
     bankId: number,
     runner: { query: (sql: string, params?: unknown[]) => Promise<unknown[]> },
@@ -437,6 +452,7 @@ export class QuestionsService {
       'SELECT question_count AS total FROM question_banks WHERE id=?',
       [bankId],
     )) as Array<{ total: number }>;
+
     return Number(rows[0].total);
   }
 }

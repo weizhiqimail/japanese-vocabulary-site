@@ -12,24 +12,24 @@ import {
   Text,
   useDisclosure,
   VStack,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { displayValue, formatDateTime } from "@/components/common/format";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageLoading } from "@/components/common/PageLoading";
-import { TagBadge } from "@/components/common/TagBadge";
-import { KnowledgeEditorModal } from "@/components/knowledge/KnowledgeEditorModal";
-import { RelationCard } from "@/components/knowledge/RelationCard";
-import { RelationManagerModal } from "@/components/knowledge/RelationManagerModal";
-import { deleteGrammar, getGrammar } from "@/http/api/grammars.api";
-import type { ResourceItem } from "@/types/api.types";
+} from '@chakra-ui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { displayValue, formatDateTime } from '@/components/common/format';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageLoading } from '@/components/common/PageLoading';
+import { TagBadge } from '@/components/common/TagBadge';
+import { KnowledgeEditorModal } from '@/components/knowledge/KnowledgeEditorModal';
+import { RelationCard } from '@/components/knowledge/RelationCard';
+import { RelationManagerModal } from '@/components/knowledge/RelationManagerModal';
+import { deleteGrammar, getGrammar } from '@/http/api/grammars.api';
+import type { ResourceItem } from '@/types/api.types';
 
 const fields = [
-  ["pattern", "语法形式"],
-  ["reading", "读法"],
-  ["meaning", "含义"],
-  ["notes", "备注"],
+  ['pattern', '语法形式'],
+  ['reading', '读法'],
+  ['meaning', '含义'],
+  ['notes', '备注'],
 ] as const;
 
 /** 语法详情独立页面，维护词汇和句子关联。 */
@@ -58,11 +58,11 @@ export function GrammarDetail() {
   }, [load]);
 
   const remove = async () => {
-    if (!window.confirm("确认逻辑删除这个语法吗？")) return;
+    if (!window.confirm('确认逻辑删除这个语法吗？')) return;
     setBusy(true);
     try {
       await deleteGrammar(grammarId);
-      navigate("/grammars");
+      navigate('/grammars');
     } finally {
       setBusy(false);
     }
@@ -76,20 +76,20 @@ export function GrammarDetail() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: "语法", path: "/grammars" },
-          { label: String(item?.pattern || "详情") },
+          { label: '语法', path: '/grammars' },
+          { label: String(item?.pattern || '详情') },
         ]}
       />
       <Flex
         justify="space-between"
-        align={{ base: "start", md: "end" }}
-        direction={{ base: "column", md: "row" }}
+        align={{ base: 'start', md: 'end' }}
+        direction={{ base: 'column', md: 'row' }}
         gap={4}
       >
         <Box>
           <Text color="slate.500">语法详情</Text>
           <Heading size="xl" mt={2}>
-            {String(item?.pattern || "")}
+            {String(item?.pattern || '')}
           </Heading>
         </Box>
         <HStack wrap="wrap">
@@ -107,7 +107,7 @@ export function GrammarDetail() {
         </HStack>
       </Flex>
       <Grid
-        templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 360px" }}
+        templateColumns={{ base: '1fr', xl: 'minmax(0, 1fr) 360px' }}
         gap={5}
         alignItems="start"
       >
@@ -121,7 +121,7 @@ export function GrammarDetail() {
                 <Box key={key}>
                   {index > 0 && <Divider />}
                   <Grid
-                    templateColumns={{ base: "100px 1fr", md: "140px 1fr" }}
+                    templateColumns={{ base: '100px 1fr', md: '140px 1fr' }}
                     gap={4}
                     py={4}
                   >

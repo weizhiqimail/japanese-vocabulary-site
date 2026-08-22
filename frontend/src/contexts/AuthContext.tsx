@@ -6,13 +6,13 @@ import {
   useMemo,
   useState,
   type PropsWithChildren,
-} from "react";
+} from 'react';
 import {
   getCurrentUser,
   login as loginRequest,
   logout as logoutRequest,
-} from "@/http/api/auth.api";
-import type { User } from "@/types/api.types";
+} from '@/http/api/auth.api';
+import type { User } from '@/types/api.types';
 
 interface AuthContextValue {
   user: User | null;
@@ -59,7 +59,7 @@ export function useAuth() {
   const value = useContext(AuthContext);
 
   if (!value) {
-    throw new Error("AuthProvider 未配置");
+    throw new Error('AuthProvider 未配置');
   }
 
   return value;

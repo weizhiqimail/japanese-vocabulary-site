@@ -3,8 +3,8 @@ import {
   FormLabel,
   Grid,
   type FormControlProps,
-} from "@chakra-ui/react";
-import type { ReactNode } from "react";
+} from '@chakra-ui/react';
+import type { ReactNode } from 'react';
 
 interface InlineFieldProps extends FormControlProps {
   children: ReactNode;
@@ -16,7 +16,7 @@ export function InlineField({ label, children, ...props }: InlineFieldProps) {
   return (
     <FormControl {...props}>
       <Grid
-        templateColumns={{ base: "1fr", md: "140px minmax(0, 1fr)" }}
+        templateColumns={{ base: '1fr', md: '140px minmax(0, 1fr)' }}
         gap={{ base: 2, md: 4 }}
         alignItems="start"
       >

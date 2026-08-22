@@ -7,17 +7,17 @@ import {
   Stack,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { InlineField } from "@/components/common/InlineField";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageLoading } from "@/components/common/PageLoading";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { InlineField } from '@/components/common/InlineField';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageLoading } from '@/components/common/PageLoading';
 import {
   getSettings,
   saveSetting,
   type PaginationDefaults,
-} from "@/http/api/settings.api";
-import { PAGE_SIZES, PAGINATION_RESOURCES } from "./config";
+} from '@/http/api/settings.api';
+import { PAGE_SIZES, PAGINATION_RESOURCES } from './config';
 
 /** 设置独立页面，所有表单采用 inline 布局。 */
 export function Settings() {
@@ -49,7 +49,7 @@ export function Settings() {
   const save = async () => {
     setBusy(true);
     try {
-      await saveSetting("pagination_defaults", values);
+      await saveSetting('pagination_defaults', values);
     } finally {
       setBusy(false);
     }
@@ -58,7 +58,7 @@ export function Settings() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: "管理", path: "/manage/tags" }, { label: "设置" }]}
+        items={[{ label: '管理', path: '/manage/tags' }, { label: '设置' }]}
       />
       <Heading size="xl">设置</Heading>
       <Text color="slate.500">维护各模块默认分页数量。</Text>

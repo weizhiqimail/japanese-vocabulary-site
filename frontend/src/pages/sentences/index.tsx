@@ -1,1 +1,1 @@
-export { Sentences } from "./Sentences";
+export { Sentences } from './Sentences';

@@ -1,1 +1,1 @@
-export { VocabularyDetail } from "./VocabularyDetail";
+export { VocabularyDetail } from './VocabularyDetail';

@@ -16,12 +16,12 @@ import {
   Spacer,
   Text,
   useDisclosure,
-} from "@chakra-ui/react";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import { useState } from "react";
-import { PageLoading } from "@/components/common/PageLoading";
-import { useAuth } from "@/contexts/AuthContext";
-import { MANAGEMENT_ITEMS, NAV_ITEMS } from "./config";
+} from '@chakra-ui/react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { PageLoading } from '@/components/common/PageLoading';
+import { useAuth } from '@/contexts/AuthContext';
+import { MANAGEMENT_ITEMS, NAV_ITEMS } from './config';
 
 function NavigationBreadcrumb({
   mobile = false,
@@ -32,14 +32,14 @@ function NavigationBreadcrumb({
 }) {
   return (
     <Breadcrumb
-      separator={mobile ? "" : "·"}
-      display={mobile ? "block" : "flex"}
+      separator={mobile ? '' : '·'}
+      display={mobile ? 'block' : 'flex'}
       spacing={mobile ? 0 : 2}
     >
       {NAV_ITEMS.map((item) => (
         <BreadcrumbItem
           key={item.path}
-          display={mobile ? "block" : "flex"}
+          display={mobile ? 'block' : 'flex'}
           mb={mobile ? 2 : 0}
         >
           <BreadcrumbLink
@@ -51,8 +51,8 @@ function NavigationBreadcrumb({
             borderRadius="md"
             fontWeight="600"
             color="slate.600"
-            _activeLink={{ bg: "brand.100", color: "brand.800" }}
-            _hover={{ bg: "brand.50", textDecoration: "none" }}
+            _activeLink={{ bg: 'brand.100', color: 'brand.800' }}
+            _hover={{ bg: 'brand.50', textDecoration: 'none' }}
           >
             {item.label}
           </BreadcrumbLink>
@@ -76,7 +76,7 @@ function ManagementBreadcrumb() {
           <BreadcrumbLink
             as={NavLink}
             to={item.path}
-            _activeLink={{ color: "brand.700", fontWeight: "700" }}
+            _activeLink={{ color: 'brand.700', fontWeight: '700' }}
           >
             {item.label}
           </BreadcrumbLink>
@@ -116,12 +116,12 @@ export function AppLayout() {
         <Flex
           maxW="1680px"
           mx="auto"
-          h={{ base: "64px", lg: "72px" }}
+          h={{ base: '64px', lg: '72px' }}
           px={{ base: 4, md: 6, xl: 8 }}
           align="center"
         >
           <IconButton
-            display={{ base: "inline-flex", lg: "none" }}
+            display={{ base: 'inline-flex', lg: 'none' }}
             aria-label="打开菜单"
             mr={3}
             onClick={drawer.onOpen}
@@ -133,17 +133,17 @@ export function AppLayout() {
             flexShrink={0}
             mr={{ lg: 8 }}
             fontWeight="800"
-            fontSize={{ base: "lg", xl: "2xl" }}
+            fontSize={{ base: 'lg', xl: '2xl' }}
             color="brand.700"
           >
-            日本語言葉勉強
+            dazi study
           </Text>
-          <Box display={{ base: "none", lg: "block" }}>
+          <Box display={{ base: 'none', lg: 'block' }}>
             <NavigationBreadcrumb />
           </Box>
           <Spacer />
           <HStack spacing={3}>
-            <Text display={{ base: "none", sm: "block" }} color="slate.600">
+            <Text display={{ base: 'none', sm: 'block' }} color="slate.600">
               {user?.displayName}
             </Text>
             <Button
@@ -162,7 +162,7 @@ export function AppLayout() {
         py={{ base: 6, md: 10 }}
         px={{ base: 4, md: 7, xl: 8 }}
       >
-        {location.pathname.startsWith("/manage") && <ManagementBreadcrumb />}
+        {location.pathname.startsWith('/manage') && <ManagementBreadcrumb />}
         <Outlet />
       </Container>
       <Drawer isOpen={drawer.isOpen} placement="left" onClose={drawer.onClose}>

@@ -33,13 +33,13 @@ import {
   Textarea,
   useDisclosure,
   VStack,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { InlineField } from "@/components/common/InlineField";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageHeader } from "@/components/common/PageHeader";
-import { PageLoading } from "@/components/common/PageLoading";
+} from '@chakra-ui/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { InlineField } from '@/components/common/InlineField';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { PageLoading } from '@/components/common/PageLoading';
 import {
   deleteCollection,
   getCollection,
@@ -47,21 +47,21 @@ import {
   saveCollection,
   type CollectionType,
   type SaveCollectionInput,
-} from "@/http/api/collections.api";
-import type { ResourceItem } from "@/types/api.types";
-import { COLLECTION_TYPES } from "./config";
+} from '@/http/api/collections.api';
+import type { ResourceItem } from '@/types/api.types';
+import { COLLECTION_TYPES } from './config';
 
 const emptyForm: SaveCollectionInput = {
-  name: "",
-  type: "custom",
-  source: "",
-  description: "",
+  name: '',
+  type: 'custom',
+  source: '',
+  description: '',
 };
 
 function collectionType(value: unknown): CollectionType {
-  return ["source", "custom", "favorite", "error"].includes(String(value))
+  return ['source', 'custom', 'favorite', 'error'].includes(String(value))
     ? (value as CollectionType)
-    : "custom";
+    : 'custom';
 }
 
 /** 词汇集合独立页面，卡片菜单负责编辑和逻辑删除。 */
@@ -98,10 +98,10 @@ export function Collections() {
         detail
           ? {
               collectionId: Number(detail.id),
-              name: String(detail.name || ""),
+              name: String(detail.name || ''),
               type: collectionType(detail.type),
-              source: String(detail.source || ""),
-              description: String(detail.description || ""),
+              source: String(detail.source || ''),
+              description: String(detail.description || ''),
             }
           : emptyForm,
       );
@@ -143,13 +143,12 @@ export function Collections() {
   const update = <Key extends keyof SaveCollectionInput>(
     key: Key,
     value: SaveCollectionInput[Key],
-  ) =>
-    setForm((current) => ({ ...current, [key]: value }));
+  ) => setForm((current) => ({ ...current, [key]: value }));
 
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: "首页", path: "/" }, { label: "集合" }]}
+        items={[{ label: '首页', path: '/' }, { label: '集合' }]}
       />
       <PageHeader
         title="词汇集合"
@@ -175,7 +174,7 @@ export function Collections() {
                       <Badge colorScheme={type.scheme}>{type.label}</Badge>
                     </HStack>
                     <Text mt={3} color="slate.500" minH="48px">
-                      {String(item.description || item.source || "—")}
+                      {String(item.description || item.source || '—')}
                     </Text>
                   </Box>
                   <Menu placement="bottom-end">
@@ -231,22 +230,22 @@ export function Collections() {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            {form.collectionId ? "编辑集合" : "新增集合"}
+            {form.collectionId ? '编辑集合' : '新增集合'}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={4}>
               <InlineField label="集合名称" isRequired>
                 <Input
-                  value={String(form.name || "")}
-                  onChange={(event) => update("name", event.target.value)}
+                  value={String(form.name || '')}
+                  onChange={(event) => update('name', event.target.value)}
                 />
               </InlineField>
               <InlineField label="集合类型">
                 <Select
-                  value={String(form.type || "custom")}
+                  value={String(form.type || 'custom')}
                   onChange={(event) =>
-                    update("type", collectionType(event.target.value))
+                    update('type', collectionType(event.target.value))
                   }
                 >
                   {COLLECTION_TYPES.map((type) => (
@@ -258,15 +257,15 @@ export function Collections() {
               </InlineField>
               <InlineField label="来源">
                 <Input
-                  value={String(form.source || "")}
-                  onChange={(event) => update("source", event.target.value)}
+                  value={String(form.source || '')}
+                  onChange={(event) => update('source', event.target.value)}
                 />
               </InlineField>
               <InlineField label="说明">
                 <Textarea
-                  value={String(form.description || "")}
+                  value={String(form.description || '')}
                   onChange={(event) =>
-                    update("description", event.target.value)
+                    update('description', event.target.value)
                   }
                 />
               </InlineField>

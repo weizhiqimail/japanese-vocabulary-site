@@ -6,10 +6,10 @@ import {
   Heading,
   Stack,
   Text,
-} from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { knowledgeName } from "@/components/common/format";
-import type { KnowledgeResource, ResourceItem } from "@/types/api.types";
+} from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
+import { knowledgeName } from '@/components/common/format';
+import type { KnowledgeResource, ResourceItem } from '@/types/api.types';
 
 export function RelationCard({
   items,

@@ -1,5 +1,5 @@
 {
-  "name": "japanese-vocabulary-site-backend",
+  "name": "dazi-study-backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"{src,test}/**/*.ts\" \"*.{mjs,json}\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:dev:local": "cross-env NODE_ENV=local nest start --watch",
@@ -18,7 +18,7 @@
     "questions:validate": "node scripts/import-question-bank.mjs --dry-run",
     "questions:import": "node scripts/import-question-bank.mjs",
     "questions:verify": "node scripts/verify-question-bank.mjs",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest",
     "test:api": "node scripts/test-all-apis.mjs",
     "test:watch": "jest --watch",
@@ -56,8 +56,6 @@
     "@types/supertest": "^7.0.0",
     "cross-env": "^10.1.0",
     "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.2",
     "globals": "^17.0.0",
     "jest": "^30.0.0",
     "prettier": "^3.4.2",

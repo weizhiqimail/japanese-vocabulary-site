@@ -24,7 +24,7 @@ export interface ListQuery {
   type?: string;
 }
 
-export type KnowledgeResource = "vocabularies" | "grammars" | "sentences";
+export type KnowledgeResource = 'vocabularies' | 'grammars' | 'sentences';
 
 export interface RelationPayload {
   targetId: number;

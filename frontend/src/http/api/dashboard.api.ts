@@ -1,4 +1,4 @@
-import { request } from "@/http/request";
+import { request } from '@/http/request';
 
 export interface DashboardStatistics {
   collections: number;
@@ -8,5 +8,5 @@ export interface DashboardStatistics {
 }
 
 export function getDashboardStatistics() {
-  return request<DashboardStatistics>({ url: "/dashboard" });
+  return request<DashboardStatistics>({ url: '/dashboard' });
 }

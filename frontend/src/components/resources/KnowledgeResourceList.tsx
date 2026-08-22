@@ -24,44 +24,44 @@ import {
   useDisclosure,
   useMediaQuery,
   VStack,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
   type FormEvent,
-} from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { displayValue, formatDateTime } from "@/components/common/format";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageLoading } from "@/components/common/PageLoading";
-import { TagBadge } from "@/components/common/TagBadge";
-import { KnowledgeEditorModal } from "@/components/knowledge/KnowledgeEditorModal";
-import { VocabularyVisibilityControls } from "@/components/vocabulary/VocabularyVisibilityControls";
-import { useVocabularyVisibility } from "@/components/vocabulary/useVocabularyVisibility";
-import { PageHeader } from "@/components/common/PageHeader";
-import { KNOWLEDGE_CONFIG } from "@/config/resources";
+} from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { displayValue, formatDateTime } from '@/components/common/format';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageLoading } from '@/components/common/PageLoading';
+import { TagBadge } from '@/components/common/TagBadge';
+import { KnowledgeEditorModal } from '@/components/knowledge/KnowledgeEditorModal';
+import { VocabularyVisibilityControls } from '@/components/vocabulary/VocabularyVisibilityControls';
+import { useVocabularyVisibility } from '@/components/vocabulary/useVocabularyVisibility';
+import { PageHeader } from '@/components/common/PageHeader';
+import { KNOWLEDGE_CONFIG } from '@/config/resources';
 import {
   deleteGrammar,
   getGrammar,
   getGrammars,
-} from "@/http/api/grammars.api";
+} from '@/http/api/grammars.api';
 import {
   deleteSentence,
   getSentence,
   getSentences,
-} from "@/http/api/sentences.api";
+} from '@/http/api/sentences.api';
 import {
   deleteVocabulary,
   getVocabulary,
   getVocabularies,
-} from "@/http/api/vocabularies.api";
+} from '@/http/api/vocabularies.api';
 import type {
   KnowledgeResource,
   PaginatedData,
   ResourceItem,
-} from "@/types/api.types";
+} from '@/types/api.types';
 
 const pageSizes = [10, 20, 30, 50, 100];
 
@@ -69,41 +69,41 @@ async function loadResource(
   resource: KnowledgeResource,
   params: { pageNum: number; pageSize: number; q: string },
 ) {
-  return resource === "vocabularies"
+  return resource === 'vocabularies'
     ? getVocabularies(params)
-    : resource === "grammars"
+    : resource === 'grammars'
       ? getGrammars(params)
       : getSentences(params);
 }
 
 async function loadDetail(resource: KnowledgeResource, id: number) {
-  return resource === "vocabularies"
+  return resource === 'vocabularies'
     ? getVocabulary(id)
-    : resource === "grammars"
+    : resource === 'grammars'
       ? getGrammar(id)
       : getSentence(id);
 }
 
 async function removeResource(resource: KnowledgeResource, id: number) {
-  return resource === "vocabularies"
+  return resource === 'vocabularies'
     ? deleteVocabulary(id)
-    : resource === "grammars"
+    : resource === 'grammars'
       ? deleteGrammar(id)
       : deleteSentence(id);
 }
 
 function valueForColumn(item: ResourceItem, key: string) {
-  return key.endsWith("_at")
+  return key.endsWith('_at')
     ? formatDateTime(item[key])
     : displayValue(item[key]);
 }
 
 function tagBadges(value: unknown) {
-  return String(value || "")
-    .split(";;")
+  return String(value || '')
+    .split(';;')
     .filter(Boolean)
     .map((entry) => {
-      const [name, color] = entry.split("|");
+      const [name, color] = entry.split('|');
       return (
         <TagBadge key={entry} color={color}>
           {name}
@@ -120,7 +120,7 @@ export function KnowledgeResourceList({
 }) {
   const config = KNOWLEDGE_CONFIG[resource];
   const [search, setSearch] = useSearchParams();
-  const [mobile] = useMediaQuery("(max-width: 767px)");
+  const [mobile] = useMediaQuery('(max-width: 767px)');
   const [result, setResult] = useState<PaginatedData<ResourceItem> | null>(
     null,
   );
@@ -136,9 +136,9 @@ export function KnowledgeResourceList({
   const editor = useDisclosure();
   const confirm = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const pageNum = Number(search.get("pageNum") || 1);
-  const pageSize = Number(search.get("pageSize") || 20);
-  const q = search.get("q") || "";
+  const pageNum = Number(search.get('pageNum') || 1);
+  const pageSize = Number(search.get('pageSize') || 20);
+  const q = search.get('q') || '';
 
   const load = useCallback(async () => {
     setBusy(true);
@@ -157,7 +157,7 @@ export function KnowledgeResourceList({
   const updateSearch = (values: Record<string, string | number>) => {
     const next = new URLSearchParams(search);
     Object.entries(values).forEach(([key, value]) =>
-      value === "" ? next.delete(key) : next.set(key, String(value)),
+      value === '' ? next.delete(key) : next.set(key, String(value)),
     );
     setSearch(next);
   };
@@ -198,7 +198,7 @@ export function KnowledgeResourceList({
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: "首页", path: "/" }, { label: config.title }]}
+        items={[{ label: '首页', path: '/' }, { label: config.title }]}
       />
       <PageHeader
         title={config.title}
@@ -206,7 +206,7 @@ export function KnowledgeResourceList({
         actionLabel={`新增${config.singular}`}
         onAction={() => void openEditor()}
       />
-      {resource === "vocabularies" && (
+      {resource === 'vocabularies' && (
         <VocabularyVisibilityControls
           value={visibility}
           onChange={setVisibility}
@@ -218,12 +218,12 @@ export function KnowledgeResourceList({
           event.preventDefault();
           const element = event.currentTarget as unknown as HTMLFormElement;
           updateSearch({
-            q: (element.elements.namedItem("q") as HTMLInputElement).value,
+            q: (element.elements.namedItem('q') as HTMLInputElement).value,
             pageNum: 1,
           });
         }}
       >
-        <Flex gap={3} direction={{ base: "column", md: "row" }}>
+        <Flex gap={3} direction={{ base: 'column', md: 'row' }}>
           <Input
             name="q"
             defaultValue={q}
@@ -244,7 +244,7 @@ export function KnowledgeResourceList({
               as={Link}
               to={`/${resource}/${item.id}`}
               bg="white"
-              _hover={{ borderColor: "brand.300" }}
+              _hover={{ borderColor: 'brand.300' }}
             >
               <CardBody>
                 <Text fontWeight="700" fontSize="lg" color="brand.800">
@@ -283,17 +283,17 @@ export function KnowledgeResourceList({
             </Thead>
             <Tbody>
               {result?.data.map((item) => (
-                <Tr key={String(item.id)} _hover={{ bg: "brand.50" }}>
+                <Tr key={String(item.id)} _hover={{ bg: 'brand.50' }}>
                   {config.columns.map((column) => {
                     const vocabularyField =
-                      resource === "vocabularies" &&
-                      ["word", "reading", "translation"].includes(column.key);
+                      resource === 'vocabularies' &&
+                      ['word', 'reading', 'translation'].includes(column.key);
                     const content = vocabularyField ? (
                       showVocabularyValue(
                         item,
-                        column.key as "word" | "reading" | "translation",
+                        column.key as 'word' | 'reading' | 'translation',
                       )
-                    ) : column.key === "tag_names" ? (
+                    ) : column.key === 'tag_names' ? (
                       <HStack wrap="wrap">{tagBadges(item.tag_badges)}</HStack>
                     ) : (
                       valueForColumn(item, column.key)
@@ -307,9 +307,9 @@ export function KnowledgeResourceList({
                         onClick={() =>
                           vocabularyField && toggleReveal(item, column.key)
                         }
-                        cursor={vocabularyField ? "pointer" : undefined}
+                        cursor={vocabularyField ? 'pointer' : undefined}
                       >
-                        {column.key === config.primary && content !== "•••" ? (
+                        {column.key === config.primary && content !== '•••' ? (
                           <Text
                             as={Link}
                             to={`/${resource}/${item.id}`}

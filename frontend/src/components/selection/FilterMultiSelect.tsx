@@ -12,8 +12,8 @@ import {
   TagLabel,
   Text,
   Wrap,
-} from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+} from '@chakra-ui/react';
+import { useMemo, useState } from 'react';
 
 export interface MultiSelectOption {
   color?: string;
@@ -33,11 +33,11 @@ interface FilterMultiSelectProps {
 export function FilterMultiSelect({
   onChange,
   options,
-  placeholder = "选择",
+  placeholder = '选择',
   values,
-  showSearchInput = false
+  showSearchInput = false,
 }: FilterMultiSelectProps) {
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState('');
   const filtered = useMemo(
     () =>
       options.filter((option) =>
@@ -63,14 +63,14 @@ export function FilterMultiSelect({
         </PopoverTrigger>
         <PopoverContent w="var(--popper-reference-width)" maxW="620px">
           <PopoverBody p={4}>
-            {
-              showSearchInput && <Input
-                    value={keyword}
-                    onChange={(event) => setKeyword(event.target.value)}
-                    placeholder="输入名称筛选"
-                    mb={3}
-                />
-            }
+            {showSearchInput && (
+              <Input
+                value={keyword}
+                onChange={(event) => setKeyword(event.target.value)}
+                placeholder="输入名称筛选"
+                mb={3}
+              />
+            )}
 
             <Wrap spacing={2} maxH="220px" overflowY="auto">
               {filtered.map((option) => {
@@ -80,9 +80,9 @@ export function FilterMultiSelect({
                   <Button
                     key={option.value}
                     size="sm"
-                    variant={active ? "solid" : "outline"}
+                    variant={active ? 'solid' : 'outline'}
                     bg={active && option.color ? option.color : undefined}
-                    color={active && option.color ? "#3F2D18" : undefined}
+                    color={active && option.color ? '#3F2D18' : undefined}
                     onClick={() =>
                       onChange(
                         active
@@ -104,7 +104,7 @@ export function FilterMultiSelect({
           {selected.map((option) => (
             <Tag
               key={option.value}
-              bg={option.color || "brand.100"}
+              bg={option.color || 'brand.100'}
               color="#3F2D18"
             >
               <TagLabel>{option.label}</TagLabel>

@@ -14,15 +14,15 @@ import {
   Tr,
   useMediaQuery,
   VStack,
-} from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import type { ResourceItem } from "@/types/api.types";
-import { VocabularyVisibilityControls } from "./VocabularyVisibilityControls";
-import { useVocabularyVisibility } from "./useVocabularyVisibility";
+} from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
+import type { ResourceItem } from '@/types/api.types';
+import { VocabularyVisibilityControls } from './VocabularyVisibilityControls';
+import { useVocabularyVisibility } from './useVocabularyVisibility';
 
 interface VocabularyStudyListProps {
   items: ResourceItem[];
-  onRecord(item: ResourceItem, eventType: "learn" | "review"): void;
+  onRecord(item: ResourceItem, eventType: 'learn' | 'review'): void;
 }
 
 /** 集合学习和词库学习共用的显示/默记规则。 */
@@ -30,7 +30,7 @@ export function VocabularyStudyList({
   items,
   onRecord,
 }: VocabularyStudyListProps) {
-  const [mobile] = useMediaQuery("(max-width: 767px)");
+  const [mobile] = useMediaQuery('(max-width: 767px)');
   const {
     setVisibility,
     toggle: reveal,
@@ -56,13 +56,13 @@ export function VocabularyStudyList({
                   fontWeight="700"
                   fontSize="lg"
                 >
-                  {value(item, "word")}
+                  {value(item, 'word')}
                 </Text>
-                <Text mt={1} onClick={() => reveal(item, "reading")}>
-                  {value(item, "reading")}
+                <Text mt={1} onClick={() => reveal(item, 'reading')}>
+                  {value(item, 'reading')}
                 </Text>
-                <Text mt={2} onClick={() => reveal(item, "translation")}>
-                  {value(item, "translation")}
+                <Text mt={2} onClick={() => reveal(item, 'translation')}>
+                  {value(item, 'translation')}
                 </Text>
               </CardBody>
             </Card>
@@ -87,8 +87,8 @@ export function VocabularyStudyList({
             <Tbody>
               {items.map((item) => (
                 <Tr key={String(item.id)}>
-                  <Td onClick={() => reveal(item, "word")} cursor="pointer">
-                    {value(item, "word") === "•••" ? (
+                  <Td onClick={() => reveal(item, 'word')} cursor="pointer">
+                    {value(item, 'word') === '•••' ? (
                       <Text as="span" color="brand.800" fontWeight="700">
                         •••
                       </Text>
@@ -99,29 +99,29 @@ export function VocabularyStudyList({
                         color="brand.800"
                         fontWeight="700"
                       >
-                        {value(item, "word")}
+                        {value(item, 'word')}
                       </Text>
                     )}
                   </Td>
-                  <Td onClick={() => reveal(item, "reading")} cursor="pointer">
-                    {value(item, "reading")}
+                  <Td onClick={() => reveal(item, 'reading')} cursor="pointer">
+                    {value(item, 'reading')}
                   </Td>
                   <Td
-                    onClick={() => reveal(item, "translation")}
+                    onClick={() => reveal(item, 'translation')}
                     cursor="pointer"
                   >
-                    {value(item, "translation")}
+                    {value(item, 'translation')}
                   </Td>
                   <Td>
                     <HStack justify="flex-end">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onRecord(item, "review")}
+                        onClick={() => onRecord(item, 'review')}
                       >
                         复习
                       </Button>
-                      <Button size="sm" onClick={() => onRecord(item, "learn")}>
+                      <Button size="sm" onClick={() => onRecord(item, 'learn')}>
                         已学习
                       </Button>
                     </HStack>

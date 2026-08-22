@@ -6,35 +6,35 @@ import {
   Center,
   Input,
   Stack,
-} from "@chakra-ui/react";
-import { useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { InlineField } from "@/components/common/InlineField";
-import { PageLoading } from "@/components/common/PageLoading";
-import { useAuth } from "@/contexts/AuthContext";
-import { LoginFooter } from "./components/LoginFooter";
-import { LoginHeader } from "./components/LoginHeader";
+} from '@chakra-ui/react';
+import { useState, type FormEvent } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { InlineField } from '@/components/common/InlineField';
+import { PageLoading } from '@/components/common/PageLoading';
+import { useAuth } from '@/contexts/AuthContext';
+import { LoginFooter } from './components/LoginFooter';
+import { LoginHeader } from './components/LoginHeader';
 
 /** 登录独立页面级组件。 */
 export function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [search] = useSearchParams();
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setBusy(true);
-    setError("");
+    setError('');
 
     try {
       await login(username, password);
-      navigate(search.get("from") || "/", { replace: true });
+      navigate(search.get('from') || '/', { replace: true });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "登录失败");
+      setError(reason instanceof Error ? reason.message : '登录失败');
     } finally {
       setBusy(false);
     }

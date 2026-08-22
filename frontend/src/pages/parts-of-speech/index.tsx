@@ -1,1 +1,1 @@
-export { PartsOfSpeech } from "./PartsOfSpeech";
+export { PartsOfSpeech } from './PartsOfSpeech';

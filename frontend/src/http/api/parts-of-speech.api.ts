@@ -1,6 +1,6 @@
-import { request } from "@/http/request";
-import { listQuery } from "@/http/api/api.utils";
-import type { ListQuery, PaginatedData, ResourceItem } from "@/types/api.types";
+import { request } from '@/http/request';
+import { listQuery } from '@/http/api/api.utils';
+import type { ListQuery, PaginatedData, ResourceItem } from '@/types/api.types';
 
 export interface SavePartOfSpeechInput {
   code?: string;
@@ -11,15 +11,15 @@ export interface SavePartOfSpeechInput {
 
 export function getPartsOfSpeech(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/parts-of-speech",
+    url: '/parts-of-speech',
     params: listQuery(params),
   });
 }
 
 export function savePartOfSpeech(input: SavePartOfSpeechInput) {
   return request<ResourceItem>({
-    method: "POST",
-    url: "/parts-of-speech/save",
+    method: 'POST',
+    url: '/parts-of-speech/save',
     data: {
       ...(input.partOfSpeechId
         ? { partOfSpeechId: input.partOfSpeechId }

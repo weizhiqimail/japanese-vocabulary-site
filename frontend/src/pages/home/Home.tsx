@@ -6,21 +6,21 @@ import {
   SimpleGrid,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageLoading } from "@/components/common/PageLoading";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageLoading } from '@/components/common/PageLoading';
 import {
   getDashboardStatistics,
   type DashboardStatistics,
-} from "@/http/api/dashboard.api";
+} from '@/http/api/dashboard.api';
 
 const cards = [
-  { key: "vocabularies", label: "词汇", path: "/vocabularies" },
-  { key: "collections", label: "集合", path: "/collections" },
-  { key: "grammars", label: "语法", path: "/grammars" },
-  { key: "sentences", label: "句子", path: "/sentences" },
+  { key: 'vocabularies', label: '词汇', path: '/vocabularies' },
+  { key: 'collections', label: '集合', path: '/collections' },
+  { key: 'grammars', label: '语法', path: '/grammars' },
+  { key: 'sentences', label: '句子', path: '/sentences' },
 ] as const;
 
 /** 首页独立页面级组件。 */
@@ -35,7 +35,7 @@ export function Home() {
 
   return (
     <VStack align="stretch" spacing={7}>
-      <PageBreadcrumb items={[{ label: "首页" }]} />
+      <PageBreadcrumb items={[{ label: '首页' }]} />
       <Heading size="xl">首页</Heading>
       <Text color="slate.500" fontSize="lg">
         整理词汇、语法和句子，并从集合开始学习。

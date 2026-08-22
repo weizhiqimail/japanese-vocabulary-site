@@ -31,29 +31,29 @@ import {
   useDisclosure,
   useMediaQuery,
   VStack,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { InlineField } from "@/components/common/InlineField";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageHeader } from "@/components/common/PageHeader";
-import { PageLoading } from "@/components/common/PageLoading";
-import { TagBadge } from "@/components/common/TagBadge";
+} from '@chakra-ui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { InlineField } from '@/components/common/InlineField';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { PageLoading } from '@/components/common/PageLoading';
+import { TagBadge } from '@/components/common/TagBadge';
 import {
   deleteTag,
   getTags,
   saveTag,
   TAG_COLORS,
   type SaveTagInput,
-} from "@/http/api/tags.api";
-import type { ResourceItem } from "@/types/api.types";
+} from '@/http/api/tags.api';
+import type { ResourceItem } from '@/types/api.types';
 
 /** 标签管理独立页面，颜色只能从固定十色中选择。 */
 export function Tags() {
   const modal = useDisclosure();
-  const [mobile] = useMediaQuery("(max-width: 767px)");
+  const [mobile] = useMediaQuery('(max-width: 767px)');
   const [items, setItems] = useState<ResourceItem[]>([]);
   const [form, setForm] = useState<SaveTagInput>({
-    name: "",
+    name: '',
     color: TAG_COLORS[0],
   });
   const [busy, setBusy] = useState(true);
@@ -76,14 +76,14 @@ export function Tags() {
       item
         ? {
             tagId: Number(item.id),
-            name: String(item.name || ""),
+            name: String(item.name || ''),
             color: TAG_COLORS.includes(
               item.color as (typeof TAG_COLORS)[number],
             )
               ? (item.color as (typeof TAG_COLORS)[number])
               : TAG_COLORS[0],
           }
-        : { name: "", color: TAG_COLORS[0] },
+        : { name: '', color: TAG_COLORS[0] },
     );
     modal.onOpen();
   };
@@ -113,7 +113,7 @@ export function Tags() {
   return (
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
-        items={[{ label: "管理", path: "/manage/tags" }, { label: "标签" }]}
+        items={[{ label: '管理', path: '/manage/tags' }, { label: '标签' }]}
       />
       <PageHeader
         title="标签"
@@ -128,8 +128,8 @@ export function Tags() {
               <CardBody>
                 <Flex justify="space-between">
                   <TagBadge color={item.color}>{String(item.name)}</TagBadge>
-                  <Badge colorScheme={item.enabled ? "green" : "gray"}>
-                    {item.enabled ? "启用" : "停用"}
+                  <Badge colorScheme={item.enabled ? 'green' : 'gray'}>
+                    {item.enabled ? '启用' : '停用'}
                   </Badge>
                 </Flex>
               </CardBody>
@@ -171,8 +171,8 @@ export function Tags() {
                     </HStack>
                   </Td>
                   <Td>
-                    <Badge colorScheme={item.enabled ? "green" : "gray"}>
-                      {item.enabled ? "启用" : "停用"}
+                    <Badge colorScheme={item.enabled ? 'green' : 'gray'}>
+                      {item.enabled ? '启用' : '停用'}
                     </Badge>
                   </Td>
                   <Td>
@@ -203,13 +203,13 @@ export function Tags() {
       <Modal isOpen={modal.isOpen} onClose={modal.onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{form.tagId ? "编辑标签" : "新增标签"}</ModalHeader>
+          <ModalHeader>{form.tagId ? '编辑标签' : '新增标签'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={4}>
               <InlineField label="名称" isRequired>
                 <Input
-                  value={String(form.name || "")}
+                  value={String(form.name || '')}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,

@@ -5,6 +5,8 @@
   "scripts": {
     "install:all": "npm install --prefix frontend && npm install --prefix backend",
     "dev": "concurrently -n frontend,backend -c cyan,blue \"npm run dev --prefix frontend\" \"npm run start:dev:local --prefix backend\"",
+    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+    "format": "npm run format --prefix frontend && npm run format --prefix backend",
     "typecheck": "npm run build --prefix frontend && npm run build --prefix backend",
     "build": "node scripts/build.mjs",
     "start": "npm run start:prod --prefix backend",

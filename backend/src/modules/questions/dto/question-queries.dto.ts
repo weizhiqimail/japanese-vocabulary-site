@@ -8,6 +8,7 @@ export class QuestionGroupsQueryDto {
   @IsInt()
   @Min(1)
   parentId?: number;
+
   @IsOptional() @IsIn(['provider', 'certification']) level?:
     'provider' | 'certification';
 }
@@ -17,6 +18,7 @@ export class QuestionBanksQueryDto extends PaginationQueryDto {
   @IsInt()
   @Min(1)
   groupId?: number;
+
   @IsOptional()
   @Transform(({ value }) => Number(value))
   @IsInt()
@@ -32,6 +34,7 @@ export class CurrentQuestionQueryDto extends BankIdQueryDto {
 }
 export class QuestionItemsQueryDto extends PaginationQueryDto {
   @Transform(({ value }) => Number(value)) @IsInt() @Min(1) bankId: number;
+
   @IsIn(['errors', 'favorites']) scope: 'errors' | 'favorites';
 }
 export class QuestionAttemptsQueryDto extends PaginationQueryDto {

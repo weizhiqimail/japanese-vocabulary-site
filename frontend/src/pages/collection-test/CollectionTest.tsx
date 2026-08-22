@@ -10,19 +10,19 @@ import {
   Stack,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageLoading } from "@/components/common/PageLoading";
-import { getCollection } from "@/http/api/collections.api";
+} from '@chakra-ui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageLoading } from '@/components/common/PageLoading';
+import { getCollection } from '@/http/api/collections.api';
 import {
   getTestQuestions,
   submitTestAnswer,
   type TestQuestion,
-} from "@/http/api/study.api";
-import type { ResourceItem } from "@/types/api.types";
-import type { TestResult } from "./types";
+} from '@/http/api/study.api';
+import type { ResourceItem } from '@/types/api.types';
+import type { TestResult } from './types';
 
 /** 每组固定请求十个词汇，完成后展示整组结果和错题归集状态。 */
 export function CollectionTest() {
@@ -80,11 +80,11 @@ export function CollectionTest() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: "集合", path: "/collections" },
-          { label: String(collection?.name || "测试") },
+          { label: '集合', path: '/collections' },
+          { label: String(collection?.name || '测试') },
         ]}
       />
-      <Heading size="xl">{String(collection?.name || "集合测试")}</Heading>
+      <Heading size="xl">{String(collection?.name || '集合测试')}</Heading>
       {complete ? (
         <Card bg="white">
           <CardBody p={{ base: 5, md: 8 }}>
@@ -103,7 +103,9 @@ export function CollectionTest() {
                 >
                   <VStack align="start" spacing={1}>
                     <Text fontWeight="700">
-                      {result.question.word}　{result.question.reading || ""}
+                      {result.question.word}
+                      {'　'}
+                      {result.question.reading || ''}
                     </Text>
                     <Text color="slate.500">
                       正确答案：{result.question.translation}
@@ -112,8 +114,8 @@ export function CollectionTest() {
                       <Text color="red.600">你的答案：{result.selected}</Text>
                     )}
                   </VStack>
-                  <Badge colorScheme={result.correct ? "green" : "red"}>
-                    {result.correct ? "正确" : "已加入错题本"}
+                  <Badge colorScheme={result.correct ? 'green' : 'red'}>
+                    {result.correct ? '正确' : '已加入错题本'}
                   </Badge>
                 </HStack>
               ))}
@@ -138,10 +140,10 @@ export function CollectionTest() {
               <Text color="slate.500">
                 第 {index + 1} / {questions.length} 题
               </Text>
-              <Heading fontSize={{ base: "3xl", md: "5xl" }}>
+              <Heading fontSize={{ base: '3xl', md: '5xl' }}>
                 {question.word}
               </Heading>
-              <Text color="slate.500">{question.reading || "—"}</Text>
+              <Text color="slate.500">{question.reading || '—'}</Text>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                 {question.options.map((option) => (
                   <Button

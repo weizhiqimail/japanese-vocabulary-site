@@ -1,9 +1,9 @@
-import { Center, Portal, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Center, Portal, Spinner, Text, VStack } from '@chakra-ui/react';
 
 /** 覆盖整个页面的操作锁，避免查询和增删改期间重复提交。 */
 export function PageLoading({
   visible,
-  label = "处理中…",
+  label = '处理中…',
 }: {
   visible: boolean;
   label?: string;

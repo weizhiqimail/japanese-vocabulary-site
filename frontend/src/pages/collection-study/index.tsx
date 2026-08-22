@@ -1,1 +1,1 @@
-export { CollectionStudy } from "./CollectionStudy";
+export { CollectionStudy } from './CollectionStudy';

@@ -12,24 +12,24 @@ import {
   Text,
   useDisclosure,
   VStack,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { displayValue, formatDateTime } from "@/components/common/format";
-import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import { PageLoading } from "@/components/common/PageLoading";
-import { TagBadge } from "@/components/common/TagBadge";
-import { KnowledgeEditorModal } from "@/components/knowledge/KnowledgeEditorModal";
-import { RelationCard } from "@/components/knowledge/RelationCard";
-import { RelationManagerModal } from "@/components/knowledge/RelationManagerModal";
-import { deleteSentence, getSentence } from "@/http/api/sentences.api";
-import type { ResourceItem } from "@/types/api.types";
+} from '@chakra-ui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { displayValue, formatDateTime } from '@/components/common/format';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
+import { PageLoading } from '@/components/common/PageLoading';
+import { TagBadge } from '@/components/common/TagBadge';
+import { KnowledgeEditorModal } from '@/components/knowledge/KnowledgeEditorModal';
+import { RelationCard } from '@/components/knowledge/RelationCard';
+import { RelationManagerModal } from '@/components/knowledge/RelationManagerModal';
+import { deleteSentence, getSentence } from '@/http/api/sentences.api';
+import type { ResourceItem } from '@/types/api.types';
 
 const fields = [
-  ["japanese", "日语句子"],
-  ["reading", "注音"],
-  ["translation", "翻译"],
-  ["notes", "备注"],
+  ['japanese', '日语句子'],
+  ['reading', '注音'],
+  ['translation', '翻译'],
+  ['notes', '备注'],
 ] as const;
 
 /** 句子详情独立页面，维护词汇和语法关联。 */
@@ -57,11 +57,11 @@ export function SentenceDetail() {
   }, [load]);
 
   const remove = async () => {
-    if (!window.confirm("确认逻辑删除这个句子吗？")) return;
+    if (!window.confirm('确认逻辑删除这个句子吗？')) return;
     setBusy(true);
     try {
       await deleteSentence(sentenceId);
-      navigate("/sentences");
+      navigate('/sentences');
     } finally {
       setBusy(false);
     }
@@ -75,20 +75,20 @@ export function SentenceDetail() {
     <VStack align="stretch" spacing={6}>
       <PageBreadcrumb
         items={[
-          { label: "句子", path: "/sentences" },
-          { label: String(item?.japanese || "详情") },
+          { label: '句子', path: '/sentences' },
+          { label: String(item?.japanese || '详情') },
         ]}
       />
       <Flex
         justify="space-between"
-        align={{ base: "start", md: "end" }}
-        direction={{ base: "column", md: "row" }}
+        align={{ base: 'start', md: 'end' }}
+        direction={{ base: 'column', md: 'row' }}
         gap={4}
       >
         <Box>
           <Text color="slate.500">句子详情</Text>
           <Heading size="lg" mt={2}>
-            {String(item?.japanese || "")}
+            {String(item?.japanese || '')}
           </Heading>
         </Box>
         <HStack>
@@ -105,7 +105,7 @@ export function SentenceDetail() {
         </HStack>
       </Flex>
       <Grid
-        templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 360px" }}
+        templateColumns={{ base: '1fr', xl: 'minmax(0, 1fr) 360px' }}
         gap={5}
         alignItems="start"
       >
@@ -119,7 +119,7 @@ export function SentenceDetail() {
                 <Box key={key}>
                   {index > 0 && <Divider />}
                   <Grid
-                    templateColumns={{ base: "100px 1fr", md: "140px 1fr" }}
+                    templateColumns={{ base: '100px 1fr', md: '140px 1fr' }}
                     gap={4}
                     py={4}
                   >

@@ -1,8 +1,8 @@
-import { request } from "@/http/request";
-import { listQuery } from "@/http/api/api.utils";
-import type { ListQuery, PaginatedData, ResourceItem } from "@/types/api.types";
+import { request } from '@/http/request';
+import { listQuery } from '@/http/api/api.utils';
+import type { ListQuery, PaginatedData, ResourceItem } from '@/types/api.types';
 
-export type CollectionType = "source" | "custom" | "favorite" | "error";
+export type CollectionType = 'source' | 'custom' | 'favorite' | 'error';
 
 export interface SaveCollectionInput {
   collectionId?: number;
@@ -14,22 +14,22 @@ export interface SaveCollectionInput {
 
 export function getCollections(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/collections",
+    url: '/collections',
     params: listQuery(params),
   });
 }
 
 export function getCollection(collectionId: number) {
   return request<ResourceItem>({
-    url: "/collections",
+    url: '/collections',
     params: { collectionId },
   });
 }
 
 export function saveCollection(input: SaveCollectionInput) {
   return request<ResourceItem>({
-    method: "POST",
-    url: "/collections/save",
+    method: 'POST',
+    url: '/collections/save',
     data: {
       ...(input.collectionId
         ? { collectionId: input.collectionId }
@@ -44,8 +44,8 @@ export function saveCollection(input: SaveCollectionInput) {
 
 export function deleteCollection(collectionId: number) {
   return request({
-    method: "POST",
-    url: "/collections/delete",
+    method: 'POST',
+    url: '/collections/delete',
     data: { collectionId },
   });
 }

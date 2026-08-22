@@ -1,11 +1,11 @@
-import { request } from "@/http/request";
-import { listQuery } from "@/http/api/api.utils";
+import { request } from '@/http/request';
+import { listQuery } from '@/http/api/api.utils';
 import type {
   ListQuery,
   PaginatedData,
   RelationPayload,
   ResourceItem,
-} from "@/types/api.types";
+} from '@/types/api.types';
 
 export interface SaveGrammarInput {
   grammarId?: number;
@@ -20,19 +20,19 @@ export interface SaveGrammarInput {
 
 export function getGrammars(params: ListQuery = {}) {
   return request<PaginatedData<ResourceItem>>({
-    url: "/grammars",
+    url: '/grammars',
     params: listQuery(params),
   });
 }
 
 export function getGrammar(grammarId: number) {
-  return request<ResourceItem>({ url: "/grammars", params: { grammarId } });
+  return request<ResourceItem>({ url: '/grammars', params: { grammarId } });
 }
 
 export function saveGrammar(input: SaveGrammarInput) {
   return request<ResourceItem>({
-    method: "POST",
-    url: "/grammars/save",
+    method: 'POST',
+    url: '/grammars/save',
     data: {
       ...(input.grammarId ? { grammarId: input.grammarId } : undefined),
       pattern: input.pattern,
@@ -48,8 +48,8 @@ export function saveGrammar(input: SaveGrammarInput) {
 
 export function deleteGrammar(grammarId: number) {
   return request({
-    method: "POST",
-    url: "/grammars/delete",
+    method: 'POST',
+    url: '/grammars/delete',
     data: { grammarId },
   });
 }
@@ -59,8 +59,8 @@ export function saveGrammarRelation(
   relation: RelationPayload,
 ) {
   return request({
-    method: "POST",
-    url: "/grammars/relations/save",
+    method: 'POST',
+    url: '/grammars/relations/save',
     data: {
       grammarId,
       targetResource: relation.targetResource,
@@ -74,8 +74,8 @@ export function deleteGrammarRelation(
   relation: RelationPayload,
 ) {
   return request({
-    method: "POST",
-    url: "/grammars/relations/delete",
+    method: 'POST',
+    url: '/grammars/relations/delete',
     data: {
       grammarId,
       targetResource: relation.targetResource,

@@ -1,4 +1,4 @@
-import type { ResourceItem } from "@/types/api.types";
+import type { ResourceItem } from '@/types/api.types';
 
 export type CollectionItem = ResourceItem & {
   description?: string;
@@ -6,5 +6,5 @@ export type CollectionItem = ResourceItem & {
   member_count?: number;
   name: string;
   source?: string;
-  type: "source" | "custom" | "favorite" | "error";
+  type: 'source' | 'custom' | 'favorite' | 'error';
 };

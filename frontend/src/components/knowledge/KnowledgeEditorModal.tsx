@@ -10,22 +10,22 @@ import {
   ModalOverlay,
   Stack,
   Textarea,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { InlineField } from "@/components/common/InlineField";
-import { PageLoading } from "@/components/common/PageLoading";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { InlineField } from '@/components/common/InlineField';
+import { PageLoading } from '@/components/common/PageLoading';
 import {
   FilterMultiSelect,
   type MultiSelectOption,
-} from "@/components/selection/FilterMultiSelect";
-import { KNOWLEDGE_CONFIG } from "@/config/resources";
-import { getCollections } from "@/http/api/collections.api";
-import { getGrammars, saveGrammar } from "@/http/api/grammars.api";
-import { getPartsOfSpeech } from "@/http/api/parts-of-speech.api";
-import { getSentences, saveSentence } from "@/http/api/sentences.api";
-import { getTags } from "@/http/api/tags.api";
-import { getVocabularies, saveVocabulary } from "@/http/api/vocabularies.api";
-import type { KnowledgeResource, ResourceItem } from "@/types/api.types";
+} from '@/components/selection/FilterMultiSelect';
+import { KNOWLEDGE_CONFIG } from '@/config/resources';
+import { getCollections } from '@/http/api/collections.api';
+import { getGrammars, saveGrammar } from '@/http/api/grammars.api';
+import { getPartsOfSpeech } from '@/http/api/parts-of-speech.api';
+import { getSentences, saveSentence } from '@/http/api/sentences.api';
+import { getTags } from '@/http/api/tags.api';
+import { getVocabularies, saveVocabulary } from '@/http/api/vocabularies.api';
+import type { KnowledgeResource, ResourceItem } from '@/types/api.types';
 
 interface KnowledgeEditorModalProps {
   initialValue?: ResourceItem | null;
@@ -45,16 +45,16 @@ const relationKeys: Record<
   Array<{ key: string; label: string }>
 > = {
   vocabularies: [
-    { key: "grammarIds", label: "关联语法" },
-    { key: "sentenceIds", label: "关联句子" },
+    { key: 'grammarIds', label: '关联语法' },
+    { key: 'sentenceIds', label: '关联句子' },
   ],
   grammars: [
-    { key: "vocabularyIds", label: "关联词汇" },
-    { key: "sentenceIds", label: "关联句子" },
+    { key: 'vocabularyIds', label: '关联词汇' },
+    { key: 'sentenceIds', label: '关联句子' },
   ],
   sentences: [
-    { key: "vocabularyIds", label: "关联词汇" },
-    { key: "grammarIds", label: "关联语法" },
+    { key: 'vocabularyIds', label: '关联词汇' },
+    { key: 'grammarIds', label: '关联语法' },
   ],
 };
 
@@ -70,17 +70,17 @@ function options(items: ResourceItem[]) {
 
 function relatedIds(source: ResourceItem | undefined | null, key: string) {
   const relationName =
-    key === "posIds"
-      ? "partsOfSpeech"
-      : key === "tagIds"
-        ? "tags"
-        : key === "collectionIds"
-          ? "collections"
-          : key === "grammarIds"
-            ? "grammars"
-            : key === "sentenceIds"
-              ? "sentences"
-              : "vocabularies";
+    key === 'posIds'
+      ? 'partsOfSpeech'
+      : key === 'tagIds'
+        ? 'tags'
+        : key === 'collectionIds'
+          ? 'collections'
+          : key === 'grammarIds'
+            ? 'grammars'
+            : key === 'sentenceIds'
+              ? 'sentences'
+              : 'vocabularies';
 
   return ((source?.[relationName] as ResourceItem[] | undefined) || []).map(
     (item) => Number(item.id),
@@ -100,7 +100,7 @@ function formIds(form: Record<string, unknown>, key: string) {
 }
 
 function formText(form: Record<string, unknown>, key: string) {
-  return String(form[key] ?? "");
+  return String(form[key] ?? '');
 }
 
 /** 词汇、语法、句子共用的新增/编辑能力；页面只负责决定何时打开。 */
@@ -126,15 +126,15 @@ export function KnowledgeEditorModal({
       ...Object.fromEntries(
         config.fields.map((field) => [
           field.key,
-          initialValue?.[field.key] || "",
+          initialValue?.[field.key] || '',
         ]),
       ),
       ...(initialValue ? { [config.idKey]: Number(initialValue.id) } : {}),
-      tagIds: relatedIds(initialValue, "tagIds"),
-      ...(resource === "vocabularies"
+      tagIds: relatedIds(initialValue, 'tagIds'),
+      ...(resource === 'vocabularies'
         ? {
-            posIds: relatedIds(initialValue, "posIds"),
-            collectionIds: relatedIds(initialValue, "collectionIds"),
+            posIds: relatedIds(initialValue, 'posIds'),
+            collectionIds: relatedIds(initialValue, 'collectionIds'),
           }
         : {}),
       ...Object.fromEntries(
@@ -178,39 +178,39 @@ export function KnowledgeEditorModal({
 
     try {
       const saved =
-        resource === "vocabularies"
+        resource === 'vocabularies'
           ? await saveVocabulary({
-              wordId: formId(form, "wordId"),
-              word: formText(form, "word"),
-              reading: formText(form, "reading"),
-              translation: formText(form, "translation"),
-              notes: formText(form, "notes"),
-              collectionIds: formIds(form, "collectionIds"),
-              posIds: formIds(form, "posIds"),
-              tagIds: formIds(form, "tagIds"),
-              grammarIds: formIds(form, "grammarIds"),
-              sentenceIds: formIds(form, "sentenceIds"),
+              wordId: formId(form, 'wordId'),
+              word: formText(form, 'word'),
+              reading: formText(form, 'reading'),
+              translation: formText(form, 'translation'),
+              notes: formText(form, 'notes'),
+              collectionIds: formIds(form, 'collectionIds'),
+              posIds: formIds(form, 'posIds'),
+              tagIds: formIds(form, 'tagIds'),
+              grammarIds: formIds(form, 'grammarIds'),
+              sentenceIds: formIds(form, 'sentenceIds'),
             })
-          : resource === "grammars"
+          : resource === 'grammars'
             ? await saveGrammar({
-                grammarId: formId(form, "grammarId"),
-                pattern: formText(form, "pattern"),
-                reading: formText(form, "reading"),
-                meaning: formText(form, "meaning"),
-                notes: formText(form, "notes"),
-                tagIds: formIds(form, "tagIds"),
-                vocabularyIds: formIds(form, "vocabularyIds"),
-                sentenceIds: formIds(form, "sentenceIds"),
+                grammarId: formId(form, 'grammarId'),
+                pattern: formText(form, 'pattern'),
+                reading: formText(form, 'reading'),
+                meaning: formText(form, 'meaning'),
+                notes: formText(form, 'notes'),
+                tagIds: formIds(form, 'tagIds'),
+                vocabularyIds: formIds(form, 'vocabularyIds'),
+                sentenceIds: formIds(form, 'sentenceIds'),
               })
             : await saveSentence({
-                sentenceId: formId(form, "sentenceId"),
-                japanese: formText(form, "japanese"),
-                reading: formText(form, "reading"),
-                translation: formText(form, "translation"),
-                notes: formText(form, "notes"),
-                tagIds: formIds(form, "tagIds"),
-                vocabularyIds: formIds(form, "vocabularyIds"),
-                grammarIds: formIds(form, "grammarIds"),
+                sentenceId: formId(form, 'sentenceId'),
+                japanese: formText(form, 'japanese'),
+                reading: formText(form, 'reading'),
+                translation: formText(form, 'translation'),
+                notes: formText(form, 'notes'),
+                tagIds: formIds(form, 'tagIds'),
+                vocabularyIds: formIds(form, 'vocabularyIds'),
+                grammarIds: formIds(form, 'grammarIds'),
               });
 
       await onSaved(saved);
@@ -242,16 +242,16 @@ export function KnowledgeEditorModal({
                   label={field.label}
                   isRequired={field.required}
                 >
-                  {field.type === "textarea" ? (
+                  {field.type === 'textarea' ? (
                     <Textarea
-                      value={String(form[field.key] ?? "")}
+                      value={String(form[field.key] ?? '')}
                       onChange={(event) =>
                         update(field.key, event.target.value)
                       }
                     />
                   ) : (
                     <Input
-                      value={String(form[field.key] ?? "")}
+                      value={String(form[field.key] ?? '')}
                       onChange={(event) =>
                         update(field.key, event.target.value)
                       }
@@ -263,23 +263,23 @@ export function KnowledgeEditorModal({
                 <FilterMultiSelect
                   values={(form.tagIds as number[]) || []}
                   options={lookups.tagIds || []}
-                  onChange={(values) => update("tagIds", values)}
+                  onChange={(values) => update('tagIds', values)}
                 />
               </InlineField>
-              {resource === "vocabularies" && (
+              {resource === 'vocabularies' && (
                 <>
                   <InlineField label="词性">
                     <FilterMultiSelect
                       values={(form.posIds as number[]) || []}
                       options={lookups.posIds || []}
-                      onChange={(values) => update("posIds", values)}
+                      onChange={(values) => update('posIds', values)}
                     />
                   </InlineField>
                   <InlineField label="所属集合">
                     <FilterMultiSelect
                       values={(form.collectionIds as number[]) || []}
                       options={lookups.collectionIds || []}
-                      onChange={(values) => update("collectionIds", values)}
+                      onChange={(values) => update('collectionIds', values)}
                     />
                   </InlineField>
                 </>

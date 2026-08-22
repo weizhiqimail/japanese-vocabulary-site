@@ -9,6 +9,7 @@ import {
 export class QuestionImportBatchEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true, comment: '主键' })
   id: string;
+
   @Column({
     name: 'bank_id',
     type: 'bigint',
@@ -17,6 +18,7 @@ export class QuestionImportBatchEntity {
     comment: '题库ID',
   })
   bankId: string | null;
+
   @Column({
     name: 'content_version',
     type: 'varchar',
@@ -24,6 +26,7 @@ export class QuestionImportBatchEntity {
     comment: '内容版本',
   })
   contentVersion: string;
+
   @Column({
     name: 'original_filename',
     type: 'varchar',
@@ -31,6 +34,7 @@ export class QuestionImportBatchEntity {
     comment: '原文件名',
   })
   originalFilename: string;
+
   @Column({
     name: 'file_hash',
     type: 'char',
@@ -38,6 +42,7 @@ export class QuestionImportBatchEntity {
     comment: '文件SHA-256',
   })
   fileHash: string;
+
   @Column({
     name: 'question_count',
     type: 'int',
@@ -46,6 +51,7 @@ export class QuestionImportBatchEntity {
     comment: '题数',
   })
   questionCount: number;
+
   @Column({
     type: 'enum',
     enum: ['validating', 'completed', 'failed'],
@@ -53,6 +59,7 @@ export class QuestionImportBatchEntity {
     comment: '导入状态',
   })
   status: 'validating' | 'completed' | 'failed';
+
   @Column({
     name: 'summary_json',
     type: 'json',
@@ -60,6 +67,7 @@ export class QuestionImportBatchEntity {
     comment: '校验与差异摘要',
   })
   summaryJson: Record<string, unknown> | null;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'datetime',
@@ -67,6 +75,7 @@ export class QuestionImportBatchEntity {
     comment: '创建时间',
   })
   createdAt: Date;
+
   @Column({
     name: 'completed_at',
     type: 'datetime',

@@ -1,1 +1,1 @@
-export { GrammarDetail } from "./GrammarDetail";
+export { GrammarDetail } from './GrammarDetail';

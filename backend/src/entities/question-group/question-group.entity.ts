@@ -10,6 +10,7 @@ import {
 export class QuestionGroupEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true, comment: '主键' })
   id: string;
+
   @Column({
     name: 'parent_id',
     type: 'bigint',
@@ -18,9 +19,12 @@ export class QuestionGroupEntity {
     comment: '父分组ID',
   })
   parentId: string | null;
+
   @Column({ type: 'varchar', length: 100, comment: '稳定分组代码' })
   code: string;
+
   @Column({ type: 'varchar', length: 255, comment: '分组名称' }) name: string;
+
   @Column({
     name: 'group_level',
     type: 'enum',
@@ -28,8 +32,10 @@ export class QuestionGroupEntity {
     comment: '分组层级',
   })
   groupLevel: 'provider' | 'certification';
+
   @Column({ type: 'text', nullable: true, comment: '分组说明' }) description:
     string | null;
+
   @Column({
     name: 'sort_order',
     type: 'int',
@@ -38,8 +44,10 @@ export class QuestionGroupEntity {
     comment: '排序',
   })
   sortOrder: number;
+
   @Column({ type: 'boolean', default: true, comment: '是否启用' })
   enabled: boolean;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'datetime',
@@ -47,6 +55,7 @@ export class QuestionGroupEntity {
     comment: '创建时间',
   })
   createdAt: Date;
+
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'datetime',
@@ -54,6 +63,7 @@ export class QuestionGroupEntity {
     comment: '更新时间',
   })
   updatedAt: Date;
+
   @Column({
     name: 'deleted_at',
     type: 'datetime',

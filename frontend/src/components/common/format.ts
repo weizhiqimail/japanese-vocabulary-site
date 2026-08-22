@@ -1,7 +1,7 @@
 /** 所有页面统一使用本地时间的 YYYY-MM-DD HH:mm:ss 格式。 */
 export function formatDateTime(value: unknown) {
   if (!value) {
-    return "—";
+    return '—';
   }
 
   const date = new Date(String(value));
@@ -10,14 +10,14 @@ export function formatDateTime(value: unknown) {
     return String(value);
   }
 
-  const pad = (part: number) => String(part).padStart(2, "0");
+  const pad = (part: number) => String(part).padStart(2, '0');
 
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 export function displayValue(value: unknown) {
-  if (value === null || value === undefined || value === "") {
-    return "—";
+  if (value === null || value === undefined || value === '') {
+    return '—';
   }
 
   return String(value);
